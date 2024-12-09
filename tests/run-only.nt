@@ -1,0 +1,76 @@
+# Cases
+#
+# This file indicates which tests should be run by pytest.
+# You can specify a specific test to run using this format:
+#
+#     cases:
+#         ❬suite❭:
+#             ❬category❭:
+#                 ❬scenario❭: ❬case❭
+#
+# At any level you can give multiple choices.  A test will be run if there are 
+# any matches.  For example:
+#
+#     cases:
+#         ❬suite❭:
+#             ❬category❭:
+#                 ❬scenario1❭: ❬case❭
+#                 ❬scenario2❭: ❬case❭
+#
+# The case is different from the others in that it can be given as a string or 
+# a list, and if given as a string it is split on whitespace into a list.
+#
+#     cases:
+#         ❬suite❭:
+#             ❬category❭:
+#                 ❬scenario1❭: ❬case1❭ ❬case2❭
+#
+# where:
+#     suite is the name of the NT file containing the tests, with no suffix.
+#     category is the name at the top of the NT file, the first-level key
+#     scenario is the first word in the second-level key.
+#     case is the first word in the test name
+#
+# Finally, you can use globbing to create matches.  For example, to run all 
+# tests use:
+#
+#     cases:
+#         *:
+#             *:
+#                 *: *
+#
+# or, if you use NestedText inline notation, this can be collapsed to:
+#
+#     {cases: {*: {*: {*:*}}}}
+#
+# If you use the inline format, the line must start either with a brace or 
+# a bracket and the matching brace or bracket must be the last character on the 
+# same line.
+#
+#
+# Checks
+#
+# You can also specify the set of checks to be used by specifying a glob string 
+# that the name of the file being checked must satisfy:
+#
+#     checks: *.log
+#
+# or
+#
+#     {cases: {*: {*: {*:*}}}, checks: *}
+
+cases:
+    {*: {*: {*:*}}, checks: *}
+
+    # example:
+    # {assimilate: {assimilate: {beautify:*}}, checks: *}
+
+# skip_until:
+#     # when present it causes all tests to be skipped until it finds a match
+#     # skip_until must include all four keys
+#     - suite
+#     - category
+#     - scenario
+#     - test
+# example:
+#     skip_until: assimilate.assimilate.druid.catacomb

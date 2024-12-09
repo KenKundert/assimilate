@@ -1,0 +1,1414 @@
+# Assimilate tests
+
+assimilate:
+
+    initialize {{{1:
+        initialization:
+        tests:
+            foamy {{{2:
+                run: assimilate
+                checks:
+                    stdout:
+                        matches text:
+                            > Configuration directory created:
+                            >     /{run_dir}/.config/assimilate
+                            > Includes example settings files. Edit them to suit your needs.
+                            > Search for and replace any fields delimited with ⟪ and ⟫.
+                            > Delete any configurations you do not need.
+
+                    ~/.config/assimilate/shared.conf.nt:
+                        contains lines in order:
+                            > default config: ⟪default-config⟫
+                            > composite configs: ⟪composite-configs⟫
+                            > default mount point: ~/ASSIMILATE
+                            > notify: ⟪your-email-address⟫
+                            > notifier: notify-send -u normal {{prog_name}} "{{msg}}"
+                            > prune after create: 'yes
+                            > check after create: 'latest
+                            > compact after delete: 'yes
+                            > exclude if present: .nobackup
+                            > exclude caches: 'yes
+                            > exclude nodump: 'yes
+                            > command aliases:
+                            >     repo-list:
+                            >         - archives
+                            >         - recent --last 20
+                            >     list: paths
+                            > logging:
+                            >     keep for: 1w
+                            > list formats:
+                            >     name: {{path}}
+                            >     short: {{path}}{{Type}}
+                            >     date: {{MTime:ddd YYYY-MM-DD HH:mm:ss}} {{path}}{{Type}}
+                            >     size: {{size:8}} {{path}}{{Type}}
+                            >     si: {{Size:6.2}} {{path}}{{Type}}
+                            >     owner: {{user:8}} {{path}}{{Type}}
+                            >     group: {{group:8}} {{path}}{{Type}}
+                            >     long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
+                            > default list format: short
+
+                    ~/.config/assimilate/root.conf.nt:
+                        contains lines in order:
+                            > repository: ⟪host⟫:⟪path⟫/{{host_name}}-{{user_name}}-{{config_name}}
+                            > archive: {{host_name}}-{{{{now}}}}
+                            > encryption: ⟪encryption⟫
+                            > passphrase: ⟪passcode⟫
+                            > pass command: ⟪command⟫
+                            >     - R /etc
+                            >     - R /home
+                            >     - R /root
+                            >     - R /var
+                            >     - R /srv
+                            >     - R /opt
+                            >     - R /usr/local
+                            >     - - /var/cache
+                            >     - - /var/lock
+                            >     - - /var/run
+                            >     - - /var/tmp
+                            >     - - /root/.cache
+                            >     - - /home/*/.cache
+                            > keep within: 1d
+                            > keep daily: 7
+                            > keep weekly: 4
+                            > keep monthly: 6
+
+                    ~/.config/assimilate/home.conf.nt:
+                        contains lines in order:
+                            > repository: ⟪host⟫:⟪path⟫/{{host_name}}-{{user_name}}-{{config_name}}
+                            > archive: {{config_name}}-{{{{now}}}}
+                            > encryption: ⟪encryption⟫
+                            > passphrase: ⟪passcode⟫
+                            > pass command: ⟪command⟫
+                            > patterns:
+                            >     - R ~
+                            >     - - ~/.cache
+                            >     - - **/*~
+                            >     - - **/__pycache__
+                            >     - - **/*.pyc
+                            >     - - **/.*.swp
+                            >     - - **/.*.swo
+                            > keep within: 1d
+                            > keep daily: 7
+                            > keep weekly: 4
+                            > keep monthly: 6
+
+                    ~/.config/assimilate/cache.conf.nt:
+                        contains lines in order:
+                            > repository: ~/.cache/backups
+                            > archive: {{config_name}}-{{{{now}}}}
+                            > encryption: none
+                            > patterns:
+                            >     - R ~
+                            >     - - ~/music
+                            >     - - ~/videos
+                            >     - - ~/photos
+                            >     - - ~/.cache
+                            >     - - **/*~
+                            >     - - **/__pycache__
+                            >     - - **/*.pyc
+                            >     - - **/.*.swp
+                            >     - - **/.*.swo
+                            > keep within: 1d
+                            > keep hourly: 48
+
+    druid — single config that uses patterns, explicit archive, and basic settings {{{1:
+        initialization:
+            create:
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > encryption: none
+                        > borg executable: /home/ken/tools/python-experimental/bin/borg
+
+                ~/REPO/:
+
+                ~/.config/assimilate/test.conf.nt:
+                    contents:
+                        > repository: ~/REPO/{config_name}
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/a:
+                    contents:
+                        > aaa
+                    ctime: 2024-11-27
+
+                ~/b:
+                    contents:
+                        > bbb
+                    ctime: 2024-11-26
+
+        tests:
+            catacomb — version {{{2:
+                run: assimilate version
+                checks:
+                    stdout:
+                        matches regex: assimilate version: \d+\.\d+(\.\d+(\.?\w+\d+)?)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+
+            vignette — help {{{2:
+                run: assimilate help
+                checks:
+                    stdout:
+                        matches text:
+                            > Assimilate Backups
+                            >
+                            > Backs up the contents of a file hierarchy.  A front end for Borg's
+                            > encrypted incremental backup utility.
+                            >
+                            > Usage:
+                            >     assimilate [options] [<command> [<args>...]]
+                            >
+                            > Options:
+                            >     -c <cfgname>, --config <cfgname>  Specifies the configuration to use.
+                            >     -d, --dry-run                     Run Borg in dry run mode.
+                            >     -h, --help                        Output basic usage information.
+                            >     -m, --mute                        Suppress all output.
+                            >     -n, --narrate                     Send Assimilate and Borg narration to stdout.
+                            >     -q, --quiet                       Suppress optional output.
+                            >     -r, --relocated                   Acknowledge that repository was relocated.
+                            >     -v, --verbose                     Make Borg more verbose.
+                            >     --no-log                          Do not create log file.
+                            >
+                            > Available commands:
+                            >     borg              run a raw borg command
+                            >     break-lock        breaks the repository and cache locks
+                            >     check             checks the repository and its archives
+                            >     compact           compact segment files in the repository
+                            >     compare           compare local files or directories to those in an archive
+                            >     configs           list available backup configurations
+                            >     create            create an archive of the current files
+                            >     delete            delete an archive currently contained in the repository
+                            >     diff              show the differences between two archives
+                            >     due               days since last backup
+                            >     extract           recover file or files from archive
+                            >     help              give information about commands or other topics
+                            >     info              display metadata for a repository or archive
+                            >     list              list the files contained in an archive
+                            >     log               display log for the last assimilate run
+                            >     mount             mount a repository or archive
+                            >     overdue           show status of known repositories
+                            >     prune             prune the repository of excess archives
+                            >     repo-create       initialize the repository
+                            >     repo-list         display available archives
+                            >     repo-space        manage the amount of space kept in reserve
+                            >     restore           restore requested files or directories in place
+                            >     settings, setting
+                            >                       display settings of chosen configuration
+                            >     umount            un-mount a previously mounted repository or archive
+                            >     version           display assimilate version
+                            >
+                            > Available topics:
+                            >     overview          overview of assimilate
+                            >     precautions       what everybody should know before using assimilate
+
+            convince — help borg {{{2:
+                run: assimilate help borg
+                checks:
+                    stdout:
+                        matches text:
+                            > Run a Raw Borg Command.
+                            >
+                            > Usage:
+                            >     assimilate borg <borg_args>...
+                            >
+                            > You can specify the repository to act on using “@repo”, which is
+                            > replaced with the path to the repository.  The passphrase is set before
+                            > the command is run.
+                            >
+                            > Be aware that the Borg is run from ‘working_dir’ (default is /), and
+                            > so any relative paths given as command line arguments are relative to
+                            > ‘working_dir’.
+
+            binding — repo-create {{{2:
+                run: assimilate repo-create
+                checks:
+                    stdout:
+                        contains text: Reserve some repository storage space now for emergencies
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-create
+                            -
+
+            putter — create {{{2:
+                run: assimilate create
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            oxcart — create again {{{2:
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            expiate — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-list$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-list
+                            -
+
+
+            informer — list {{{2:
+                run: assimilate list
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    stderr:
+                        matches regex:
+                            > archive: {aid2} {ar2} .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: list$
+                        contains regex: ^        aid:{aid2}[a-f0-9]+$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: list
+                            -
+
+            provider — break-lock {{{2:
+                # there is no lock to break, but exercise the command anyway
+                run: assimilate break-lock
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: break-lock$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: break-lock
+                            -
+
+            rafter — prune {{{2:
+                run: assimilate prune
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: No prune settings available.
+                            >     At least one of keep_within, keep_last, keep_minutely, keep_hourly,
+                            >     keep_daily, keep_weekly, keep_monthly, or keep_yearly must be
+                            >     specified.
+                    status: 2
+
+            felony — compact {{{2:
+                run: assimilate compact
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: compact$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: compact
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            pullet — check {{{2:
+                run: assimilate check
+                checks:
+                    stderr:
+                        matches regex: ^archive.*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: check$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: check
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            fitting — compare {{{2:
+                run: assimilate compare
+                checks:
+                    stderr:
+                        matches text: assimilate error: must specify default_mount_point setting to use this command.
+                    status: 2
+
+            salesman — configs {{{2:
+                run: assimilate configs
+                checks:
+                    stdout:
+                        matches text:
+                            > Available Configurations:
+                            >     test
+                            >
+                            > No default configuration available.
+
+            fireguard — overdue {{{2:
+                run: assimilate overdue
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error:
+                            >     /{run_dir}/.config/assimilate/overdue.conf.nt: no such file or directory.
+                    status: 2
+
+            profile — settings {{{2:
+                run: assimilate settings
+                checks:
+                    stdout:
+                        matches text:
+                            >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
+                            >            ❬when resolved❭: kundert-ken-test-{{now}}
+                            >            borg_executable: /home/ken/tools/python-experimental/bin/borg
+                            >                   cmd_name: settings
+                            >                 config_dir: /{run_dir}/.config/assimilate
+                            >                config_name: test
+                            >                 encryption: none
+                            >                   home_dir: /{run_dir}
+                            >                    log_dir: /{run_dir}/.local/share/assimilate
+                            >             match_archives: ↓
+                            >                             - sh:{{host_name}}-{{user_name}}-{{config_name}}-*
+                            >            ❬when resolved❭: ↓
+                            >                             - sh:kundert-ken-test-*
+                            >                   patterns: ↓
+                            >                             - R ~
+                            >                             - - ~/.cache
+                            >                             - - ~/.local
+                            >                             - - ~/bu
+                            >                             - - ~/REPO
+                            >                 repository: ~/REPO/{{config_name}}
+                            >            ❬when resolved❭: ~/REPO/test
+
+            sixth — setting config_name {{{2:
+                run: assimilate setting config_name
+                checks:
+                    stdout:
+                        matches text:                config_name: test
+
+
+    shaman — single config that uses patterns, explicit archive, and more complete settings {{{1:
+        initialization:
+            create:
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > default config: test
+                        > default mount point: ~/ASSIMILATE
+                        > encryption: none
+                        > borg executable: /home/ken/tools/python-experimental/bin/borg
+                        > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
+                        >
+                        > prune_after_create: 'yes
+                        > check_after_create: 'latest
+                        > compact_after_delete: 'yes
+                        >
+                        > exclude if present: .nobackup
+                        > exclude caches: 'yes
+                        > exclude nodump: 'yes
+                        >
+                        > keep within: 1d
+                        > keep hourly: 0
+                        > keep daily: 7
+                        > keep weekly: 4
+                        > keep monthly: 6
+                        > keep yearly: 0
+
+                ~/REPO/:
+
+                ~/.config/assimilate/test.conf.nt:
+                    contents:
+                        > repository: ~/REPO/{config_name}
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/a:
+                    contents:
+                        > aaa
+                    ctime: 2024-11-27
+
+                ~/b:
+                    contents:
+                        > bbb
+                    ctime: 2024-11-26
+
+        tests:
+            jogger — version {{{2:
+                run: assimilate version
+                checks:
+                    stdout:
+                        matches regex: assimilate version: \d+\.\d+(\.\d+(\.?\w+\d+)?)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+
+            commander — help {{{2:
+                run: assimilate help
+                checks:
+                    stdout:
+                        matches text:
+                            > Assimilate Backups
+                            >
+                            > Backs up the contents of a file hierarchy.  A front end for Borg's
+                            > encrypted incremental backup utility.
+                            >
+                            > Usage:
+                            >     assimilate [options] [<command> [<args>...]]
+                            >
+                            > Options:
+                            >     -c <cfgname>, --config <cfgname>  Specifies the configuration to use.
+                            >     -d, --dry-run                     Run Borg in dry run mode.
+                            >     -h, --help                        Output basic usage information.
+                            >     -m, --mute                        Suppress all output.
+                            >     -n, --narrate                     Send Assimilate and Borg narration to stdout.
+                            >     -q, --quiet                       Suppress optional output.
+                            >     -r, --relocated                   Acknowledge that repository was relocated.
+                            >     -v, --verbose                     Make Borg more verbose.
+                            >     --no-log                          Do not create log file.
+                            >
+                            > Available commands:
+                            >     borg              run a raw borg command
+                            >     break-lock        breaks the repository and cache locks
+                            >     check             checks the repository and its archives
+                            >     compact           compact segment files in the repository
+                            >     compare           compare local files or directories to those in an archive
+                            >     configs           list available backup configurations
+                            >     create            create an archive of the current files
+                            >     delete            delete an archive currently contained in the repository
+                            >     diff              show the differences between two archives
+                            >     due               days since last backup
+                            >     extract           recover file or files from archive
+                            >     help              give information about commands or other topics
+                            >     info              display metadata for a repository or archive
+                            >     list              list the files contained in an archive
+                            >     log               display log for the last assimilate run
+                            >     mount             mount a repository or archive
+                            >     overdue           show status of known repositories
+                            >     prune             prune the repository of excess archives
+                            >     repo-create       initialize the repository
+                            >     repo-list         display available archives
+                            >     repo-space        manage the amount of space kept in reserve
+                            >     restore           restore requested files or directories in place
+                            >     settings, setting
+                            >                       display settings of chosen configuration
+                            >     umount            un-mount a previously mounted repository or archive
+                            >     version           display assimilate version
+                            >
+                            > Available topics:
+                            >     overview          overview of assimilate
+                            >     precautions       what everybody should know before using assimilate
+
+            grandma — help borg {{{2:
+                run: assimilate help borg
+                checks:
+                    stdout:
+                        matches text:
+                            > Run a Raw Borg Command.
+                            >
+                            > Usage:
+                            >     assimilate borg <borg_args>...
+                            >
+                            > You can specify the repository to act on using “@repo”, which is
+                            > replaced with the path to the repository.  The passphrase is set before
+                            > the command is run.
+                            >
+                            > Be aware that the Borg is run from ‘working_dir’ (default is /), and
+                            > so any relative paths given as command line arguments are relative to
+                            > ‘working_dir’.
+
+            albino — repo-create {{{2:
+                run: assimilate repo-create
+                checks:
+                    stdout:
+                        contains text: Reserve some repository storage space now for emergencies
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-create
+                            -
+
+            daddy — due {{{2:
+                run: assimilate due
+                checks:
+                    stdout:
+                        matches text:
+                            > test backup never run.
+                            > test compact never run.
+                            > test check never run.
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        excludes line:     > running command: due
+
+            clammy — create {{{2:
+                run: assimilate create
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            ceasefire — create again {{{2:
+                initialization:
+                    remove: ~/b
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            unplug — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-list$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-list
+                            -
+
+            editorial — repo-space {{{2:
+                run: assimilate repo-space --reserve=1MiB
+                checks:
+                    stdout:
+                        contains regex:
+                            > There is [0-9.]+ MB reserved space in this repository now.
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-space$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-space
+                            -
+
+
+            ligament — info {{{2:
+                run: assimilate info
+                checks:
+                    stdout:
+                        contains regex:
+                            >               config: test
+                            >                roots: /{run_dir}
+                            >          destination: /{run_dir}/REPO/test
+                            >   settings directory: /{run_dir}/.config/assimilate
+                            >              logfile: /{run_dir}/.local/share/assimilate/test.log
+                            >      create last run: .*
+                            >       prune last run: .*
+                            >     compact last run: .*
+                            >       check last run: .*
+                        contains regex:
+                            > Repository ID: [a-f0-9]+
+                            > Location: /{run_dir}/REPO/test
+                            > Repository version: 3
+                            > Append only: False
+                            > Encrypted: No
+                            > Storage quota: 0 B used
+                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
+                            > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: info$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: info
+                            -
+
+            embolden — list {{{2:
+                run: assimilate list
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+
+                    stderr:
+                        matches regex:
+                            > archive: {aid2} {ar2} .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: list$
+                        contains regex: ^        aid:{aid2}[a-f0-9]+$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: list
+                            -
+
+            souvenir — list {{{2:
+                run: assimilate list -a aid:{aid1}
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: list$
+                        contains regex: ^        aid:{aid1}
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: list
+                            -
+
+            fraud — break-lock {{{2:
+                # there is no lock to break, but exercise the command anyway
+                run: assimilate break-lock
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: break-lock$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: break-lock
+                            -
+
+            grapple — prune {{{2:
+                run: assimilate prune
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: prune$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: prune
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^prune last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            small — compact {{{2:
+                run: assimilate compact
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: compact$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: compact
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            exult — check {{{2:
+                run: assimilate check
+                checks:
+                    stderr:
+                        matches regex: ^archive.*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: check$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: check
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            publisher — compare {{{2:
+                run: assimilate compare
+                checks:
+                    stdout:
+                        matches text:
+                            > Only in .: ASSIMILATE
+                            > Only in .: bu
+                            > Only in .: .cache
+                            > Only in .: REPO
+
+                    stderr:
+                        matches regex:
+                            > archive: {aid2} {ar2} .*
+
+                    status: 1
+
+            coffee — compare -a {{{2:
+                run: assimilate compare -a aid:{aid1}
+                checks:
+                    stdout:
+                        matches text:
+                            > Only in .: ASSIMILATE
+                            > Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
+                            > Only in .: bu
+                            > Only in .: .cache
+                            > Only in .: REPO
+                    status: 1
+
+            urinate — diff {{{2:
+                run: assimilate diff aid:{aid1} aid:{aid2}
+                checks:
+                    stdout:
+                        matches text:
+                            > ctime               {run_dir}
+                            > removed             {run_dir}/b
+                    status: 1
+
+            wobble — configs {{{2:
+                run: assimilate configs
+                checks:
+                    stdout:
+                        matches text:
+                            > Available Configurations:
+                            >     test
+                            >
+                            > Default Configuration:
+                            >     test
+
+#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:
+            persevere — mount {{{2:
+                run: assimilate mount
+                checks:
+                    stderr:
+                        matches regex:
+                            > mount point is: /{run_dir}/ASSIMILATE
+                            > archive: {aid2} {ar2} .*
+                    ~/ASSIMILATE/{ar1}/{run_dir}/a:
+                        matches text: aaa
+                    ~/ASSIMILATE/{ar1}/{run_dir}/b:
+                        matches text: bbb
+                    ~/ASSIMILATE/{ar2}/{run_dir}/a:
+                        matches text: aaa
+
+            woodshed — umount {{{2:
+                run: assimilate umount
+
+            gobbler — restore {{{2:
+                run: assimilate restore -a aid:{aid1} b
+                checks:
+                    ~/b:
+                        matches text: bbb
+
+            farmhouse — extract {{{2:
+                run: assimilate extract -a aid:{aid1} {run_dir}/a
+                checks:
+                    ~/{run_dir}/a:
+                        matches text: aaa
+
+            comfy — extract {{{2:
+                run: assimilate extract -a aid:{aid1} /{run_dir}/b
+                checks:
+                    ~/{run_dir}/b:
+                        matches text: bbb
+
+            genital — delete {{{2:
+                initialization:
+                    remove: ~/.local/share/assimilate/test.latest.nt
+                run: assimilate delete -a aid:{aid1}
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: delete$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: delete
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        matches regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            dawdle — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-list$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-list
+                            -
+
+            mossy — log {{{2:
+                run: assimilate log
+                checks:
+                    stdout:
+                        contains regex:
+                            > aid:{aid2}  {ar2}   .*
+
+            pension — borg repo-list {{{2:
+                run: assimilate borg -r @repo repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > {aid2}  .*  {ar2}  .*
+
+
+#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:
+    beautify — single config that uses patterns, explicit archive, and more complete settings {{{1:
+        initialization:
+            create:
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > default config: test
+                        > default mount point: ~/ASSIMILATE
+                        > encryption: repokey-blake2-chacha20-poly1305
+                        > compression: zstd,1
+                        > passphrase: roadhouse pause govern parry
+                        > borg executable: /home/ken/tools/python-experimental/bin/borg
+                        > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
+                        >
+                        > prune_after_create: 'yes
+                        > check_after_create: 'latest
+                        > compact_after_delete: 'yes
+                        >
+                        > exclude if present: .nobackup
+                        > exclude caches: 'yes
+                        > exclude nodump: 'yes
+                        >
+                        > keep within: 1d
+                        > keep hourly: 0
+                        > keep daily: 7
+                        > keep weekly: 4
+                        > keep monthly: 6
+                        > keep yearly: 0
+
+                ~/.config/assimilate/test.conf.nt:
+                    contents:
+                        > repository: ~/REPO/{config_name}
+                        > archive: {config_name}
+                        > match archives: id:{config_name}
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/REPO/:
+
+                ~/a:
+                    contents: aaa
+                    ctime: 2024-11-27
+
+                ~/b:
+                    contents: bbb
+                    ctime: 2024-11-26
+
+        tests:
+            compel — version {{{2:
+                run: assimilate version
+                checks:
+                    stdout:
+                        matches regex: assimilate version: \d+\.\d+(\.\d+(\.?\w+\d+)?)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+
+            yearning — help {{{2:
+                run: assimilate help
+                checks:
+                    stdout:
+                        matches text:
+                            > Assimilate Backups
+                            >
+                            > Backs up the contents of a file hierarchy.  A front end for Borg's
+                            > encrypted incremental backup utility.
+                            >
+                            > Usage:
+                            >     assimilate [options] [<command> [<args>...]]
+                            >
+                            > Options:
+                            >     -c <cfgname>, --config <cfgname>  Specifies the configuration to use.
+                            >     -d, --dry-run                     Run Borg in dry run mode.
+                            >     -h, --help                        Output basic usage information.
+                            >     -m, --mute                        Suppress all output.
+                            >     -n, --narrate                     Send Assimilate and Borg narration to stdout.
+                            >     -q, --quiet                       Suppress optional output.
+                            >     -r, --relocated                   Acknowledge that repository was relocated.
+                            >     -v, --verbose                     Make Borg more verbose.
+                            >     --no-log                          Do not create log file.
+                            >
+                            > Available commands:
+                            >     borg              run a raw borg command
+                            >     break-lock        breaks the repository and cache locks
+                            >     check             checks the repository and its archives
+                            >     compact           compact segment files in the repository
+                            >     compare           compare local files or directories to those in an archive
+                            >     configs           list available backup configurations
+                            >     create            create an archive of the current files
+                            >     delete            delete an archive currently contained in the repository
+                            >     diff              show the differences between two archives
+                            >     due               days since last backup
+                            >     extract           recover file or files from archive
+                            >     help              give information about commands or other topics
+                            >     info              display metadata for a repository or archive
+                            >     list              list the files contained in an archive
+                            >     log               display log for the last assimilate run
+                            >     mount             mount a repository or archive
+                            >     overdue           show status of known repositories
+                            >     prune             prune the repository of excess archives
+                            >     repo-create       initialize the repository
+                            >     repo-list         display available archives
+                            >     repo-space        manage the amount of space kept in reserve
+                            >     restore           restore requested files or directories in place
+                            >     settings, setting
+                            >                       display settings of chosen configuration
+                            >     umount            un-mount a previously mounted repository or archive
+                            >     version           display assimilate version
+                            >
+                            > Available topics:
+                            >     overview          overview of assimilate
+                            >     precautions       what everybody should know before using assimilate
+
+            diary — help borg {{{2:
+                run: assimilate help borg
+                checks:
+                    stdout:
+                        matches text:
+                            > Run a Raw Borg Command.
+                            >
+                            > Usage:
+                            >     assimilate borg <borg_args>...
+                            >
+                            > You can specify the repository to act on using “@repo”, which is
+                            > replaced with the path to the repository.  The passphrase is set before
+                            > the command is run.
+                            >
+                            > Be aware that the Borg is run from ‘working_dir’ (default is /), and
+                            > so any relative paths given as command line arguments are relative to
+                            > ‘working_dir’.
+
+            epicenter — repo-create {{{2:
+                run: assimilate repo-create
+                checks:
+                    stdout:
+                        contains text: Reserve some repository storage space now for emergencies
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-create
+                            -
+
+            promoter — due {{{2:
+                run: assimilate due
+                checks:
+                    stdout:
+                        matches text:
+                            > test backup never run.
+                            > test compact never run.
+                            > test check never run.
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        excludes line:     > running command: due
+
+            facsimile — create {{{2:
+                run: assimilate create
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            consulate — create again {{{2:
+                initialization:
+                    remove: ~/b
+                    create:
+                        ~/c:
+                            contents: ccc
+                            ctime: 2024-11-28
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            touchdown — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-list$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-list
+                            -
+
+            sexton — repo-space {{{2:
+                run: assimilate repo-space --reserve=1MiB
+                checks:
+                    stdout:
+                        contains regex:
+                            > There is [0-9.]+ MB reserved space in this repository now.
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-space$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-space
+                            -
+
+
+            romance — info {{{2:
+                run: assimilate info
+                checks:
+                    stdout:
+                        contains regex:
+                            >               config: test
+                            >                roots: /{run_dir}
+                            >          destination: /{run_dir}/REPO/test
+                            >   settings directory: /{run_dir}/.config/assimilate
+                            >              logfile: /{run_dir}/.local/share/assimilate/test.log
+                            >      create last run: .*
+                            >       prune last run: .*
+                            >     compact last run: .*
+                            >       check last run: .*
+                        contains regex:
+                            > Repository ID: [a-f0-9]+
+                            > Location: /{run_dir}/REPO/test
+                            > Repository version: 3
+                            > Append only: False
+                            > Encrypted: Yes \(repokey BLAKE2b ChaCha20-Poly1305\)
+                            > Storage quota: 0 B used
+                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
+                            > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: info$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: info
+                            -
+
+            contract — list {{{2:
+                run: assimilate list
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/c
+
+                    stderr:
+                        matches regex:
+                            > archive: {aid2} {ar2} .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: list$
+                        contains regex: ^        aid:{aid2}[a-f0-9]+$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: list
+                            -
+
+            ninny — list {{{2:
+                run: assimilate list -a aid:{aid1}
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: list$
+                        contains regex: ^        aid:{aid1}
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: list
+                            -
+
+            bully — break-lock {{{2:
+                # there is no lock to break, but exercise the command anyway
+                run: assimilate break-lock
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: break-lock$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: break-lock
+                            -
+
+            fluster — prune {{{2:
+                run: assimilate prune
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: prune$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: prune
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^prune last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            optician — compact {{{2:
+                run: assimilate compact
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: compact$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: compact
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            waggle — check {{{2:
+                run: assimilate check
+                checks:
+                    stderr:
+                        matches regex: ^archive.*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: check$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: check
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            arrowhead — compare {{{2:
+                run: assimilate compare
+                checks:
+                    stdout:
+                        matches text:
+                            > Only in .: ASSIMILATE
+                            > Only in .: bu
+                            > Only in .: .cache
+                            > Only in .: REPO
+
+                    stderr:
+                        matches regex:
+                            > archive: {aid2} {ar2} .*
+
+                    status: 1
+
+            adapt — compare -a {{{2:
+                run: assimilate compare -a aid:{aid1}
+                checks:
+                    stdout:
+                        matches text:
+                            > Only in .: ASSIMILATE
+                            > Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
+                            > Only in .: bu
+                            > Only in .: c
+                            > Only in .: .cache
+                            > Only in .: REPO
+                    status: 1
+
+            detach — diff {{{2:
+                run: assimilate diff aid:{aid1} aid:{aid2}
+                checks:
+                    stdout:
+                        matches text:
+                            > ctime               {run_dir}
+                            > added               {run_dir}/c
+                            > removed             {run_dir}/b
+                    status: 1
+
+            publicist — configs {{{2:
+                run: assimilate configs
+                checks:
+                    stdout:
+                        matches text:
+                            > Available Configurations:
+                            >     test
+                            >
+                            > Default Configuration:
+                            >     test
+
+            voter — mount {{{2:
+                run: assimilate mount
+                checks:
+                    stderr:
+                        matches regex:
+                            > mount point is: /{run_dir}/ASSIMILATE
+                            > archive: {aid2} {ar2} .*
+                    ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/a:
+                        matches text: aaa
+                    ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/b:
+                        matches text: bbb
+                    ~/ASSIMILATE/{ar2}-{aid2}/{run_dir}/a:
+                        matches text: aaa
+
+            inspect — umount {{{2:
+                run: assimilate umount
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: umount$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: umount
+                            -
+
+            debutante — restore {{{2:
+                run: assimilate restore -a aid:{aid1} b
+                checks:
+                    ~/b:
+                        matches text: bbb
+
+            sovereign — extract {{{2:
+                run: assimilate extract -a aid:{aid1} {run_dir}/a
+                checks:
+                    ~/{run_dir}/a:
+                        matches text: aaa
+
+            vassal — extract {{{2:
+                run: assimilate extract -a aid:{aid1} /{run_dir}/b
+                checks:
+                    ~/{run_dir}/b:
+                        matches text: bbb
+
+            promote — delete {{{2:
+                initialization:
+                    remove: ~/.local/share/assimilate/test.latest.nt
+                run: assimilate delete -a aid:{aid1}
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: delete$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: delete
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        matches regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            hospice — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-list$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-list
+                            -
+
+            imprint — log {{{2:
+                run: assimilate log
+                checks:
+                    stdout:
+                        contains regex:
+                            > aid:{aid2}  {ar2}   .*
+
+            dinosaur — borg repo-list {{{2:
+                run: assimilate borg --repo @repo repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > {aid2}  .*  {ar2}  .*
+
+#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:

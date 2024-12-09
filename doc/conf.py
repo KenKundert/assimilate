@@ -11,7 +11,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+# import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -32,6 +32,7 @@ extensions = '''
     sphinx.ext.napoleon
     sphinx.ext.todo
     sphinx.ext.viewcode
+    sphinx_rtd_theme
 '''.split()
 
 # Add any paths that contain templates here, relative to this directory.
@@ -48,14 +49,14 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'assimilate'
-copyright = u'2018-2021, Ken Kundert'
+copyright = u'2018-2024, Ken Kundert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = '1.24.0'
+release = '0.0a0'
 # The short X.Y version.
 version = '.'.join(release.split('.')[0:2])
 
@@ -98,10 +99,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-# html_theme = 'nature'
-# Use default rather than my normal nature so we get the read-the-docs style on
-# that website.
-html_theme = 'default'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -238,7 +236,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Assimilate', u'Assimilate Documentation',
-   u'Ken Kundert', 'Assimilate', 'One line description of project.',
+   u'Ken Kundert', 'Assimilate', 'Front-end to Borg Backup.',
    'Miscellaneous'),
 ]
 

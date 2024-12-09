@@ -1,0 +1,23 @@
+major: 0
+minor: 0
+patch: 0
+revision: 0
+type: alpha
+files:
+    pyproject.toml:
+        version: version
+    assimilate/__init__.py:
+        version: __version__
+        date: __released__
+    README.rst:
+        version: Version
+        date: Released
+    doc/conf.py:
+        version: release
+    doc/index.rst:
+        version: Version
+        date: Released
+    doc/releases.rst:
+        version: Version
+        date: Released
+style: python
