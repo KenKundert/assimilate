@@ -402,9 +402,9 @@ assimilate:
                             >                   home_dir: /{run_dir}
                             >                    log_dir: /{run_dir}/\.local/share/assimilate
                             >             match_archives: ↓
-                            >                             - sh:{{host_name}}-{{user_name}}-{{config_name}}-*
+                            >                             - sh:{{host_name}}-{{user_name}}-{{config_name}}-\*
                             >            ❬when resolved❭: ↓
-                            >                             - sh:.+-.+-test-*
+                            >                             - sh:.+-.+-test-\*
                             >                   patterns: ↓
                             >                             - R ~
                             >                             - - ~/\.cache
