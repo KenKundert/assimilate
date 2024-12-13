@@ -779,11 +779,11 @@ assimilate:
                 run: assimilate compare
                 checks:
                     stdout:
-                        matches text:
-                            > Only in .: ASSIMILATE
-                            > Only in .: bu
-                            > Only in .: .cache
-                            > Only in .: REPO
+                        contains lines:
+                            - Only in .: ASSIMILATE
+                            - Only in .: bu
+                            - Only in .: .cache
+                            - Only in .: REPO
 
                     stderr:
                         matches regex:
@@ -795,12 +795,12 @@ assimilate:
                 run: assimilate compare -a aid:{aid1}
                 checks:
                     stdout:
-                        matches text:
-                            > Only in .: ASSIMILATE
-                            > Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
-                            > Only in .: bu
-                            > Only in .: .cache
-                            > Only in .: REPO
+                        contains lines:
+                            - Only in .: ASSIMILATE
+                            - Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
+                            - Only in .: bu
+                            - Only in .: .cache
+                            - Only in .: REPO
                     status: 1
 
             urinate — diff {{{2:
@@ -1272,11 +1272,11 @@ assimilate:
                 run: assimilate compare
                 checks:
                     stdout:
-                        matches text:
-                            > Only in .: ASSIMILATE
-                            > Only in .: bu
-                            > Only in .: .cache
-                            > Only in .: REPO
+                        contains lines:
+                            - Only in .: ASSIMILATE
+                            - Only in .: bu
+                            - Only in .: .cache
+                            - Only in .: REPO
 
                     stderr:
                         matches regex:
@@ -1288,13 +1288,13 @@ assimilate:
                 run: assimilate compare -a aid:{aid1}
                 checks:
                     stdout:
-                        matches text:
-                            > Only in .: ASSIMILATE
-                            > Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
-                            > Only in .: bu
-                            > Only in .: c
-                            > Only in .: .cache
-                            > Only in .: REPO
+                        contains lines:
+                            - Only in .: ASSIMILATE
+                            - Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
+                            - Only in .: bu
+                            - Only in .: c
+                            - Only in .: .cache
+                            - Only in .: REPO
                     status: 1
 
             detach — diff {{{2:
