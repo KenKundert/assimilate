@@ -117,7 +117,6 @@ assimilate:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > encryption: none
-                        > borg executable: /home/ken/tools/python-experimental/bin/borg
 
                 ~/REPO/:
 
@@ -396,7 +395,6 @@ assimilate:
                         matches text:
                             >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
                             >            ❬when resolved❭: kundert-ken-test-{{now}}
-                            >            borg_executable: /home/ken/tools/python-experimental/bin/borg
                             >                   cmd_name: settings
                             >                 config_dir: /{run_dir}/.config/assimilate
                             >                config_name: test
@@ -431,7 +429,6 @@ assimilate:
                         > default config: test
                         > default mount point: ~/ASSIMILATE
                         > encryption: none
-                        > borg executable: /home/ken/tools/python-experimental/bin/borg
                         > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
                         >
                         > prune_after_create: 'yes
@@ -920,7 +917,6 @@ assimilate:
                         > encryption: repokey-blake2-chacha20-poly1305
                         > compression: zstd,1
                         > passphrase: roadhouse pause govern parry
-                        > borg executable: /home/ken/tools/python-experimental/bin/borg
                         > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
                         >
                         > prune_after_create: 'yes
