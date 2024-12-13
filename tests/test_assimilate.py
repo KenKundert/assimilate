@@ -34,6 +34,7 @@ shlib_set_prefs(use_inform=True)
 NAMES_SEEN = {}     # used to enforce that all test names are unique
                     # without this names could be repeated between levels,
                     # which might cause confusion when debugging
+DEFAULT_UMASK = 0o77
 
 
 # PARAMETERIZATION {{{1
@@ -365,6 +366,8 @@ def run_tests(suite, category, scenario, initialization, tests, home_dir, subTes
             cmd = cmd.format(run_dir=run_dir, **matches)
             checker = Checker(full_test_name, cmd, home_dir)
 
+            os.umask(DEFAULT_UMASK)
+
             initialization = test.get('initialization')
             if initialization:
                 file_ops(initialization)
@@ -467,7 +470,6 @@ def add_script(home_dir):
     schema = scenario_schema,
 )
 def test_assimilate(subtests, tmp_path, scenario, initialization, tests):
-    os.umask(0o77)
     run_tests(
         TEST_SUITE.stem,
         'assimilate',
