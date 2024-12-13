@@ -89,7 +89,7 @@ def as_str(arg):
 # as_int() {{{2
 def as_int(arg):
     try:
-        return str(int(arg))
+        return str(int(arg, base=0))
     except ValueError:
         raise Invalid('expected integer')
 
@@ -122,6 +122,7 @@ file_ops_schema = Any(
     {
         "create": {str: Any(create_file_schema, '')},
         "remove": as_lines,
+        "umask": as_int,
     },
     ''  # initialization may be empty
 )
@@ -447,6 +448,8 @@ def file_ops(operations):
         elif type == 'run':
             for cmd in ops:
                 Run(cmd, 'SoeW')
+        elif type == 'umask':
+            os.umask(ops)
         else:
             raise NotImplementedError(type)
 
@@ -464,6 +467,7 @@ def add_script(home_dir):
     schema = scenario_schema,
 )
 def test_assimilate(subtests, tmp_path, scenario, initialization, tests):
+    os.umask(0o77)
     run_tests(
         TEST_SUITE.stem,
         'assimilate',
