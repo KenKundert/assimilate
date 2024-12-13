@@ -392,23 +392,23 @@ assimilate:
                 run: assimilate settings
                 checks:
                     stdout:
-                        matches text:
+                        matches regex:
                             >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
-                            >            ❬when resolved❭: kundert-ken-test-{{now}}
+                            >            ❬when resolved❭: .+-.+-test-{{now}}
                             >                   cmd_name: settings
-                            >                 config_dir: /{run_dir}/.config/assimilate
+                            >                 config_dir: /{run_dir}/\.config/assimilate
                             >                config_name: test
                             >                 encryption: none
                             >                   home_dir: /{run_dir}
-                            >                    log_dir: /{run_dir}/.local/share/assimilate
+                            >                    log_dir: /{run_dir}/\.local/share/assimilate
                             >             match_archives: ↓
                             >                             - sh:{{host_name}}-{{user_name}}-{{config_name}}-*
                             >            ❬when resolved❭: ↓
-                            >                             - sh:kundert-ken-test-*
+                            >                             - sh:.+-.+-test-*
                             >                   patterns: ↓
                             >                             - R ~
-                            >                             - - ~/.cache
-                            >                             - - ~/.local
+                            >                             - - ~/\.cache
+                            >                             - - ~/\.local
                             >                             - - ~/bu
                             >                             - - ~/REPO
                             >                 repository: ~/REPO/{{config_name}}
