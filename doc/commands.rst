@@ -374,7 +374,7 @@ files contained in two archives.
 Configs
 -------
 
-List the available backup configurations urations using:
+List the available backup configurations using:
 
 .. code-block:: bash
 
@@ -616,7 +616,7 @@ For example:
 Info
 ----
 
-This command prints out the locations of important files and directories.
+This command prints out helpful information about your repository:
 
 .. code-block:: bash
 
@@ -626,7 +626,7 @@ You can also get information about a particular archive.
 
 .. code-block:: bash
 
-    $ assimilate info home-2022-11-03T23:07:25
+    $ assimilate info -a home-2022-11-03T23:07:25
 
 
 .. _log:

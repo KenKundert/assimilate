@@ -79,7 +79,6 @@ from inform import (
     fatal,
     get_informer,
     get_prog_name,
-    output,
     os_error,
     terminate,
     truth,
@@ -90,7 +89,7 @@ from quantiphy import Quantity, UnitConversion
 from voluptuous import Schema, Invalid, MultipleInvalid
 from .preferences import CONFIG_DIR, DATA_DIR, OVERDUE_FILE
 from .shlib import Run, to_path, set_prefs as set_shlib_prefs
-from .utilities import read_latest, report_voluptuous_errors
+from .utilities import output, read_latest, report_voluptuous_errors
 
 # GLOBALS {{{1
 set_shlib_prefs(use_inform=True, log_cmd=True)

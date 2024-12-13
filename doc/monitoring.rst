@@ -36,14 +36,14 @@ logging using the :ref:`logging` in the shared configuration file.
 The contents of *logging is a dictionary (key-value pairs) where each line give 
 the name and value of an *NTLog* command line argument.  For example:
 
-.. code-block: nestedtext
+.. code-block:: nestedtext
 
     logging:
         keep for: 1d
 
 By default *Assimilate* uses the following defaults for *NTLog*:
 
-.. code-block: nestedtext
+.. code-block:: nestedtext
 
     logging:
         keep for: 1w

@@ -67,8 +67,9 @@ There are a few things to notice.
    taken literally.
 
 5. The keys are case insensitive and are converted internally to snake case.  
-   Thus, the key may be `tempus fugit` or `tempus-fugit`, but either of those is 
+   Thus, the key may be `Tempus Fugit` or `tempus-fugit`, but either of those is 
    converted to *tempus_fugit*.
+
 
 .. _shared_settings:
 
@@ -559,7 +560,7 @@ names will be unique, which means that they can directly be specified to those
 commands that operate on a single archive.  Otherwise you would use the archive 
 ID to specify the desired archive.
 
-You can custimize *now* and *utcnow* using `strftime 
+You can customize *now* and *utcnow* using `strftime 
 <https://docs.python.org/3/library/datetime.html#datetime.date.strftime>`_ 
 formatting codes.  For example, you can reduce the length of the timestamp using:
 
@@ -666,6 +667,24 @@ Alternately this can written more compactly using:
 
 In the this case the value of *rsync* is converted to a list by splitting the 
 string on whitespace.
+
+
+.. _create_retries:
+
+create_retries
+~~~~~~~~~~~~~~
+
+If given and greater than 1 *Assimilate* will retry a *Borg* *create* command if 
+there is a failure.
+
+
+.. _create_retry_sleep:
+
+create_retry_sleep
+~~~~~~~~~~~~~~~~~~
+
+The time, in seconds, to pause before retrying a "Borg* *create* command if 
+*create_retries* is 2 or greater.
 
 
 .. _cronhub_url:

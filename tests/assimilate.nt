@@ -146,7 +146,7 @@ assimilate:
                 run: assimilate version
                 checks:
                     stdout:
-                        matches regex: assimilate version: \d+\.\d+(\.\d+(\.?\w+\d+)?)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+                        matches regex: assimilate version: \d+\.\d+(\.\d+)?(\.?\w+\d+)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
 
             vignette — help {{{2:
                 run: assimilate help
@@ -476,7 +476,7 @@ assimilate:
                 run: assimilate version
                 checks:
                     stdout:
-                        matches regex: assimilate version: \d+\.\d+(\.\d+(\.?\w+\d+)?)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+                        matches regex: assimilate version: \d+\.\d+(\.\d+)?(\.?\w+\d+)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
 
             commander — help {{{2:
                 run: assimilate help
@@ -965,7 +965,7 @@ assimilate:
                 run: assimilate version
                 checks:
                     stdout:
-                        matches regex: assimilate version: \d+\.\d+(\.\d+(\.?\w+\d+)?)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
+                        matches regex: assimilate version: \d+\.\d+(\.\d+)?(\.?\w+\d+)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
 
             yearning — help {{{2:
                 run: assimilate help

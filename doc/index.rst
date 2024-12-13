@@ -101,7 +101,7 @@ and will never use *Duplicity* again.
 Terminology
 -----------
 
-It is helpful to understand two terms that are used by *Borg* to describe your 
+It is helpful to understand a few terms that are used by *Borg* to describe your 
 backups.
 
 :repository:
@@ -233,7 +233,7 @@ be initialized before it can first used.  To do so, one uses the
 
 .. code-block:: bash
 
-    $ assimilate repo-creae
+    $ assimilate repo-create
 
 Once the repository is initialized, it is ready for use.  The :ref:`create 
 command <create>` creates an archive, meaning that it backs up your current 
@@ -423,17 +423,3 @@ Contents
    releases
 
 * :ref:`genindex`
-
-.. _Avendesora: https://avendesora.readthedocs.io
-.. _Borg: https://borgbackup.readthedocs.io
-.. _BorgBase: https://www.borgbase.com
-.. _BorgMatic: https://torsion.org/borgmatic
-.. _Duplicity: http://duplicity.nongnu.org
-.. _GitHub: https://github.com/KenKundert/assimilate/issues
-.. _HealthChecks.io: https://healthchecks.io
-.. _Hetzner: https://www.hetzner.com/storage/storage-box
-.. _NestedText: https://nestedtext.org
-.. _PostFix: http://www.postfix.org
-.. _RSync: https://www.rsync.net/products/attic.html
-.. _SpareKeys: https://github.com/kalekundert/sparekeys
-.. _Vorta: https://github.com/borgbase/vorta

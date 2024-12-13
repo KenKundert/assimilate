@@ -41,7 +41,6 @@ from inform import (
     log,
     narrate,
     os_error,
-    output,
     plural,
     title_case,
     truth,
@@ -56,7 +55,7 @@ from .shlib import (
     Cmd, Run, cwd, lsd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
 )
 from .utilities import (
-    gethostname, pager, read_latest, table, two_columns,
+    gethostname, output, pager, read_latest, table, two_columns,
     update_latest, when,
 )
 
@@ -946,22 +945,33 @@ class CreateCommand(Command):
         src_dirs = settings.src_dirs
         with settings.hooks as hooks:
             try:
-                borg = settings.run_borg(
-                    cmd = "create",
-                    borg_opts = borg_opts,
-                    args = [settings.value('archive')] + src_dirs,
-                    assimilate_opts = options,
-                    show_borg_output = show_stats,
-                    use_working_dir = True,
-                )
+                tries_left = max(settings.value("create_retries", 1), 1)
+                while tries_left:
+                    try:
+                        borg = settings.run_borg(
+                            cmd = "create",
+                            borg_opts = borg_opts,
+                            args = [settings.value('archive')] + src_dirs,
+                            assimilate_opts = options,
+                            show_borg_output = show_stats,
+                            use_working_dir = True,
+                        )
+                        break
+                    except Error as e:
+                        narrate('Borg failed.', codicil=indent(f"error = {e!s}"))
+                        if e.stderr and "is not a valid repository" in e.stderr:
+                            e.reraise(codicil="Run 'assimilate init' to initialize the repository.")
+                        tries_left -= 1
+                        if tries_left:
+                            narrate('Will try again.')
+                        else:
+                            raise
+                        seconds = max(settings.value("create_retry_sleep", 0), 0)
+                        narrate(f"waiting for {seconds:.0f} seconds.")
+                        sleep(seconds)
                 updated.append('create')
                 create_status = borg.status
                 hooks.report_results(borg)
-            except Error as e:
-                if e.stderr and "is not a valid repository" in e.stderr:
-                    e.reraise(codicil="Run 'assimilate init' to initialize the repository.")
-                else:
-                    raise
             finally:
                 # run commands specified to be run after a backup
                 postrequisite_settings = ["run_after_backup"]
@@ -1625,9 +1635,10 @@ class InfoCommand(Command):
     USAGE = dedent(
         """
         Usage:
-            assimilate info [options] [<archive>]
+            assimilate info [options]
 
         Options:
+            -a, --archive <archive>  the archive to report on
             -f, --fast               only report local information
 
         """
@@ -1641,10 +1652,22 @@ class InfoCommand(Command):
         # read command line
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         fast = cmdline["--fast"]
-        archive = cmdline["<archive>"]
+        if cmdline["--archive"]:
+            archive, description = find_archive(settings, cmdline)
+            if description:
+                display(f'archive: {description}')
+        else:
+            archive = None
 
         # report local information
-        if not archive:
+        if archive:
+            borg = settings.run_borg(
+                cmd = "info",
+                args = [archive],
+                assimilate_opts = options,
+                strip_archive_matcher = True,
+            )
+        else:
             output(f"              config: {settings.config_name}")
             output(f'               roots: {", ".join(settings.get_roots())}')
             output(f"         destination: {settings.repository}")
@@ -1671,12 +1694,13 @@ class InfoCommand(Command):
             if fast:
                 return
 
-        # now output the information from borg about the repository
-        borg = settings.run_borg(
-            cmd = "repo-info",
-            assimilate_opts = options,
-            strip_archive_matcher = True,
-        )
+            # now output the information from borg about the repository/archive
+            borg = settings.run_borg(
+                cmd = "repo-info",
+                assimilate_opts = options,
+                strip_archive_matcher = True,
+            )
+
         out = borg.stderr or borg.stdout
         if out:
             output()
@@ -1918,7 +1942,7 @@ class ListCommand(Command):
                 colorize = healthy_color
             else:
                 colorize = broken_color
-            values['healthy'] = truth(values['healthy'], defaults='healthy/broken')
+            values['healthy'] = truth(values['healthy'], formatter='healthy/broken')
             type = values['mode'][0]
             values['Type'] = ''
             values['extra'] = ''

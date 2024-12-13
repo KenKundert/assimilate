@@ -20,11 +20,9 @@
 
 # Imports {{{1
 from textwrap import dedent
-
-from inform import Error, error, output
-
+from inform import Error, error
 from .command import Command
-from .utilities import pager, two_columns
+from .utilities import output, pager, two_columns
 
 
 # HelpMessage base class {{{1

@@ -24,7 +24,6 @@ from inform import (
     Color,
     Error,
     LoggingCache,
-    codicil,
     comment,
     conjoin,
     cull,
@@ -40,7 +39,6 @@ from inform import (
     join,
     log,
     narrate,
-    output,
     plural,
     render,
     warn,
@@ -80,10 +78,10 @@ from .preferences import (
     SHARED_SETTINGS_FILE,
 )
 from .shlib import (
-    Run, cd, cwd, getmod, render_command, to_path,
+    Run, cd, cwd, render_command, to_path,
     set_prefs as set_shlib_prefs
 )
-from .utilities import getfullhostname, gethostname, getusername
+from .utilities import getfullhostname, gethostname, getusername, output
 
 # Globals {{{1
 borg_commands_with_dryrun = "create delete extract prune upgrade recreate".split()

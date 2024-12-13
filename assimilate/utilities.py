@@ -21,10 +21,21 @@ import arrow
 import pwd
 import os
 import socket
+import sys
 import nestedtext as nt
-from inform import Error, conjoin, cull, error, full_stop, narrate, os_error, warn
+from inform import (
+    Error, conjoin, cull, error, full_stop, narrate, os_error, warn,
+    output as output_raw
+)
 from .shlib import Run, set_prefs as set_shlib_prefs
 set_shlib_prefs(use_inform=True, log_cmd=True)
+
+
+# output {{{1
+# create new version of output that always writes to stout regardless of Inform
+# stream_policy.
+output = output_raw
+output.stream = sys.stdout
 
 
 # gethostname {{{1

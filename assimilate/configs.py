@@ -24,7 +24,7 @@ from .utilities import report_voluptuous_errors
 from inform import (
     codicil, conjoin, dedent, is_str, join, narrate, warn, terminate, truth
 )
-# from quantiphy import Quantity, InvalidNumber
+from quantiphy import Quantity, InvalidNumber
 from voluptuous import Schema, Invalid, MultipleInvalid, Extra
 import nestedtext as nt
 import functools
@@ -89,15 +89,15 @@ def as_integer(arg):
         raise Invalid(f"expected integer, found ‘{arg}’")
     return arg
 
-# # as_quantity {{{2
-# # raise error if value is a string that cannot be cast to an quantity
-# def as_quantity(arg):
-#     arg = as_string(arg).strip()
-#     try:
-#         arg = Quantity(arg)
-#     except InvalidNumber:
-#         raise Invalid(f"expected number, found ‘{arg}’")
-#     return arg
+# as_quantity {{{2
+# raise error if value is a string that cannot be cast to an quantity
+def as_quantity(arg):
+    arg = as_string(arg).strip()
+    try:
+        arg = Quantity(arg)
+    except InvalidNumber:
+        raise Invalid(f"expected number, found ‘{arg}’")
+    return arg
 
 # as_lines {{{2
 # raise error if value is not a list of strings
@@ -205,7 +205,7 @@ def as_enum(*choices):
 # as_bool {{{2
 @as_enum("'yes", "'no", "'true", "'false")
 def as_bool(arg):
-    return truth(arg in ["'yes", "'true"], defaults="'yes/'no")
+    return truth(arg in ["'yes", "'true"], formatter="'yes/'no")
 
 # as_colorscheme {{{2
 @as_enum("'light", "'dark")
@@ -262,6 +262,14 @@ ASSIMILATE_SETTINGS = dict(
     composite_configs = dict(
         desc = "composite configurations and their children",
         validator = as_dict,
+    ),
+    create_retries = dict(
+        desc = "number of times to retry a create if failures occur",
+        validator = as_integer,
+    ),
+    create_retry_sleep = dict(
+        desc = "time to sleep between retries [s]",
+        validator = as_quantity,
     ),
     default_config = dict(
         desc = "default Assimilate configuration",
