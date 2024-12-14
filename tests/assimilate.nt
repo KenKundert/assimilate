@@ -32,7 +32,7 @@ assimilate:
                             > command aliases:
                             >     repo-list:
                             >         - archives
-                            >         - recent --last 20
+                            >         - recent --last=20
                             >     list: paths
                             > logging:
                             >     keep for: 1w
@@ -269,7 +269,7 @@ assimilate:
                     stdout:
                         matches regex:
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: repo-list$
@@ -295,11 +295,11 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid2}[a-f0-9]+$
+                        contains regex: ^        aid:{aid0}[a-f0-9]+$
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -620,7 +620,7 @@ assimilate:
                     stdout:
                         matches regex:
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: repo-list$
@@ -692,11 +692,11 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid2}[a-f0-9]+$
+                        contains regex: ^        aid:{aid0}[a-f0-9]+$
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -796,7 +796,7 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
 
                     status: 1
 
@@ -813,7 +813,7 @@ assimilate:
                     status: 1
 
             urinate — diff {{{2:
-                run: assimilate diff aid:{aid1} aid:{aid2}
+                run: assimilate diff aid:{aid1} aid:{aid0}
                 checks:
                     stdout:
                         matches text:
@@ -832,19 +832,18 @@ assimilate:
                             > Default Configuration:
                             >     test
 
-#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:
             persevere — mount {{{2:
                 run: assimilate mount
                 checks:
                     stderr:
                         matches regex:
                             > mount point is: /{run_dir}/ASSIMILATE
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
                     ~/ASSIMILATE/{ar1}/{run_dir}/a:
                         matches text: aaa
                     ~/ASSIMILATE/{ar1}/{run_dir}/b:
                         matches text: bbb
-                    ~/ASSIMILATE/{ar2}/{run_dir}/a:
+                    ~/ASSIMILATE/{ar0}/{run_dir}/a:
                         matches text: aaa
 
             woodshed — umount {{{2:
@@ -890,7 +889,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: repo-list$
@@ -905,17 +904,16 @@ assimilate:
                 checks:
                     stdout:
                         contains regex:
-                            > aid:{aid2}  {ar2}   .*
+                            > aid:{aid0}  {ar0}   .*
 
             pension — borg repo-list {{{2:
                 run: assimilate borg -r @repo repo-list
                 checks:
                     stdout:
                         matches regex:
-                            > {aid2}  .*  {ar2}  .*
+                            > {aid0}  .*  {ar0}  .*
 
 
-#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:
     beautify — single config that uses patterns, explicit archive, and more complete settings {{{1:
         initialization:
             create:
@@ -945,7 +943,7 @@ assimilate:
                         >
                         > command aliases:
                         >     repo-list:
-                        >         - recent --last 20
+                        >         - recent --last=20
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
@@ -1037,7 +1035,7 @@ assimilate:
                 checks:
                     stdout:
                         matches text:
-                            > ‘recent’ is an alias of ‘repo-list --last 20’.
+                            > ‘recent’ is an alias of ‘repo-list --last=20’.
                             >
                             > Display Available Archives.
                             >
@@ -1122,7 +1120,7 @@ assimilate:
                     stdout:
                         matches regex:
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: repo-list$
@@ -1131,22 +1129,6 @@ assimilate:
                         contains lines in order:
                             -     > running command: repo-list
                             -
-
-            sexton — repo-space {{{2:
-                run: assimilate repo-space --reserve=1MiB
-                checks:
-                    stdout:
-                        contains regex:
-                            > There is [0-9.]+ MB reserved space in this repository now.
-
-                    ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-space$
-
-                    ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: repo-space
-                            -
-
 
             romance — info {{{2:
                 run: assimilate info
@@ -1195,11 +1177,11 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid2}[a-f0-9]+$
+                        contains regex: ^        aid:{aid0}[a-f0-9]+$
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1299,7 +1281,7 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
 
                     status: 1
 
@@ -1317,7 +1299,7 @@ assimilate:
                     status: 1
 
             detach — diff {{{2:
-                run: assimilate diff aid:{aid1} aid:{aid2}
+                run: assimilate diff aid:{aid1} aid:{aid0}
                 checks:
                     stdout:
                         matches text:
@@ -1343,12 +1325,12 @@ assimilate:
                     stderr:
                         matches regex:
                             > mount point is: /{run_dir}/ASSIMILATE
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/a:
                         matches text: aaa
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/b:
                         matches text: bbb
-                    ~/ASSIMILATE/{ar2}-{aid2}/{run_dir}/a:
+                    ~/ASSIMILATE/{ar0}-{aid0}/{run_dir}/a:
                         matches text: aaa
 
             inspect — umount {{{2:
@@ -1402,7 +1384,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: repo-list$
@@ -1417,16 +1399,15 @@ assimilate:
                 checks:
                     stdout:
                         contains regex:
-                            > aid:{aid2}  {ar2}   .*
+                            > aid:{aid0}  {ar0}   .*
 
             dinosaur — borg repo-list {{{2:
                 run: assimilate borg --repo @repo repo-list
                 checks:
                     stdout:
                         matches regex:
-                            > {aid2}  .*  {ar2}  .*
+                            > {aid0}  .*  {ar0}  .*
 
-#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:
     skirting — composite config that uses patterns and implicit archive {{{1:
         initialization:
             create:
@@ -1608,7 +1589,7 @@ assimilate:
                     stdout:
                         matches regex:
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test1.log:
                         contains line: running command: repo-list
@@ -1697,11 +1678,11 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test1.log:
                         contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid2}[a-f0-9]+$
+                        contains regex: ^        aid:{aid0}[a-f0-9]+$
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -1850,7 +1831,7 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
 
                     status: 1
 
@@ -1868,7 +1849,7 @@ assimilate:
                     status: 1
 
             kilogram — diff {{{2:
-                run: assimilate diff aid:{aid1} aid:{aid2}
+                run: assimilate diff aid:{aid1} aid:{aid0}
                 checks:
                     stderr:
                         matches text: assimilate error: test: command does not support composite configs.
@@ -1893,12 +1874,12 @@ assimilate:
                     stderr:
                         matches regex:
                             > mount point is: /{run_dir}/ASSIMILATE
-                            > archive: {aid2} {ar2} .*
+                            > archive: {aid0} {ar0} .*
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/a:
                         matches text: aaa
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/b:
                         matches text: bbb
-                    ~/ASSIMILATE/{ar2}-{aid2}/{run_dir}/a:
+                    ~/ASSIMILATE/{ar0}-{aid0}/{run_dir}/a:
                         matches text: aaa
 
             fusspot — umount {{{2:
@@ -1951,7 +1932,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test1.log:
                         contains line: running command: repo-list
@@ -1972,7 +1953,7 @@ assimilate:
                 checks:
                     stdout:
                         contains regex:
-                            > aid:{aid2}  {ar2}   .*
+                            > aid:{aid0}  {ar0}   .*
 
                     stderr:
                         matches text:
@@ -1988,4 +1969,267 @@ assimilate:
                         matches text: assimilate error: test: command does not support composite configs.
                     status: 2
 
-#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:
+    hornet — single config, filter options {{{1:
+        initialization:
+            create:
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > default config: test
+                        > encryption: none
+
+                ~/REPO/:
+
+                ~/.config/assimilate/test.conf.nt:
+                    contents:
+                        > repository: ~/REPO/{config_name}
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/a:
+                    contents:
+                        > aaa
+                    ctime: 2024-11-27
+
+                ~/b:
+                    contents:
+                        > bbb
+                    ctime: 2024-11-26
+
+        tests:
+            pantry — repo-create {{{2:
+                run: assimilate repo-create
+                checks:
+                    stdout:
+                        contains text: Reserve some repository storage space now for emergencies
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-create
+                            -
+
+            roster — create {{{2:
+                run: assimilate create
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: create$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            trundle — create again {{{2:
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            marginal — create again² {{{2:
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            mistress — create again³ {{{2:
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            hangman — create again⁴ {{{2:
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            larder — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 4   aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
+                            > 3   aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
+                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+            indicate — repo-list --first=3 {{{2:
+                run: assimilate repo-list --first=3
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+
+
+            stockroom — repo-list --last=3 {{{2:
+                run: assimilate repo-list --last=3
+                checks:
+                    stdout:
+                        matches regex:
+                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+            larder — repo-list --oldest=1d {{{2:
+                run: assimilate repo-list --oldest=1d
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+            elevate — repo-list --newest=1d {{{2:
+                run: assimilate repo-list --newest=1d
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+            wrongdoer — repo-list --older=1d {{{2:
+                run: assimilate repo-list --older=1d
+                checks:
+                    stdout:
+                        matches regex:
+
+            climb — repo-list --newer=1d {{{2:
+                run: assimilate repo-list --newer=1d
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+            parade — list -a 4 {{{2:
+                run: assimilate list -a 4
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    stderr:
+                        matches regex: archive: {aid4} {ar4} .*
+
+            expect — list -a 3 {{{2:
+                run: assimilate list -a 3
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    stderr:
+                        matches regex: archive: {aid3} {ar3} .*
+
+            shell — list -a 2 {{{2:
+                run: assimilate list -a 2
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    stderr:
+                        matches regex: archive: {aid2} {ar2} .*
+
+            tombola — list -a 1 {{{2:
+                run: assimilate list -a 1
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    stderr:
+                        matches regex: archive: {aid1} {ar1} .*
+
+            partitive — list -a 0 {{{2:
+                run: assimilate list -a 0
+                checks:
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    stderr:
+                        matches regex: archive: {aid0} {ar0} .*
+

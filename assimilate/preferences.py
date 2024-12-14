@@ -85,7 +85,7 @@ INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
     command aliases:
         repo-list:
             - archives
-            - recent --last 20
+            - recent --last=20
         list: paths
 
     logging:

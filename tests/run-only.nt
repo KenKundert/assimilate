@@ -63,7 +63,7 @@ cases:
     {*: {*: {*:*}}, checks: *}
 
     # example:
-    # {assimilate: {assimilate: {beautify:*}}, checks: *}
+    # {assimilate: {assimilate: {hornet:*}}, checks: *}
 
 # skip_until:
 #     # when present it causes all tests to be skipped until it finds a match

@@ -405,7 +405,7 @@ class Command:
                         alias, args = alias.split(maxsplit=1)
                         cls.cmd_alias[alias] = f"{cmd} {args}"
                         alias_args[alias] = args.split()
-                    except ValueError as e:
+                    except ValueError:
                         pass
                     cls.cmd_name_map[alias] = cmd
             args = alias_args.get(name, [])
