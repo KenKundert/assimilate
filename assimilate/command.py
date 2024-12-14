@@ -184,61 +184,6 @@ def find_archive(settings, options):
     archive = get_latest_archive(settings)
     return desc_and_id(archive)
 
-# get_name_of_nearest_archive() {{{2
-def get_name_of_nearest_archive(settings, date):
-    warn('DELETE ME')
-    archives = get_available_archives(settings)
-    try:
-        index = int(date) + 1
-        if index > len(archives):
-            warn('index is too large, using oldest archive.', culprit=date)
-            index = 0
-        if index < 0:
-            raise Error('index must be positive.', culprit=date)
-        archive = archives[-index]
-        return archive["name"]
-    except ValueError:
-        try:
-            target = arrow.get(date, tzinfo='local')
-        except arrow.parser.ParserError as e:
-            try:
-                seconds = Quantity(date, scale='s')
-                target = arrow.now().shift(seconds=-seconds)
-            except QuantiPhyError:
-                codicil = join(
-                    full_stop(e),
-                    'Alternatively relative time formats are accepted:',
-                    'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
-                )
-                raise Error(
-                    "invalid date specification.",
-                    culprit=date, codicil=codicil, wrap=True
-                )
-
-    # find oldest archive that is younger than specified target
-    archive = prev_archive = None
-    for archive in reversed(archives):
-        archive_time = arrow.get(archive["time"], tzinfo='local')
-        if archive_time <= target:
-            if prev_archive:
-                return prev_archive["name"]
-            warn(
-                f'archive younger than {date} ({target.humanize()}) was not found.',
-                codicil='Using youngest that is older than given date or age.'
-            )
-            return archive["name"]
-        prev_archive = archive
-    if archive:
-        warn(
-            f'archive older than {date} ({target.humanize()}) was not found.',
-            codicil='Using oldest available.'
-        )
-        return archive["name"]
-    raise Error(
-        f"no archive available is older than {date} ({target.humanize()})."
-    )
-
-
 # archive_filter_options() {{{2
 def archive_filter_options(given_options):
     processed_options = []

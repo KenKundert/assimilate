@@ -855,6 +855,18 @@ assimilate:
                     ~/b:
                         matches text: bbb
 
+            invasion — restore <path>... {{{2:
+                initialization:
+                    remove:
+                        - ~/a
+                        - ~/b
+                run: assimilate restore -a aid:{aid1} a b
+                checks:
+                    ~/a:
+                        matches text: aaa
+                    ~/b:
+                        matches text: bbb
+
             farmhouse — extract {{{2:
                 run: assimilate extract -a aid:{aid1} {run_dir}/a
                 checks:
