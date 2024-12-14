@@ -1758,3 +1758,42 @@ log_dir
 ~~~~~~~
 
 Absolute path to the *Assimilate*'s logging directory.
+
+
+Environment Variables
+---------------------
+
+The following environment variables affect *Assimilate*.
+
+XDG_CONFIG_HOME
+~~~~~~~~~~~~~~~
+
+Specifies the directory that contains configuration directories.  When set, 
+*Assimilate*s configuration directory will be ``$XDG_CONFIG_HOME/assimilate``.  
+If not set, the location of the configuration directories is system specific.  
+On Linux systems it is ``~/.config``.
+
+
+XDG_DATA_HOME
+~~~~~~~~~~~~~
+
+Specifies the directory that contains data directories.  When set, *Assimilate*s 
+data directory will be ``$XDG_DATA_HOME/assimilate``.  If not set, the location 
+of the configuration directories is system specific.  On Linux systems it is 
+``~/.local/share``.  The *Assimilate* data directory is where *Assimilate* 
+places its log files.
+
+
+PAGER
+~~~~~
+
+The command used for paging through text one screenful at a time.  This is used 
+when displaying help messages.  The default is *less*.
+
+
+PATH
+~~~~
+
+Specifies the search path used by your shell to find executables.  When 
+*Assimilate* runs commands on your behalf, such as *borg*, this affects which 
+version of programs are run.

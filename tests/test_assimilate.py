@@ -27,7 +27,7 @@ SCRIPT = dedent("""
 
     export HOME={home_dir}
     export XDG_DATA_HOME={home_dir}/.local/share
-    /home/ken/bin/assimilate $*
+    assimilate $*
 """, strip_nl='l')
 TEST_DIR = to_path(__file__).parent
 shlib_set_prefs(use_inform=True)

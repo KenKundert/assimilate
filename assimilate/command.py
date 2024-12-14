@@ -398,12 +398,14 @@ class Command:
             name = DEFAULT_COMMAND
         elif shared_settings:
             cls.cmd_name_map = {}
+            cls.cmd_alias = {}
             for cmd, aliases in shared_settings.get('command_aliases', {}).items():
                 for alias in aliases:
                     try:
                         alias, args = alias.split(maxsplit=1)
+                        cls.cmd_alias[alias] = f"{cmd} {args}"
                         alias_args[alias] = args.split()
-                    except ValueError:
+                    except ValueError as e:
                         pass
                     cls.cmd_name_map[alias] = cmd
             args = alias_args.get(name, [])
@@ -864,9 +866,15 @@ class ConfigsCommand(Command):
         # check command line for errors
         docopt(cls.USAGE, argv=[command] + args)
 
-        configs = settings.configs
+        configs = list(settings.configs)
+        if settings.composite_configs:
+            composite_configs = [
+                f"{k} = {', '.join(v.split())}"
+                for k, v in settings.composite_configs.items()
+            ]
+            configs += composite_configs
         if configs:
-            output("Available Configurations:", *configs, sep="\n    ")
+            output("Available Configurations:", *sorted(configs), sep="\n    ")
         else:
             output("No configurations available.")
 
@@ -1616,12 +1624,15 @@ class HelpCommand(Command):
 
         from .help import HelpMessage
 
+        cmd_name_map = getattr(cls, 'cmd_name_map', {})
+        cmd_alias = getattr(cls, 'cmd_alias', {})
+
         topic = cmdline["<topic>"]
-        alias_maps = getattr(cls, 'cmd_name_map', {})
-        cmd = alias_maps.get(topic, topic)
+        cmd = cmd_name_map.get(topic, topic)
+        alias = cmd_alias.get(topic, cmd)
         if cmd != topic:
-            display(f"‘{topic}’ is an alias of ‘{cmd}’.")
-            display()
+            output(f"‘{topic}’ is an alias of ‘{alias}’.")
+            output()
             topic = cmd
         HelpMessage.show(topic)
 
@@ -2357,7 +2368,7 @@ class RepoSpaceCommand(Command):
                 if space.units and space.units not in ["B", "bytes", "byte"]:
                     raise Error('expected bytes.', culprit="--reserve")
                 space = space.render(prec="full", show_units=False)
-                borg_opts.extend(["--reserve", space])
+                borg_opts.append(f"--reserve={space}")
             except QuantiPhyError as e:
                 raise Error(e, culprit=cmdline["--reserve"])
         if cmdline["--free"]:

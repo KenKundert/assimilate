@@ -28,7 +28,7 @@ PROGRAM_NAME = "assimilate"
 BORG = "borg"  # default command name for borg backup executable
 
 # Directories {{{2
-# Use XDG enviornment variables to override location of config and data
+# Use XDG environment variables to override location of config and data
 # directories
 if 'XDG_CONFIG_HOME' in os.environ:
     CONFIG_DIR = os.sep.join([os.environ['XDG_CONFIG_HOME'], PROGRAM_NAME])
