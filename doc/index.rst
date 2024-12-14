@@ -24,10 +24,15 @@ repository.  The philosophy of *Assimilate* is to provide commands that you woul
 use often and in an interactive manner with the expectation that you would use 
 *Borg* directly for more unusual or esoteric situations.
 
-*Assimilate* is the next generation of Emborg_ that is designed to work with 
-*Borg 2.0*.  You should use *Emborg* if you are using an earlier version of 
-*Borg* and if you are currently an *Emborg* user you will need to switch to 
-*Assimilate* when you upgrade to *Borg 2.0*.
+.. important::
+
+    *Assimilate* is the next generation of Emborg_ that is designed to work with 
+    *Borg 2.0*.  You should use *Emborg* if you are using an earlier version of 
+    *Borg* and if you are currently an *Emborg* user you will need to switch to 
+    *Assimilate* when you upgrade to *Borg 2.0*.
+
+    All future development is moving to *Assimilate* and *Emborg* is 
+    transitioning to maintenance support only.
 
 
 Why Assimilate?
