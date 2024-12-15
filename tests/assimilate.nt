@@ -304,14 +304,14 @@ assimilate:
                 run: assimilate list
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     stderr:
                         matches regex:
@@ -717,13 +717,13 @@ assimilate:
                 run: assimilate list
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
 
                     stderr:
                         matches regex:
@@ -742,14 +742,14 @@ assimilate:
                 run: assimilate list -a aid:{aid1}
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: list$
@@ -1213,14 +1213,14 @@ assimilate:
                 run: assimilate list
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/c
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/c
 
                     stderr:
                         matches regex:
@@ -1239,14 +1239,14 @@ assimilate:
                 run: assimilate list -a aid:{aid1}
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: list$
@@ -1760,15 +1760,15 @@ assimilate:
                 run: assimilate list
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test1.conf.nt
-                            > {run_dir}/.config/assimilate/test2.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/c
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test1.conf.nt
+                            - {run_dir}/.config/assimilate/test2.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/c
 
                     stderr:
                         matches regex:
@@ -1787,15 +1787,15 @@ assimilate:
                 run: assimilate list -a aid:{aid1}
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test1.conf.nt
-                            > {run_dir}/.config/assimilate/test2.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test1.conf.nt
+                            - {run_dir}/.config/assimilate/test2.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     ~/.local/share/assimilate/test1.log:
                         contains regex: ^running command: list$
@@ -2253,14 +2253,14 @@ assimilate:
                 run: assimilate list -a 4
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     stderr:
                         matches regex: archive: {aid4} {ar4} .*
@@ -2269,9 +2269,9 @@ assimilate:
                 run: assimilate list -a 3 .config
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
+                        contains lines:
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
 
                     stderr:
                         matches regex: archive: {aid3} {ar3} .*
@@ -2280,11 +2280,11 @@ assimilate:
                 run: assimilate list --archive 2 --recursive .config
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
+                        contains lines:
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
 
                     stderr:
                         matches regex: archive: {aid2} {ar2} .*
@@ -2293,14 +2293,14 @@ assimilate:
                 run: assimilate list -a 1
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     stderr:
                         matches regex: archive: {aid1} {ar1} .*
@@ -2309,14 +2309,14 @@ assimilate:
                 run: assimilate list -a 0
                 checks:
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     stderr:
                         matches regex: archive: {aid0} {ar0} .*
