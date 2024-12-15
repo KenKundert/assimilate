@@ -361,7 +361,7 @@ class Assimilate:
             raise Error("must be an absolute path.", culprit="working_dir")
 
     # handle errors {{{2
-    def fail(self, *msg, cmd='<unknown>'):
+    def fail(self, *msg, cmd='❬unknown❭'):
         msg = join(*msg)
         try:
             msg = msg.decode('ascii', errors='replace')
@@ -715,7 +715,7 @@ class Assimilate:
             os.environ["BORG_RSH"] = self.ssh_command
         environ = {k: v for k, v in os.environ.items() if k.startswith("BORG_")}
         if "BORG_PASSPHRASE" in environ:
-            environ["BORG_PASSPHRASE"] = "<redacted>"
+            environ["BORG_PASSPHRASE"] = "❬redacted❭"
         executable = to_path(self.value("borg_executable", BORG))
         borg_opts = self.borg_options(
             cmd, borg_opts, assimilate_opts, strip_archive_matcher

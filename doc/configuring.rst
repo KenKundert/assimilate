@@ -112,6 +112,7 @@ It might look like the following:
 
     logging:
         keep for: 1w
+        max entries: 20
 
 
 .. _individual_configurations:
@@ -288,6 +289,7 @@ Command     Response to Composite Config
 borg        error
 break-lock  error
 check       run on each subconfig
+compare     run only on first subconfig
 configs     does not use any configurations
 create      run on each subconfig
 delete      error
@@ -304,7 +306,7 @@ repo-create run on each subconfig
 repo-list   run only on first subconfig
 repo-space  run on each subconfig
 restore     run only on first subconfig
-settings    error
+settings    run only on first subconfig
 umount      run only on first subconfig
 version     does not use any configurations
 =========== ===============================
@@ -1062,6 +1064,10 @@ logging
 
 Specifies settings for the composite logging, such as how long to accumulate log 
 files and how events should be labeled.  For more detail, see :ref:`log_files`.
+
+Be aware the composite logfile generation occurs on most commands can be slow if 
+a large number of log entries are kept.  It is recommended that you specify 
+a reasonable value for *max_entries*.
 
 
 .. _must_exist:

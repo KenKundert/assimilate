@@ -48,7 +48,7 @@ from inform import (
 )
 from quantiphy import Quantity, UnitConversion, QuantiPhyError
 from time import sleep
-from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS
+from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, RESERVED_SETTINGS
 from .overdue import overdue, OVERDUE_USAGE
 from .preferences import DEFAULT_COMMAND, PROGRAM_NAME
 from .shlib import (
@@ -1600,7 +1600,7 @@ class InfoCommand(Command):
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
-    COMPOSITE_CONFIGS = "first"
+    COMPOSITE_CONFIGS = "all"
     LOG_COMMAND = True
 
     @classmethod
@@ -1663,31 +1663,6 @@ class InfoCommand(Command):
             output(out.rstrip())
 
         return borg.status
-
-
-# LogCommand command {{{1
-class LogCommand(Command):
-    NAMES = "log".split()
-    DESCRIPTION = "display log for the last assimilate run"
-    USAGE = dedent(
-        """
-        Usage:
-            assimilate log
-        """
-    ).strip()
-    REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = "all"
-    LOG_COMMAND = False
-
-    @classmethod
-    def run(cls, command, args, settings, options):
-        # read command line
-        docopt(cls.USAGE, argv=[command] + args)
-
-        try:
-            pager(settings.logfile.read_text())
-        except FileNotFoundError as e:
-            narrate(os_error(e))
 
 
 # ListCommand command {{{1
@@ -1791,7 +1766,7 @@ class ListCommand(Command):
             short = "{path}{Type}",
             date = "{mtime} {path}{Type}",
             size = "{size:8} {path}{Type}",
-            si = "{Size:6.2} {path}{Type}",
+            si = "{Size:6.2b} {path}{Type}",
             owner = "{user:8} {path}{Type}",
             group = "{group:8} {path}{Type}",
             long = '{mode:10} {user:6} {group:6} {size:8} {mtime} {path}{extra}',
@@ -1921,7 +1896,7 @@ class ListCommand(Command):
                 values['ATime'] = arrow.get(values['atime'])
             if 'size' in values:
                 total_size += values['size']
-                if '{Size' in template:
+                if 'Size' in template:
                     values['Size'] = Quantity(values['size'], "B")
             if 'csize' in values and '{CSize' in template:
                 values['CSize'] = Quantity(values['csize'], "B")
@@ -1930,6 +1905,7 @@ class ListCommand(Command):
             if 'dcsize' in values and '{DCSize' in template:
                 values['DCSize'] = Quantity(values['dcsize'], "B")
             try:
+                # use print rather than output because it is faster
                 print(colorize(template.format(**values)))
             except ValueError as e:
                 raise Error(
@@ -1945,6 +1921,31 @@ class ListCommand(Command):
             print(f"Total size = {total_size:0.2s}.")
 
         return borg.status
+
+
+# LogCommand command {{{1
+class LogCommand(Command):
+    NAMES = "log".split()
+    DESCRIPTION = "display log for the last assimilate run"
+    USAGE = dedent(
+        """
+        Usage:
+            assimilate log
+        """
+    ).strip()
+    REQUIRES_EXCLUSIVITY = False
+    COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = False
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        docopt(cls.USAGE, argv=[command] + args)
+
+        try:
+            pager(settings.logfile.read_text())
+        except FileNotFoundError as e:
+            narrate(os_error(e))
 
 
 # MountCommand command {{{1
@@ -2438,7 +2439,7 @@ class SettingsCommand(Command):
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = False
-    COMPOSITE_CONFIGS = "error"
+    COMPOSITE_CONFIGS = "first"
     LOG_COMMAND = False
 
     @classmethod
@@ -2451,7 +2452,7 @@ class SettingsCommand(Command):
         unknown = Color("yellow", enable=Color.isTTY())
         known = Color("cyan", enable=Color.isTTY())
         resolved = Color("magenta", enable=Color.isTTY())
-        color_adjust = len(known('x')) - 1
+        len_color_codes = len(known('x')) - 1
 
         def render(value):
             val = nt.dumps(value, default=str)
@@ -2465,7 +2466,7 @@ class SettingsCommand(Command):
             def show_setting(name, desc):
                 desc = fill(desc, 74-width-2)
                 text = indent(
-                    f"{known(name):>{width + color_adjust}}: {desc}",
+                    f"{known(name):>{width + len_color_codes}}: {desc}",
                     leader = leader,
                     first = -1
                 )
@@ -2481,6 +2482,11 @@ class SettingsCommand(Command):
                 attrs = BORG_SETTINGS[name]
                 show_setting(name, attrs['desc'])
 
+            output()
+            output("Read-only:")
+            for name, desc in RESERVED_SETTINGS.items():
+                show_setting(name, desc)
+
             return 0
 
         if settings:
@@ -2491,10 +2497,10 @@ class SettingsCommand(Command):
                 if requested and requested != k:
                     continue
                 if k == "passphrase":
-                    v = "<set>"
+                    v = "❬set❭"
                 if not is_str(v) or '\n' in v:
                     v = render(v)
-                output(f"{key:>{width + color_adjust}}: {v}")
+                output(f"{key:>{width + len_color_codes}}: {v}")
                 try:
                     if "{" in v and k not in settings.do_not_expand:
                         v = settings.value(k)
@@ -2505,6 +2511,14 @@ class SettingsCommand(Command):
                         ))
                 except Error:
                     pass
+
+            if not requested:
+                output()
+                output("Read-only:")
+                for name, desc in RESERVED_SETTINGS.items():
+                    key = known(name)
+                    value = render(settings.resolve(None, "{"+name+"}"))
+                    output(f"{key:>{width + len_color_codes}}: {value}")
 
     run_early = run
     # --available is handled in run_early

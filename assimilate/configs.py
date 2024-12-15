@@ -221,6 +221,14 @@ def normalize_key(key, parent_keys):
     return '_'.join(key.lower().replace('-', '_').split())
 
 # GLOBALS {{{1
+# Reserved settings {{{2
+# These are read only settings created by Assimilate
+RESERVED_SETTINGS = dict(
+    host_name = "the name of the computer running Assimlate",
+    user_name = "the name of the user running Assimilate",
+    prog_name = "the name of the command that runs Assimilate",
+)
+
 # Assimilate settings {{{2
 # Any setting found in the users settings files that is not found in
 # ASSIMILATE_SETTINGS or BORG_SETTINGS is highlighted as a unknown setting by

@@ -60,9 +60,14 @@
 #     {cases: {*: {*: {*:*}}}, checks: *}
 
 cases:
-    {*: {*: {*:*}}, checks: *}
 
-    # example:
+    # examples:
+    {*: {*: {*:*}}, checks: *}
+    # {assimilate: {assimilate: {initialize:*}}, checks: *}
+    # {assimilate: {assimilate: {druid:*}}, checks: *}
+    # {assimilate: {assimilate: {shaman:*}}, checks: *}
+    # {assimilate: {assimilate: {beautify:*}}, checks: *}
+    # {assimilate: {assimilate: {skirting:*}}, checks: *}
     # {assimilate: {assimilate: {hornet:*}}, checks: *}
 
 # skip_until:

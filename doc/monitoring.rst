@@ -40,6 +40,7 @@ the name and value of an *NTLog* command line argument.  For example:
 
     logging:
         keep for: 1d
+        max entries: 20
 
 By default *Assimilate* uses the following defaults for *NTLog*:
 
@@ -47,6 +48,7 @@ By default *Assimilate* uses the following defaults for *NTLog*:
 
     logging:
         keep for: 1w
+        max entries: 20
         day header: D MMMM YYYY  {{{{{{1
         entry header: h:mm A  {{{{{{2
         description: {cmd_name}

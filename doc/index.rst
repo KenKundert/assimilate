@@ -24,16 +24,6 @@ repository.  The philosophy of *Assimilate* is to provide commands that you woul
 use often and in an interactive manner with the expectation that you would use 
 *Borg* directly for more unusual or esoteric situations.
 
-.. important::
-
-    *Assimilate* is the next generation of Emborg_ that is designed to work with 
-    *Borg 2.0*.  You should use *Emborg* if you are using an earlier version of 
-    *Borg* and if you are currently an *Emborg* user you will need to switch to 
-    *Assimilate* when you upgrade to *Borg 2.0*.
-
-    All future development is moving to *Assimilate* and *Emborg* is 
-    transitioning to maintenance support only.
-
 
 Why Assimilate?
 ---------------
@@ -51,6 +41,16 @@ a local disaster.  Or it can be used to apply different retention rules to
 directories.   For example you might want to use conservative retention rules to 
 precious files that are not frequently accessed, such as photo, and aggressive 
 retention rules source code it held in data management systems like *GitHub*.
+
+.. important::
+
+    *Assimilate* is the next generation of Emborg_ that is designed to work with 
+    *Borg 2.0*.  You should use *Emborg* if you are using an earlier version of 
+    *Borg* and if you are currently an *Emborg* user you will need to switch to 
+    *Assimilate* when you upgrade to *Borg 2.0*.
+
+    All future development is moving to *Assimilate* and *Emborg* is 
+    transitioning to maintenance support only.
 
 
 Why Borg?
@@ -183,6 +183,7 @@ all configurations. This is a NestedText_ file located at
     # command aliases
     logging:
         keep for: 1w
+        max entries: 20
 
 There also must be individual settings files for each backup configuration.  
 They are also NestedText files.  The above file defines the *root* 
@@ -421,6 +422,7 @@ Contents
    installing
    commands
    configuring
+   migrating
    monitoring
    accessories
    examples

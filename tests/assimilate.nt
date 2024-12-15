@@ -36,12 +36,13 @@ assimilate:
                             >     list: paths
                             > logging:
                             >     keep for: 1w
+                            >     max entries: 20
                             > list formats:
                             >     name: {{path}}
                             >     short: {{path}}{{Type}}
                             >     date: {{MTime:ddd YYYY-MM-DD HH:mm:ss}} {{path}}{{Type}}
                             >     size: {{size:8}} {{path}}{{Type}}
-                            >     si: {{Size:6.2}} {{path}}{{Type}}
+                            >     si: {{Size:6.2b}} {{path}}{{Type}}
                             >     owner: {{user:8}} {{path}}{{Type}}
                             >     group: {{group:8}} {{path}}{{Type}}
                             >     long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
@@ -249,6 +250,22 @@ assimilate:
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
+            aitch — list --show-formats {{{2:
+                run: assimilate list --show-formats
+                checks:
+                    stdout:
+                        matches text:
+                            >      name: {{path}}
+                            >     short: {{path}}{{Type}}
+                            >      date: {{mtime}} {{path}}{{Type}}
+                            >      size: {{size:8}} {{path}}{{Type}}
+                            >        si: {{Size:6.2b}} {{path}}{{Type}}
+                            >     owner: {{user:8}} {{path}}{{Type}}
+                            >     group: {{group:8}} {{path}}{{Type}}
+                            >      long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
+                            >
+                            > default format: short
+
             oxcart — create again {{{2:
                 run: assimilate
                 checks:
@@ -263,8 +280,8 @@ assimilate:
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
-            expiate — repo-list {{{2:
-                run: assimilate repo-list
+            expiate — repo-list with --relocated {{{2:
+                run: assimilate --relocated repo-list
                 checks:
                     stdout:
                         matches regex:
@@ -272,11 +289,14 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-list$
+                        contains lines in order:
+                            - running command: repo-list
+                            -     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
                             -     > running command: repo-list
+                            -     >     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
                             -
 
 
@@ -645,6 +665,21 @@ assimilate:
                             -     > running command: repo-space
                             -
 
+
+            fleet — repo-space {{{2:
+                run: assimilate repo-space --free
+                checks:
+                    stdout:
+                        contains regex:
+                            > Freed [0-9.]+ MB in repository.
+
+                    ~/.local/share/assimilate/test.log:
+                        contains regex: ^running command: repo-space$
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-space
+                            -
 
             ligament — info {{{2:
                 run: assimilate info
@@ -1264,10 +1299,18 @@ assimilate:
 
 
             waggle — check {{{2:
-                run: assimilate check
+                run: assimilate check --repair
                 checks:
                     stderr:
                         matches regex: ^archive.*
+
+                    stdout:
+                        matches text:
+                            > This is a potentially dangerous function.
+                            > check --repair might lead to data loss (for kinds of corruption it is not
+                            > capable of dealing with). BE VERY CAREFUL!
+                            >
+                            > Type 'YES' if you understand this and want to continue: YES (from BORG_CHECK_I_KNOW_WHAT_I_AM_DOING)
 
                     ~/.local/share/assimilate/test.log:
                         contains regex: ^running command: check$
@@ -1640,6 +1683,39 @@ assimilate:
                             -     > running command: repo-space
                             -
 
+            doggie — repo-space {{{2:
+                run: assimilate repo-space --free
+                checks:
+                    stderr:
+                        contains text:
+                            > === test1 ===
+                            >
+                            > === test2 ===
+
+                    stdout:
+                        contains regex:
+                            > Freed [0-9.]+ MB in repository.
+                            > Now run borg prune or borg delete plus borg compact to free more space.
+                            > After that, do not forget to reserve space again for next time!
+                            > Freed [0-9.]+ MB in repository.
+                            > Now run borg prune or borg delete plus borg compact to free more space.
+                            > After that, do not forget to reserve space again for next time!
+
+                    ~/.local/share/assimilate/test1.log:
+                        contains regex: ^running command: repo-space$
+
+                    ~/.local/share/assimilate/test1.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-space
+                            -
+
+                    ~/.local/share/assimilate/test2.log:
+                        contains regex: ^running command: repo-space$
+
+                    ~/.local/share/assimilate/test2.log.nt:
+                        contains lines in order:
+                            -     > running command: repo-space
+                            -
 
             embassy — info {{{2:
                 run: assimilate info
@@ -1664,6 +1740,12 @@ assimilate:
                             > Storage quota: 0 B used
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
                             > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+
+                    stderr:
+                        matches text:
+                            > === test1 ===
+                            >
+                            > === test2 ===
 
                     ~/.local/share/assimilate/test1.log:
                         contains regex: ^running command: info$
@@ -1797,7 +1879,7 @@ assimilate:
 
 
             slice — check {{{2:
-                run: assimilate check
+                run: assimilate check --verify-data
                 checks:
                     stderr:
                         matches regex:
@@ -1981,7 +2063,7 @@ assimilate:
                         matches text: assimilate error: test: command does not support composite configs.
                     status: 2
 
-    hornet — single config, filter options {{{1:
+    hornet — single config, implicit archive, filter options {{{1:
         initialization:
             create:
                 ~/.config/assimilate/shared.conf.nt:
@@ -1994,6 +2076,8 @@ assimilate:
                 ~/.config/assimilate/test.conf.nt:
                     contents:
                         > repository: ~/REPO/{config_name}
+                        > archive: {config_name}
+                        > match archives: id:{config_name}
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -2182,33 +2266,25 @@ assimilate:
                         matches regex: archive: {aid4} {ar4} .*
 
             expect — list -a 3 {{{2:
-                run: assimilate list -a 3
+                run: assimilate list -a 3 .config
                 checks:
                     stdout:
                         matches text:
-                            > {run_dir}/
                             > {run_dir}/.config/
                             > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
 
                     stderr:
                         matches regex: archive: {aid3} {ar3} .*
 
-            shell — list -a 2 {{{2:
-                run: assimilate list -a 2
+            gremlin — list -a 2 {{{2:
+                run: assimilate list --archive 2 --recursive .config
                 checks:
                     stdout:
                         matches text:
-                            > {run_dir}/
                             > {run_dir}/.config/
                             > {run_dir}/.config/assimilate/
                             > {run_dir}/.config/assimilate/shared.conf.nt
                             > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
 
                     stderr:
                         matches regex: archive: {aid2} {ar2} .*
