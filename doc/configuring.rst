@@ -1775,7 +1775,7 @@ XDG_CONFIG_HOME
 ~~~~~~~~~~~~~~~
 
 Specifies the directory that contains configuration directories.  When set, 
-*Assimilate*s configuration directory will be ``$XDG_CONFIG_HOME/assimilate``.  
+*Assimilate*'s configuration directory will be ``$XDG_CONFIG_HOME/assimilate``.  
 If not set, the location of the configuration directories is system specific.  
 On Linux systems it is ``~/.config``.
 

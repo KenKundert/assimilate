@@ -945,26 +945,31 @@ class CreateCommand(Command):
 
         # check and prune the archives if requested
         try:
+            check_after_create = settings.check_after_create
+            if is_str(check_after_create):
+                check_after_create = check_after_create.lower()
+            if check_after_create and check_after_create not in [
+                "'no", "'yes", "'latest", "'all", "'all_in_repository"
+            ]:
+                warn(
+                    "unknown value: {}".format(
+                        settings.check_after_create
+                    ),
+                    culprit = "check_after_create",
+                )
+                check_after_create = "'latest"
+
             with make_quiet():
                 # check the archives if requested
-                activity = "checking"
                 check_status = 0
-                if settings.check_after_create:
+                if check_after_create and check_after_create != "'no":
+                    activity = "checking"
                     announce("Checking repository ...")
-                    if settings.check_after_create == "'latest":
-                        args = []
-                    elif settings.check_after_create in [True, "'all"]:
+                    args = []
+                    if settings.check_after_create == "'all":
                         args = ["--all"]
                     elif settings.check_after_create == "'all_in_repository":
                         args = ["--all", "--include-external"]
-                    else:
-                        warn(
-                            "unknown value: {}, checking 'latest.".format(
-                                settings.check_after_create
-                            ),
-                            cuplrit = "check_after_create",
-                        )
-                        args = []
                     check = CheckCommand()
                     try:
                         check.run("check", args, settings, options)

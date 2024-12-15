@@ -14,4 +14,5 @@
 .. _PostFix: http://www.postfix.org
 .. _RSync: https://www.rsync.net/products/attic.html
 .. _SpareKeys: https://github.com/kalekundert/sparekeys
+.. _transfer: https://borgbackup.readthedocs.io/en/latest/usage/transfer.html
 .. _Vorta: https://github.com/borgbase/vorta
