@@ -955,6 +955,24 @@ If you do not specify a mount point, the value of *default_mount_point* setting
 is used if set.
 
 
+.. _undelete:
+
+Undelete
+--------
+
+Removes the deletion marker from selected archives.  The :ref:`delete <delete>` 
+and :ref:`prune <prune>` commands mark particular archives for deletion, but it 
+is the :ref:`compact` command that actual performs the deletion.  The *undelete* 
+command removes deletion marks on selected archives, meaning that undeleted 
+archives will not be deleted when the *compact* command is run.  You can list 
+those archives that are marked for deletion using the :ref:`repo-list 
+<repo-list>` command with the ``--deleted`` command line option.
+
+Setting the :ref:`compact_after_delete`` option causes deleted or pruned 
+archives to be immediately and permanently deleted, making the *undelete* 
+command useless.
+
+
 .. _version:
 
 Version

@@ -84,7 +84,7 @@ from .shlib import (
 from .utilities import getfullhostname, gethostname, getusername, output
 
 # Globals {{{1
-borg_commands_with_dryrun = "create delete extract prune upgrade recreate".split()
+borg_commands_with_dryrun = "create delete extract prune upgrade recreate undelete".split()
 set_shlib_prefs(use_inform=True, log_cmd=True, encoding=DEFAULT_ENCODING)
 
 # Utilities {{{1

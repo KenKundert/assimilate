@@ -198,6 +198,7 @@ assimilate:
                             >     settings, setting
                             >                       display settings of chosen configuration
                             >     umount            un-mount a previously mounted repository or archive
+                            >     undelete          remove deletion marker from selected archives
                             >     version           display assimilate version
                             >
                             > Available topics:
@@ -299,6 +300,41 @@ assimilate:
                             -     >     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
                             -
 
+            ampere — delete {{{2:
+                run: assimilate delete -a {ar1}
+                checks:
+                    stdout:
+                        matches regex:
+                            > Done. Run "borg compact" to free space.
+
+            bristly — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+            prodigy — repo-list --deleted {{{2:
+                run: assimilate repo-list --deleted
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+
+            ascend — undelete {{{2:
+                run: assimilate undelete -a {ar1}
+                checks:
+                    stdout:
+                        matches regex:
+                            > Done.
+
+            ground — repo-list {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
             informer — list {{{2:
                 run: assimilate list
@@ -338,7 +374,7 @@ assimilate:
                             -     > running command: break-lock
                             -
 
-            rafter — prune {{{2:
+            rafter — prune :
                 run: assimilate prune
                 checks:
                     stderr:
@@ -548,6 +584,7 @@ assimilate:
                             >     settings, setting
                             >                       display settings of chosen configuration
                             >     umount            un-mount a previously mounted repository or archive
+                            >     undelete          remove deletion marker from selected archives
                             >     version           display assimilate version
                             >
                             > Available topics:
@@ -577,6 +614,7 @@ assimilate:
                             >                             oldest+range
                             >     -e, --include-external  list all archives in repository, not just
                             >                             those associated with this configuration
+                            >     -d, --deleted           only archives archives marked for deletion
 
             albino — repo-create {{{2:
                 run: assimilate repo-create
@@ -1071,6 +1109,7 @@ assimilate:
                             >     settings, setting
                             >                       display settings of chosen configuration
                             >     umount            un-mount a previously mounted repository or archive
+                            >     undelete          remove deletion marker from selected archives
                             >     version           display assimilate version
                             >
                             > Available topics:
@@ -1100,6 +1139,8 @@ assimilate:
                             >                             oldest+range
                             >     -e, --include-external  list all archives in repository, not just
                             >                             those associated with this configuration
+                            >     -d, --deleted           only archives archives marked for deletion
+
 
             epicenter — repo-create {{{2:
                 run: assimilate repo-create
@@ -2321,3 +2362,4 @@ assimilate:
                     stderr:
                         matches regex: archive: {aid0} {ar0} .*
 
+#  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell: 

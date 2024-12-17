@@ -190,7 +190,7 @@ def archive_filter_options(given_options):
     age_opts = ('--older', '--oldest', '--newer', '--newest')
     seen = []
     for opt in age_opts:
-        value = given_options[opt]
+        value = given_options.get(opt)
         if value:
             seen.append(opt)
             minutes = Quantity(value, 'd',scale='s').scale('m')
@@ -201,13 +201,15 @@ def archive_filter_options(given_options):
     cardinality_opts = ('--first', '--last')
     seen = []
     for opt in cardinality_opts:
-        value = given_options[opt]
+        value = given_options.get(opt)
         if value:
             seen.append(opt)
             processed_options.append(f"{opt}={value}")
     if len(seen) > 1:
         raise Error(f"incompatible options: {', '.join(seen)}.")
 
+    if given_options.get('--deleted'):
+        processed_options.append('--deleted')
     return processed_options
 
 
@@ -218,7 +220,7 @@ def list_archives(data, cmdline):
         cmdline[n]
         for n in [
             "--first", "--newer", "--older", "--newest", "--oldest",
-            "--include-external"
+            "--include-external", "--deleted"
         ]
     )
     num_archives = len(data['archives'])
@@ -2248,6 +2250,7 @@ class RepoListCommand(Command):
                                     oldest+range
             -e, --include-external  list all archives in repository, not just
                                     those associated with this configuration
+            -d, --deleted           only archives archives marked for deletion
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -2268,7 +2271,9 @@ class RepoListCommand(Command):
             strip_archive_matcher = include_external_archives,
         )
         if not borg.status:
-            output(list_archives(json.loads(borg.stdout), cmdline))
+            archives = list_archives(json.loads(borg.stdout), cmdline)
+            if archives:
+                output(archives)
         return borg.status
 
 
@@ -2572,6 +2577,64 @@ class UmountCommand(Command):
                 e.reraise(
                     codicil = f"Try running 'lsof +D {mount_point!s}' to find culprit."
                 )
+        return borg.status
+
+
+# UndeleteCommand command {{{1
+class UndeleteCommand(Command):
+    NAMES = "undelete".split()
+    DESCRIPTION = "remove deletion marker from selected archives"
+    USAGE = dedent(
+        """
+        Usage:
+            assimilate undelete [options]
+
+        Options:
+            -a, --archive <archive>     name of the archive to mount
+            -A, --after <date_or_age>   use first archive newer than given
+            -B, --before <date_or_age>  use first archive older than given
+            -f, --first <N>             consider first N archives that remain
+            -l, --last <N>              consider last N archives that remain
+            -n, --newer <age>           only consider archives newer than age
+            -o, --older <age>           only consider archives older than age
+            -N, --newest <range>        only consider archives between newest and
+                                        newest-range
+            -O, --oldest <range>        only consider archives between oldest and
+                                        oldest+range
+            -e, --include-external      include all archives in repository, not just
+                                        those associated with this configuration
+
+        You can apply the undelete command to any archives deleted with the
+        delete or prune commands.  However, undeleting archives is only possible
+        before compacting.
+        """
+    ).strip()
+    REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = "error"
+    LOG_COMMAND = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        borg_opts = archive_filter_options(cmdline)
+        if not borg_opts:
+            archive, description = find_archive(settings, cmdline)
+            if description:
+                display(f'archive: {description}')
+        list_opt = ['--list'] if 'dry-run' in options else []
+
+        # run borg
+        borg = settings.run_borg(
+            cmd = "undelete",
+            args = [archive],
+            assimilate_opts = options,
+            borg_opts = borg_opts + list_opt,
+            strip_archive_matcher = True,
+        )
+        out = borg.stderr or borg.stdout
+        if out:
+            output(out.rstrip())
         return borg.status
 
 
