@@ -478,9 +478,9 @@ assimilate:
                 run: assimilate setting archive
                 checks:
                     stdout:
-                        matches text:
+                        matches regex:
                             >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
-                            >            ❬when resolved❭: kundert-ken-test-{{now}}
+                            >            ❬when resolved❭: .*-test-{{now}}
 
             nettle — settings --available {{{2:
                 run: assimilate settings --available
