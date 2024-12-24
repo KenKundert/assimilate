@@ -39,8 +39,9 @@ used to simultaneously backup to a local repository, which provides rapid
 restores, and an off-site repository, which provides increased safety in case of 
 a local disaster.  Or it can be used to apply different retention rules to 
 directories.   For example you might want to use conservative retention rules to 
-precious files that are not frequently accessed, such as photo, and aggressive 
-retention rules source code it held in data management systems like *GitHub*.
+protect precious files that are not frequently accessed, such as photos, and 
+aggressive retention rules for source code it held in data management systems 
+like *GitHub*.
 
 .. important::
 

@@ -488,11 +488,15 @@ latest squeeze operation is the time to the older of the most recent *prune* or
     home compact never run.
     home check completed 11 hours ago.
 
-Adding the --backup-days option, --squeeze-days, or --check-days  results in the 
-message only being printed if the backup, squeeze, or check has not been 
+Adding the --since-backup option, --since-squeeze, or --since-check  results in 
+the message only being printed if the backup, squeeze, or check has not been 
 performed within the specified number of days.  If more than one are specified 
 and violated, only the backup violation is reported as it is considered the most 
-urgent.
+urgent.  The values specified for each are considered a length of time in days 
+unless a time unit is specified.  The available time units are *s*, *m*, *h, 
+*d*, *w*, *M*, and *y* to represent seconds, minutes, hours, days, weeks, 
+months, and years.  So for example, 3d represents three days and 1w represents 
+one week.
 
 Adding the --email option results in the message being sent to the specified 
 address rather than printed.  This allows you to run the :ref:`due <due>` 
@@ -517,13 +521,13 @@ the following replacements are available:
         reporting on a backup operation, and either *prune* or *compact* if 
         reporting on a squeeze operation, depending on which is older, and 
         *check* if reporting on a check operation.
-    {days}:
-        Replaced by the number of days since the last backup or squeeze.
-        You can add floating-point format codes to specify the resolution used.  
-        For example: {days:.1f}.
+    {since}:
+        Replaced by the time that has elapsed since the last last backup, 
+        squeeze or check.  You can add QuantiPhy_ format codes to specify the 
+        resolution and the units used.  For example: {since:.1pd}.
     {elapsed}:
         Replaced with a humanized description of how long it has been since the 
-        last backup.
+        last backup, squeeze, or check.
 
 So ``--message '{elapsed} since last {action} of {config}.'`` might produce 
 something like this:
@@ -968,9 +972,9 @@ archives will not be deleted when the *compact* command is run.  You can list
 those archives that are marked for deletion using the :ref:`repo-list 
 <repo-list>` command with the ``--deleted`` command line option.
 
-Setting the :ref:`compact_after_delete`` option causes deleted or pruned 
-archives to be immediately and permanently deleted, making the *undelete* 
-command useless.
+Setting the :ref:`compact_after_delete` option causes deleted or pruned archives 
+to be immediately and permanently deleted, making the *undelete* command 
+useless.
 
 
 .. _version:

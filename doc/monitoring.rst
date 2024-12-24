@@ -256,11 +256,6 @@ In addition, there are some shared settings available:
     - datetimes can include Arrow_ formats, ex: {mtime:DD MMM YY @ H:mm A}
     - booleans can include Inform_ true/false strings: {overdue:PAST DUE!/current}
 
-.. _QuantiPhy: https://quantiphy.readthedocs.io/en/stable/api.html#quantiphy.Quantity.format
-.. _Arrow: https://arrow.readthedocs.io/en/latest/guide.html#supported-tokens
-.. _Inform: https://inform.readthedocs.io/en/stable/api.html#inform.truth
-.. _NestedText: https://nestedtext.org
-
 To run the program interactively, type:
 
 .. code-block:: bash

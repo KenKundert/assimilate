@@ -16,8 +16,6 @@ Options:
     -n, --notify         Send notification if backup is overdue
     -N, --nt             Output summary in NestedText format
     -p, --no-passes      Do not show hosts that are not overdue
-    -q, --quiet          Suppress output to stdout
-    -v, --verbose        Give more information about each repository
     -M, --message <msg>  Status message template for each repository
     --version            Show software version
 
@@ -339,17 +337,12 @@ def overdue(cmdline, args, settings, options):
     colorscheme = None if colorscheme == "none" else colorscheme
     message = settings.get("message", terse_status_message)
 
-    if cmdline["--quiet"]:
-        inform.quiet = True
-        inform.narrate = False
-        inform.verbose = False
-
     problem = False
     if cmdline["--message"]:
         message = cmdline["--message"]
     if cmdline["--no-color"]:
         colorscheme = None
-    if cmdline["--verbose"]:
+    if "verbose" in options:
         message = verbose_status_message
 
     report_as_current = InformantFactory(

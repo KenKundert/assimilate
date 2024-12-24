@@ -1,5 +1,6 @@
 .. currentmodule:: assimilate
 
+.. _Arrow: https://arrow.readthedocs.io/en/latest/guide.html#supported-tokens
 .. _Avendesora: https://avendesora.readthedocs.io
 .. _BorgBackup: https://borgbackup.readthedocs.io
 .. _BorgBase: https://www.borgbase.com
@@ -9,9 +10,11 @@
 .. _GitHub: https://github.com/KenKundert/assimilate/issues
 .. _HealthChecks.io: https://healthchecks.io
 .. _Hetzner: https://www.hetzner.com/storage/storage-box
+.. _Inform: https://inform.readthedocs.io/en/stable/api.html#inform.truth
 .. _NestedText: https://nestedtext.org
 .. _NTlog: https://github.com/KenKundert/ntlog
 .. _PostFix: http://www.postfix.org
+.. _QuantiPhy: https://quantiphy.readthedocs.io/en/stable/api.html#quantiphy.Quantity.format
 .. _RSync: https://www.rsync.net/products/attic.html
 .. _SpareKeys: https://github.com/kalekundert/sparekeys
 .. _transfer: https://borgbackup.readthedocs.io/en/latest/usage/transfer.html

@@ -199,10 +199,11 @@ class Checker:
             # assure that all expected lines are present and in the right order
             prev_index = -1
             for line in expected:
-                assert line in self.lines, self.fail_message(match_type, line)
-                index = self.lines.index(line)
-                assert prev_index < index, self.fail_message(match_type, line, 'line found out of order')
-                prev_index = index
+                lines_remaining = self.lines[prev_index+1:]
+                assert line in lines_remaining, self.fail_message(
+                    match_type, line, f"line missing from [{prev_index}:..]"
+                )
+                prev_index = lines_remaining.index(line)
         elif match_type == 'contains_text':
             assert expected in self.contents, self.fail_message(match_type, expected)
         elif match_type == 'matches_regex':
@@ -363,7 +364,10 @@ def run_tests(suite, category, scenario, initialization, tests, home_dir, subTes
             cmd = test['run']
             if cmd == "BREAK":
                 break
-            cmd = cmd.format(run_dir=run_dir, **matches)
+            try:
+                cmd = cmd.format(run_dir=run_dir, **matches)
+            except (ValueError, KeyError) as e:
+                raise AssertionError(f"{full_test_name}: {e.__class__.__name__}: {e!s}")
             checker = Checker(full_test_name, cmd, home_dir)
 
             os.umask(DEFAULT_UMASK)

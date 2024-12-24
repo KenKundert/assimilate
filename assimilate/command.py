@@ -72,7 +72,15 @@ UnitConversion('s', 'd day days', 24*60*60)
 UnitConversion('s', 'w week weeks', 7*24*60*60)
 UnitConversion('s', 'M month months', 30*24*60*60)
 UnitConversion('s', 'y year years', 365*24*60*60)
+UnitConversion('d', 'm min minute minutes', 1/60/24)
+UnitConversion('d', 'h hr hour hours', 1/24)
+UnitConversion('d', 'w week weeks', 7)
+UnitConversion('d', 'M month months', 30)
+UnitConversion('d', 'y year years', 365)
 Quantity.set_prefs(ignore_sf=True, spacer='')
+
+def to_seconds(value, default_units='d'):
+    return Quantity(value, default_units, scale='s')
 
 # title() {{{2
 def title(text):
@@ -559,7 +567,11 @@ class CheckCommand(Command):
             borg_opts = borg_opts,
             strip_archive_matcher = include_external_archives,
         )
-        out = borg.stderr or borg.stdout
+        if repair:
+            out = borg.stdout
+                # suppress borg's stderr during repairs
+        else:
+            out = borg.stderr or borg.stdout
         if out:
             output(out.rstrip())
 
@@ -1189,25 +1201,31 @@ class DueCommand(Command):
             assimilate due [options]
 
         Options:
-            -d, --backup-days <num>   emit message if this many days have passed
-                                      since last backup
-            -D, --squeeze-days <num>  emit message if this many days have passed
-                                      since last prune and compact
-            -C, --check-days <num>    emit message if this many days have passed
-                                      since last check
-            -e, --email <addr>        send email message rather than print message
-                                      may be comma separated list of addresses
-            -s, --subject <subject>   subject line if sending email
-            -m, --message <msg>       the message to emit
-            -o, --oldest              with composite configuration, only report
-                                      the oldest
+            -b, --since-backup <days>   emit message if this many days have passed
+                                        since last backup
+            -s, --since-squeeze <days>  emit message if this many days have passed
+                                        since last prune and compact
+            -c, --since-check <days>    emit message if this many days have passed
+                                        since last check
+            -e, --email <addr>          send email message rather than print message
+                                        may be comma separated list of addresses
+            -S, --subject <subject>     subject line if sending email
+            -m, --message <msg>         the message to emit
+            -o, --oldest                with composite configuration, only report
+                                        the oldest
 
-        If you specify the days, then the message is only printed if the backup
+        If you specify the days, then the message is only printed if the action
         is overdue.  If not overdue, nothing is printed.  The message is always
         printed if days is not specified.
 
+        If you specify a simple value to -b, -s, or -c it is taken as a time
+        interval measured in days.  However, you can also add one of the
+        following units to the value: s, m, h, d, w, M, or y to represent
+        seconds, minutes, hours, days, weeks, months, and years.  Thus, 1w
+        represents one week.
+
         If you specify the message, the following replacements are available:
-            days: the number of days since the backup, a float.
+            since: the time that has elapsed since the backup, a quantity.
             elapsed: the time that has elapsed since the backup, a string.
             config: the name of the configuration, a string.
             cmd: the command name being reported on (‘create’, ‘prune’, or ‘compact’)
@@ -1221,10 +1239,10 @@ class DueCommand(Command):
             root squeeze completed 4.6 days ago.
             root check completed 12 days ago.
 
-            > assimilate due -d0.5 -m "It has been {days:.1f} days since the last {action}."
-            It has been 0.8 days since the last backup.
+            > assimilate due -b1 -m "It has been {since:.1pd} days since the last {action}."
+            It has been 1.8 days since the last backup.
 
-            > assimilate due -D10 -m "It has been {elapsed} since the last {cmd} of {config}."
+            > assimilate due -s10 -m "It has been {elapsed} since the last {cmd} of {config}."
             It has been 2 weeks since the last prune of home.
         """
     ).strip()
@@ -1242,9 +1260,9 @@ class DueCommand(Command):
         cmdline = docopt(cls.USAGE, argv=[command] + args)
         email = cmdline["--email"]
         config = settings.config_name
-        backup_days = cmdline.get("--backup-days")
-        squeeze_days = cmdline.get("--squeeze-days")
-        check_days = cmdline.get("--check-days")
+        since_backup_thresh = cmdline.get("--since-backup")
+        since_squeeze_thresh = cmdline.get("--since-squeeze")
+        since_check_thresh = cmdline.get("--since-check")
         exit_status = None
 
         def gen_message(cmd):
@@ -1255,9 +1273,9 @@ class DueCommand(Command):
             elapsed = when(date)
             if cmdline["--message"]:
                 since_last_backup = arrow.now() - date
-                days = since_last_backup.total_seconds() / 86400
+                days = Quantity(since_last_backup.total_seconds(), 's', scale='d')
                 replacements = dict(
-                    days=days, elapsed=elapsed, config=config,
+                    since=days, elapsed=elapsed, config=config,
                     cmd=cmd, action=action
                 )
                 try:
@@ -1331,37 +1349,37 @@ class DueCommand(Command):
                 cls.OLDEST_CONFIG[action] = config
 
         # Warn user if backup is overdue
-        if backup_days and last_run['backup']:
+        if since_backup_thresh and last_run['backup']:
             since_last_backup = arrow.now() - last_run['backup']
-            days = since_last_backup.total_seconds() / 86400
+            seconds = since_last_backup.total_seconds()
             try:
-                if days > float(backup_days):
+                if seconds > to_seconds(since_backup_thresh):
                     deliver_message('backup')
                     exit_status = 1
             except ValueError:
                 raise Error("expected a number for --backup-days.")
-            if not squeeze_days and not check_days:
+            if not since_squeeze_thresh and not since_check_thresh:
                 return exit_status
 
         # Warn user if prune or compact is overdue
-        if squeeze_days and last_run['squeeze']:
+        if since_squeeze_thresh and last_run['squeeze']:
             since_last_squeeze = arrow.now() - last_run['squeeze']
-            days = since_last_squeeze.total_seconds() / 86400
+            seconds = since_last_squeeze.total_seconds()
             try:
-                if days > float(squeeze_days):
+                if seconds > to_seconds(since_squeeze_thresh):
                     deliver_message(squeeze_cmd)
                     exit_status = 1
             except ValueError:
                 raise Error("expected a number for --squeeze-days.")
-            if not check_days:
+            if not since_check_thresh:
                 return exit_status
 
         # Warn user if check is overdue
-        if check_days and last_run['check']:
+        if since_check_thresh and last_run['check']:
             since_last_check = arrow.now() - last_run['check']
-            days = since_last_check.total_seconds() / 86400
+            seconds = since_last_check.total_seconds()
             try:
-                if days > float(check_days):
+                if seconds > to_seconds(since_check_thresh):
                     deliver_message('check')
                     exit_status = 1
             except ValueError:
@@ -1369,7 +1387,7 @@ class DueCommand(Command):
             return exit_status
 
         # Otherwise, simply report age of backups
-        if not backup_days and not squeeze_days and not check_days:
+        if not since_backup_thresh and not since_squeeze_thresh and not since_check_thresh:
             deliver_message('backup')
             deliver_message(squeeze_cmd)
             deliver_message('check')
@@ -2108,8 +2126,8 @@ class PruneCommand(Command):
         determined by the prune rules.  However, the disk space is not reclaimed
         until the compact command is run.  You can specify that a compaction is
         performed as part of the prune by setting compact_after_delete.  If set,
-        the --fast flag causes the compaction to be skipped.  If not set, the
-        --fast flag has no effect.
+        the fast flag causes the compaction to be skipped.  If not set, the
+        fast flag has no effect.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
