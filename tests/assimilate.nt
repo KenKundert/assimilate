@@ -3105,14 +3105,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
-                            > -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > -rw------- .+ 4000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > -rw------- .+ 400000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > -rw------- .+ 40000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
+                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
+                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
+                            > -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > -rw------- .+ 4000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > -rw------- .+ 400000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > -rw------- .+ 40000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
                             > Total size = 444151B.
 
             surpass — list --name {{{2:
@@ -3157,14 +3157,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
 
             cataract — list --sort-by-size {{{2:
                 run: assimilate list --sort-by-size
