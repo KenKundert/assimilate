@@ -2093,7 +2093,7 @@ class OverdueCommand(Command):
     NAMES = "overdue".split()
     DESCRIPTION = "show status of known repositories"
     USAGE = OVERDUE_USAGE.strip()
-    REQUIRES_EXCLUSIVITY = True
+    REQUIRES_EXCLUSIVITY = False
     COMPOSITE_CONFIGS = "first"
     LOG_COMMAND = True
 

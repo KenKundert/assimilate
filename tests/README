@@ -41,11 +41,11 @@ is::
 
                 ~/a:
                     contents: aaa
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27
 
                 ~/b:
                     contents: bbb
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26
 
 The scenario name, in this case ‘druid’, precedes the em dash.  The text that 
 follows the dash is a description that is ignored.  The name is generally chosen 

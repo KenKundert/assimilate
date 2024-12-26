@@ -134,12 +134,12 @@ assimilate:
                 ~/a:
                     contents:
                         > aaa
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27
 
                 ~/b:
                     contents:
                         > bbb
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26
 
         tests:
             catacomb — version {{{2:
@@ -659,11 +659,11 @@ assimilate:
 
                 ~/a:
                     contents: aaa
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27
 
                 ~/b:
                     contents: bbb
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26
 
         tests:
             jogger — version {{{2:
@@ -1239,11 +1239,11 @@ assimilate:
 
                 ~/a:
                     contents: aaa
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27
 
                 ~/b:
                     contents: bbb
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26
 
         tests:
             compel — version {{{2:
@@ -1381,7 +1381,7 @@ assimilate:
                     create:
                         ~/c:
                             contents: ccc
-                            ctime: 2024-11-28
+                            mtime: 2024-11-28
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
@@ -1755,11 +1755,11 @@ assimilate:
 
                 ~/a:
                     contents: aaa
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27
 
                 ~/b:
                     contents: bbb
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26
 
         tests:
             tundra — repo-create {{{2:
@@ -1846,7 +1846,7 @@ assimilate:
                     create:
                         ~/c:
                             contents: ccc
-                            ctime: 2024-11-28
+                            mtime: 2024-11-28
                 run: assimilate -q
                 checks:
                     ~/.local/share/assimilate/test1.log:
@@ -2323,12 +2323,12 @@ assimilate:
                 ~/a:
                     contents:
                         > aaa
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27
 
                 ~/b:
                     contents:
                         > bbb
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26
 
         tests:
             pantry — repo-create {{{2:
@@ -2608,12 +2608,12 @@ assimilate:
                 ~/a:
                     contents:
                         > aaa
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27
 
                 ~/b:
                     contents:
                         > bbb
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26
 
         tests:
             expatiate — run repo-list before repo exists {{{2:
@@ -3001,10 +3001,20 @@ assimilate:
     retract — various list formats {{{1:
         initialization:
             create:
+                ~/:
+                    mtime: 2024-11-20T00:00:00
+
+                ~/.config/:
+                    mtime: 2024-11-21T00:00:00
+
+                ~/.config/assimilate/:
+                    mtime: 2024-11-22T00:00:00
+
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > default config: test
                         > encryption: none
+                    mtime: 2024-11-23T00:00:00
 
                 ~/REPO/:
 
@@ -3017,18 +3027,19 @@ assimilate:
                         >     - - ~/.local
                         >     - - ~/bu
                         >     - - ~/REPO
+                    mtime: 2024-11-24T00:00:00
 
                 ~/a:
                     contents: !1000*'aaa\n'
-                    ctime: 2024-11-27
+                    mtime: 2024-11-27T00:00:00
 
                 ~/b:
                     contents: !100_000*'bbb\n'
-                    ctime: 2024-11-26
+                    mtime: 2024-11-26T00:00:00
 
                 ~/c:
                     contents: !10_000*'ccc\n'
-                    ctime: 2024-11-25
+                    mtime: 2024-11-25T00:00:00
 
         tests:
             crumb — repo-create {{{2:
@@ -3038,6 +3049,18 @@ assimilate:
                         contains text: Reserve some repository storage space now for emergencies
 
             decimate — create {{{2:
+                initialization:
+                    # reset the modification times for the directories
+                    create:
+                        ~/:
+                            mtime: 2024-11-27T00:00:00
+
+                        ~/.config/:
+                            mtime: 2024-11-28T00:00:00
+
+                        ~/.config/assimilate/:
+                            mtime: 2024-11-29T00:00:00
+
                 run: assimilate create
 
             chimera — list {{{2:
@@ -3082,14 +3105,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}
-                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config
-                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate
-                            > -rw------- ken    ken          37 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
-                            > -rw------- ken    ken         114 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
-                            > -rw------- ken    ken        4000 2024-11-26T16:00:00.000000-08:00 {run_dir}/a
-                            > -rw------- ken    ken      400000 2024-11-25T16:00:00.000000-08:00 {run_dir}/b
-                            > -rw------- ken    ken       40000 2024-11-24T16:00:00.000000-08:00 {run_dir}/c
+                            > drwx------ .+ 0 2024-11-26T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
+                            > drwx------ .+ 0 2024-11-27T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
+                            > drwx------ .+ 0 2024-11-28T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
+                            > -rw------- .+ 37 2024-11-22T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > -rw------- .+ 114 2024-11-23T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > -rw------- .+ 4000 2024-11-26T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > -rw------- .+ 400000 2024-11-25T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > -rw------- .+ 40000 2024-11-24T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
                             > Total size = 444151B.
 
             surpass — list --name {{{2:
@@ -3134,14 +3157,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > 2024-11-24T16:00:00.000000-08:00 {run_dir}/c
-                            > 2024-11-25T16:00:00.000000-08:00 {run_dir}/b
-                            > 2024-11-26T16:00:00.000000-08:00 {run_dir}/a
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/
+                            > 2024-11-22T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > 2024-11-23T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > 2024-11-24T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > 2024-11-25T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > 2024-11-26T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > 2024-11-26T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > 2024-11-27T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > 2024-11-28T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
 
             cataract — list --sort-by-size {{{2:
                 run: assimilate list --sort-by-size
@@ -3186,15 +3209,15 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches text:
-                            > ken      {run_dir}/
-                            > ken      {run_dir}/.config/
-                            > ken      {run_dir}/.config/assimilate/
-                            > ken      {run_dir}/.config/assimilate/shared.conf.nt
-                            > ken      {run_dir}/.config/assimilate/test.conf.nt
-                            > ken      {run_dir}/a
-                            > ken      {run_dir}/b
-                            > ken      {run_dir}/c
+                        matches regex:
+                            > .+ {run_dir}/
+                            > .+ {run_dir}/.config/
+                            > .+ {run_dir}/.config/assimilate/
+                            > .+ {run_dir}/.config/assimilate/shared.conf.nt
+                            > .+ {run_dir}/.config/assimilate/test.conf.nt
+                            > .+ {run_dir}/a
+                            > .+ {run_dir}/b
+                            > .+ {run_dir}/c
 
 
             uniform — list --sort-by-group {{{2:

@@ -12,6 +12,7 @@ Usage:
 Options:
     -c, --no-color       Do not color the output
     -h, --help           Output basic usage information
+    -l, --local          Only report on local repositories
     -m, --mail           Send mail message if backup is overdue
     -n, --notify         Send notification if backup is overdue
     -N, --nt             Output summary in NestedText format
@@ -377,7 +378,8 @@ def overdue(cmdline, args, settings, options):
         try:
             if host:
                 ignoring = ("max_age", "repo")
-                repos_data = get_remote_data(description, host, config, command)
+                if not cmdline["--local"]:
+                    repos_data = get_remote_data(description, host, config, command)
             else:
                 ignoring = ("command",)
                 repos_data = get_local_data(
@@ -449,8 +451,9 @@ def overdue(cmdline, args, settings, options):
         else:
             subject = "backup is overdue"
         messages = '\n\n'.join(overdue_hosts.values())
-        if settings.notify:
-            send_mail(settings.notify, subject, messages)
+        notify = settings.get('notify')
+        if notify:
+            send_mail(notify, subject, messages)
         else:
             raise Error('must specify notify setting to send mail.')
 

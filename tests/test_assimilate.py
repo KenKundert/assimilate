@@ -129,7 +129,7 @@ def as_lines(arg):
 create_file_schema = {
     Optional("contents"): as_str_expr,
     Optional("mode"): as_str,
-    Optional("ctime"): as_str,
+    Optional("mtime"): as_str,
 }
 
 checks_schema = {
@@ -451,24 +451,29 @@ def file_ops(operations):
     for type, ops in operations.items():
         if type == 'create':
             for filename, attributes in ops.items():
+                if not attributes:
+                    attributes = {}
                 path = to_path(filename)
 
                 if filename.endswith('/'):
                     path.mkdir(parents=True, exist_ok=True)
-                    continue
+                else:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    contents = attributes.get("contents", "")
+                    path.write_text(contents)
 
-                path.parent.mkdir(parents=True, exist_ok=True)
-                contents = attributes.get("contents", "")
                 mode = attributes.get("mode", None)
-                ctime = attributes.get("ctime", None)
-                if ctime:
-                    ctime = arrow.get(ctime)
-                path.write_text(contents)
                 if mode:
                     path.chmod(mode)
-                if ctime:
-                    create_time = ctime.timestamp()
-                    os.utime(path, (create_time, create_time))
+
+                mtime = attributes.get("mtime", None)
+                if mtime:
+                    mtime = arrow.get(mtime)
+
+                if mtime:
+                    mod_time = mtime.timestamp()
+                    os.utime(path, (mod_time, mod_time))
+
         elif type == 'remove':
             for filename in ops:
                 to_path(filename).unlink()
