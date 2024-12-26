@@ -3105,14 +3105,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
-                            > -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > -rw------- .+ 4000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > -rw------- .+ 400000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > -rw------- .+ 40000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}
+                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config
+                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate
+                            > -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
+                            > -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
+                            > -rw------- .+ 4000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
+                            > -rw------- .+ 400000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
+                            > -rw------- .+ 40000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/c
                             > Total size = 444151B.
 
             surpass — list --name {{{2:
@@ -3157,14 +3157,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/c
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/
+                            > \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/
 
             cataract — list --sort-by-size {{{2:
                 run: assimilate list --sort-by-size
@@ -3228,14 +3228,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > ken      {run_dir}/
-                            > ken      {run_dir}/.config/
-                            > ken      {run_dir}/.config/assimilate/
-                            > ken      {run_dir}/.config/assimilate/shared.conf.nt
-                            > ken      {run_dir}/.config/assimilate/test.conf.nt
-                            > ken      {run_dir}/a
-                            > ken      {run_dir}/b
-                            > ken      {run_dir}/c
+                            > .+ {run_dir}/
+                            > .+ {run_dir}/.config/
+                            > .+ {run_dir}/.config/assimilate/
+                            > .+ {run_dir}/.config/assimilate/shared.conf.nt
+                            > .+ {run_dir}/.config/assimilate/test.conf.nt
+                            > .+ {run_dir}/a
+                            > .+ {run_dir}/b
+                            > .+ {run_dir}/c
 
             piggery — list --sort-by-key {{{2:
                 run: assimilate list --sort-by-key size
