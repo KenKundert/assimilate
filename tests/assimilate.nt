@@ -3048,14 +3048,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+                            > {run_dir}/c
 
             villager — list --short {{{2:
                 run: assimilate list --short
@@ -3065,14 +3065,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+                            > {run_dir}/c
 
             drowse — list --long {{{2:
                 run: assimilate list --long
@@ -3082,14 +3082,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
-                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
-                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
-                            > -rw------- ken    ken          37 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > -rw------- ken    ken         114 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > -rw------- ken    ken        4000 2024-11-26T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > -rw------- ken    ken      400000 2024-11-25T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > -rw------- ken    ken       40000 2024-11-24T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}
+                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config
+                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate
+                            > -rw------- ken    ken          37 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
+                            > -rw------- ken    ken         114 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
+                            > -rw------- ken    ken        4000 2024-11-26T16:00:00.000000-08:00 {run_dir}/a
+                            > -rw------- ken    ken      400000 2024-11-25T16:00:00.000000-08:00 {run_dir}/b
+                            > -rw------- ken    ken       40000 2024-11-24T16:00:00.000000-08:00 {run_dir}/c
                             > Total size = 444151B.
 
             surpass — list --name {{{2:
@@ -3100,14 +3100,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > {run_dir}
+                            > {run_dir}/.config
+                            > {run_dir}/.config/assimilate
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+                            > {run_dir}/c
 
             scare — list --sort-by-name {{{2:
                 run: assimilate list --sort-by-name
@@ -3117,14 +3117,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+                            > {run_dir}/c
 
             evaporate — list --sort-by-date {{{2:
                 run: assimilate list --sort-by-date
@@ -3134,14 +3134,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > 2024-11-24T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
-                            > 2024-11-25T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > 2024-11-26T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > 2024-11-24T16:00:00.000000-08:00 {run_dir}/c
+                            > 2024-11-25T16:00:00.000000-08:00 {run_dir}/b
+                            > 2024-11-26T16:00:00.000000-08:00 {run_dir}/a
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d {run_dir}/
 
             cataract — list --sort-by-size {{{2:
                 run: assimilate list --sort-by-size
@@ -3151,14 +3151,32 @@ assimilate:
 
                     stdout:
                         matches text:
-                            >      0B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            >      0B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            >      0B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            >     37B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            >    114B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > 3.91KiB tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > 39.1KiB tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
-                            >  391KiB tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            >      0B {run_dir}/
+                            >      0B {run_dir}/.config/
+                            >      0B {run_dir}/.config/assimilate/
+                            >     37B {run_dir}/.config/assimilate/shared.conf.nt
+                            >    114B {run_dir}/.config/assimilate/test.conf.nt
+                            > 3.91KiB {run_dir}/a
+                            > 39.1KiB {run_dir}/c
+                            >  391KiB {run_dir}/b
+                            > Total size = 444151B.
+
+            relegate — list --sort-by-size --reverse-sort {{{2:
+                run: assimilate list --sort-by-size --reverse-sort
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            >  391KiB {run_dir}/b
+                            > 39.1KiB {run_dir}/c
+                            > 3.91KiB {run_dir}/a
+                            >    114B {run_dir}/.config/assimilate/test.conf.nt
+                            >     37B {run_dir}/.config/assimilate/shared.conf.nt
+                            >      0B {run_dir}/.config/assimilate/
+                            >      0B {run_dir}/.config/
+                            >      0B {run_dir}/
                             > Total size = 444151B.
 
             coquette — list --sort-by-owner {{{2:
@@ -3169,14 +3187,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > ken      {run_dir}/
+                            > ken      {run_dir}/.config/
+                            > ken      {run_dir}/.config/assimilate/
+                            > ken      {run_dir}/.config/assimilate/shared.conf.nt
+                            > ken      {run_dir}/.config/assimilate/test.conf.nt
+                            > ken      {run_dir}/a
+                            > ken      {run_dir}/b
+                            > ken      {run_dir}/c
 
 
             uniform — list --sort-by-group {{{2:
@@ -3187,14 +3205,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > ken      {run_dir}/
+                            > ken      {run_dir}/.config/
+                            > ken      {run_dir}/.config/assimilate/
+                            > ken      {run_dir}/.config/assimilate/shared.conf.nt
+                            > ken      {run_dir}/.config/assimilate/test.conf.nt
+                            > ken      {run_dir}/a
+                            > ken      {run_dir}/b
+                            > ken      {run_dir}/c
 
             piggery — list --sort-by-key {{{2:
                 run: assimilate list --sort-by-key size
@@ -3204,14 +3222,14 @@ assimilate:
 
                     stdout:
                         matches text:
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
-                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/c
+                            > {run_dir}/b
                             > Total size = 444151B.
 
             coyote — list --format {{{2:
@@ -3222,15 +3240,41 @@ assimilate:
 
                     stdout:
                         matches text:
-                            >        0 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
-                            >        0 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
-                            >        0 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
-                            >       37 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            >      114 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            >     4000 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            >   400000 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            >    40000 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            >        0 {run_dir}/
+                            >        0 {run_dir}/.config/
+                            >        0 {run_dir}/.config/assimilate/
+                            >       37 {run_dir}/.config/assimilate/shared.conf.nt
+                            >      114 {run_dir}/.config/assimilate/test.conf.nt
+                            >     4000 {run_dir}/a
+                            >   400000 {run_dir}/b
+                            >    40000 {run_dir}/c
                             > Total size = 444151B.
+
+            sphere — list ❬path❭ {{{2:
+                run: assimilate list .config
+
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+
+            yacht — list ❬path❭ {{{2:
+                run: assimilate list --recursive .config
+
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
 
             shoulder — list --show-formats {{{2:
                 run: assimilate list --show-formats

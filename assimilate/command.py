@@ -1780,11 +1780,6 @@ class ListCommand(Command):
         else:
             path = ''
 
-        # get the desired archive
-        archive, description = find_archive(settings, cmdline)
-        if description and not cmdline["--show-formats"]:
-            display(f'archive: {description}')
-
         # predefined formats
         formats = dict(
             name = "{path}",
@@ -1810,6 +1805,11 @@ class ListCommand(Command):
             output()
             output(f'default format: {default_format}')
             return
+
+        # get the desired archive
+        archive, description = find_archive(settings, cmdline)
+        if description:
+            display(f'archive: {description}')
 
         # process sort options
         fmt = default_format
@@ -1859,6 +1859,9 @@ class ListCommand(Command):
             f'--format={keys}',
             archive,
         ]
+        if path:
+            args.append(path)
+
         borg = settings.run_borg(
             cmd="list", args=args, assimilate_opts=options,
         )
