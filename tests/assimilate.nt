@@ -3105,14 +3105,14 @@ assimilate:
 
                     stdout:
                         matches regex:
-                            > drwx------ .+ 0 2024-11-26T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
-                            > drwx------ .+ 0 2024-11-27T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
-                            > drwx------ .+ 0 2024-11-28T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
-                            > -rw------- .+ 37 2024-11-22T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
-                            > -rw------- .+ 114 2024-11-23T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
-                            > -rw------- .+ 4000 2024-11-26T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
-                            > -rw------- .+ 400000 2024-11-25T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
-                            > -rw------- .+ 40000 2024-11-24T16:00:00.000000-\d\d?\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > drwx------ .+ 0 2024-11-26T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
+                            > drwx------ .+ 0 2024-11-27T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
+                            > drwx------ .+ 0 2024-11-28T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
+                            > -rw------- .+ 37 2024-11-22T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > -rw------- .+ 114 2024-11-23T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > -rw------- .+ 4000 2024-11-26T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > -rw------- .+ 400000 2024-11-25T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > -rw------- .+ 40000 2024-11-24T16:00:00.000000-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
                             > Total size = 444151B.
 
             surpass — list --name {{{2:
