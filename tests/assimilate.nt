@@ -42,7 +42,7 @@ assimilate:
                             >     short: {{path}}{{Type}}
                             >     date: {{MTime:ddd YYYY-MM-DD HH:mm:ss}} {{path}}{{Type}}
                             >     size: {{size:8}} {{path}}{{Type}}
-                            >     si: {{Size:6.2b}} {{path}}{{Type}}
+                            >     si: {{Size:7.2b}} {{path}}{{Type}}
                             >     owner: {{user:8}} {{path}}{{Type}}
                             >     group: {{group:8}} {{path}}{{Type}}
                             >     long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
@@ -260,7 +260,7 @@ assimilate:
                             >     short: {{path}}{{Type}}
                             >      date: {{mtime}} {{path}}{{Type}}
                             >      size: {{size:8}} {{path}}{{Type}}
-                            >        si: {{Size:6.2b}} {{path}}{{Type}}
+                            >        si: {{Size:7.2b}} {{path}}{{Type}}
                             >     owner: {{user:8}} {{path}}{{Type}}
                             >     group: {{group:8}} {{path}}{{Type}}
                             >      long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
@@ -658,13 +658,11 @@ assimilate:
                         >     - - ~/REPO
 
                 ~/a:
-                    contents:
-                        > aaa
+                    contents: aaa
                     ctime: 2024-11-27
 
                 ~/b:
-                    contents:
-                        > bbb
+                    contents: bbb
                     ctime: 2024-11-26
 
         tests:
@@ -1700,7 +1698,7 @@ assimilate:
                         matches regex:
                             > {aid0}  .*  {ar0}  .*
 
-    skirting — composite config that uses patterns and implicit archive {{{1:
+    daemon — composite config that uses patterns and implicit archive {{{1:
         initialization:
             create:
                 ~/.config/assimilate/shared.conf.nt:
@@ -2558,6 +2556,23 @@ assimilate:
                     stderr:
                         matches regex: archive: {aid0} {ar0} .*
 
+            outlet — mount ASSIMILATE {{{2:
+                run: assimilate mount /{run_dir}/ASSIMILATE
+                checks:
+                    stderr:
+                        matches regex:
+                            > mount point is: /{run_dir}/ASSIMILATE
+                            > archive: {aid0} {ar0} .*
+                    ~/ASSIMILATE/test-{aid1}/{run_dir}/a:
+                        matches text: aaa
+                    ~/ASSIMILATE/test-{aid1}/{run_dir}/b:
+                        matches text: bbb
+                    ~/ASSIMILATE/test-{aid0}/{run_dir}/a:
+                        matches text: aaa
+
+            virtue — umount ASSIMILATE {{{2:
+                run: assimilate umount /{run_dir}/ASSIMILATE
+
     analytic — single config, src_dirs, relative working_dir {{{1:
         initialization:
             create:
@@ -2815,7 +2830,7 @@ assimilate:
                 run: assimilate due --since-backup 0  --message '{{config}}: {{cmd}} {{action}} {{since}} {{elapsed}}'
                 checks:
                     stdout:
-                        matches regex: ^test: backup backup 0d \d+ seconds
+                        matches regex: ^test: backup backup 0d .*
 
                     status: 1
 
@@ -2823,7 +2838,7 @@ assimilate:
                 run: assimilate due --since-check 0h  --message '{{config}}: {{cmd}} {{action}} {{since:0.1ph}} {{elapsed}}'
                 checks:
                     stdout:
-                        matches regex: ^test: check check 0h \d+ seconds
+                        matches regex: ^test: check check 0h .*
 
                     status: 1
 
@@ -2831,7 +2846,7 @@ assimilate:
                 run: assimilate due --since-squeeze 0Y  --message '{{config}}: {{cmd}} {{action}} {{since:0.0ps}} {{elapsed}}'
                 checks:
                     stdout:
-                        matches regex: ^test: prune squeeze \d+s \d+ seconds
+                        matches regex: ^test: prune squeeze \d+s .*
 
                     status: 1
 
@@ -2931,5 +2946,306 @@ assimilate:
                             #     borg \
                             #         compact \
                             #         --repo=/{run_dir}/REPO/test
+
+            cannon — overdue {{{2:
+                run: assimilate overdue
+                checks:
+                    stderr:
+                        matches regex:
+                            > test: .* ago
+
+            locket — overdue --message {{{2:
+                run: assimilate overdue --message="{{description}}\n{{max_age}}\n{{mtime}}\n{{age}}\n{{updated}}\n{{overdue:past due/up to date}}\n{{locked:active/not active}}"
+                checks:
+                    stderr:
+                        matches regex:
+                            > test
+                            > 100800 s
+                            > .*
+                            > .*
+                            > .*
+                            > up to date
+                            > not active
+
+            closet — overdue {{{2:
+                run: assimilate overdue --nt
+                checks:
+                    stdout:
+                        matches regex:
+                            > -
+                            >     description: test
+                            >     path: /{run_dir}/.local/share/assimilate/test.latest.nt
+                            >     mtime: .*
+                            >     age: .*
+                            >     max_age: 100800 s
+                            >     overdue: no
+                            >     locked: no
+                            >     updated: .*
+
+            devotee — overdue {{{2:
+                run: assimilate overdue --no-passes
+
+            prism — overdue {{{2:
+                run: assimilate --verbose overdue
+                checks:
+                    stderr:
+                        matches regex:
+                            > HOST: test
+                            >     sentinel file: /{run_dir}/.local/share/assimilate/test.latest.nt
+                            >     last modified: .*
+                            >     since last change: .*
+                            >     maximum age: 28 hours
+                            >     overdue: no
+                            >     locked: no
+
+    retract — various list formats {{{1:
+        initialization:
+            create:
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > default config: test
+                        > encryption: none
+
+                ~/REPO/:
+
+                ~/.config/assimilate/test.conf.nt:
+                    contents:
+                        > repository: ~/REPO/{config_name}
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/a:
+                    contents: !1000*'aaa\n'
+                    ctime: 2024-11-27
+
+                ~/b:
+                    contents: !100_000*'bbb\n'
+                    ctime: 2024-11-26
+
+                ~/c:
+                    contents: !10_000*'ccc\n'
+                    ctime: 2024-11-25
+
+        tests:
+            crumb — repo-create {{{2:
+                run: assimilate repo-create
+                checks:
+                    stdout:
+                        contains text: Reserve some repository storage space now for emergencies
+
+            decimate — create {{{2:
+                run: assimilate create
+
+            chimera — list {{{2:
+                run: assimilate list
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+
+            villager — list --short {{{2:
+                run: assimilate list --short
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+
+            drowse — list --long {{{2:
+                run: assimilate list --long
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches regex:
+                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
+                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
+                            > drwx------ ken    ken           0 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
+                            > -rw------- ken    ken          37 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > -rw------- ken    ken         114 \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > -rw------- ken    ken        4000 2024-11-26T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > -rw------- ken    ken      400000 2024-11-25T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > -rw------- ken    ken       40000 2024-11-24T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > Total size = 444151B.
+
+            surpass — list --name {{{2:
+                run: assimilate list --name
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+
+            scare — list --sort-by-name {{{2:
+                run: assimilate list --sort-by-name
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+
+            evaporate — list --sort-by-date {{{2:
+                run: assimilate list --sort-by-date
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches regex:
+                            > 2024-11-24T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > 2024-11-25T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > 2024-11-26T16:00:00.000000-08:00 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > \d\d\d\d-[01]\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d-\d\d:\d\d tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+
+            cataract — list --sort-by-size {{{2:
+                run: assimilate list --sort-by-size
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            >      0B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            >      0B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            >      0B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            >     37B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            >    114B tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > 3.91KiB tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > 39.1KiB tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            >  391KiB tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > Total size = 444151B.
+
+            coquette — list --sort-by-owner {{{2:
+                run: assimilate list --sort-by-owner
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+
+
+            uniform — list --sort-by-group {{{2:
+                run: assimilate list --sort-by-group
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > ken      tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+
+            piggery — list --sort-by-key {{{2:
+                run: assimilate list --sort-by-key size
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            > Total size = 444151B.
+
+            coyote — list --format {{{2:
+                run: assimilate list --format size
+                checks:
+                    stderr:
+                        matches regex: archive: .*
+
+                    stdout:
+                        matches text:
+                            >        0 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/
+                            >        0 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/
+                            >        0 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/
+                            >       37 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/shared.conf.nt
+                            >      114 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/.config/assimilate/test.conf.nt
+                            >     4000 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/a
+                            >   400000 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/b
+                            >    40000 tmp/pytest-of-ken/pytest-0/test_assimilate_8_0/c
+                            > Total size = 444151B.
+
+            shoulder — list --show-formats {{{2:
+                run: assimilate list --show-formats
+                checks:
+                    stdout:
+                        matches text:
+                            >      name: {{path}}
+                            >     short: {{path}}{{Type}}
+                            >      date: {{mtime}} {{path}}{{Type}}
+                            >      size: {{size:8}} {{path}}{{Type}}
+                            >        si: {{Size:7.2b}} {{path}}{{Type}}
+                            >     owner: {{user:8}} {{path}}{{Type}}
+                            >     group: {{group:8}} {{path}}{{Type}}
+                            >      long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
+                            >
+                            > default format: short
 
 #  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:

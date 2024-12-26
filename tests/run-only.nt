@@ -70,6 +70,7 @@ cases:
     # {assimilate: {assimilate: {skirting:*}}, checks: *}
     # {assimilate: {assimilate: {hornet:*}}, checks: *}
     # {assimilate: {assimilate: {analytic:*}}, checks: *}
+    # {assimilate: {assimilate: {retract:*}}, checks: *}
 
 # skip_until:
 #     # when present it causes all tests to be skipped until it finds a match

@@ -1,7 +1,11 @@
 # DESCRIPTION {{{1
-# This is the generic test code.  It applies the tests, which are found in
-# assimilate.py, to assimilate and compares the response to the expected
-# response.
+# This is the generic test code.  The actual tests are held in assimilate.nt, a
+# NestedText file that contains both the stimulus and the expected response for
+# a wide variety of scenarios.  You can run the tests directly using:
+#     pytest
+# Or you can run run then along with some other checks in a virtual environment
+# using:
+#     cd ..; tox
 
 # IMPORTS {{{1
 from fnmatch import fnmatch
@@ -87,6 +91,22 @@ def as_str(arg):
         f"expected string, found {arg.__class__.__name__}."
     )
 
+# as_str_expr() {{{2
+def as_str_expr(arg):
+    is_str(arg)
+    try:
+        if arg[0:1] == "!":
+            arg = eval(arg[1:])
+    except Exception as e:
+        raise Invalid(
+            f"{e.__class__.__name__}: {e!s}."
+        )
+    if is_str(arg):
+        return arg
+    raise Invalid(
+        f"expected string, found {arg.__class__.__name__}."
+    )
+
 # as_int() {{{2
 def as_int(arg):
     try:
@@ -107,21 +127,21 @@ def as_lines(arg):
 
 # schema {{{2
 create_file_schema = {
-    Optional("contents"): str,
-    Optional("mode"): str,
-    Optional("ctime"): str,
+    Optional("contents"): as_str_expr,
+    Optional("mode"): as_str,
+    Optional("ctime"): as_str,
 }
 
 checks_schema = {
-    Optional("stdout"): {str: Any(str, [str])},
-    Optional("stderr"): {str: Any(str, [str])},
+    Optional("stdout"): {as_str: Any(as_str, [as_str])},
+    Optional("stderr"): {as_str: Any(as_str, [as_str])},
     Optional("status"): as_int,
-    str: {str: Any(str, [str])},   # key is a file path
+    as_str: {as_str: Any(as_str, [as_str])},   # key is a file path
 }
 
 file_ops_schema = Any(
     {
-        "create": {str: Any(create_file_schema, '')},
+        "create": {as_str: Any(create_file_schema, '')},
         "remove": as_lines,
         "umask": as_int,
     },

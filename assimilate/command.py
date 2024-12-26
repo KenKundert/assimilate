@@ -1791,7 +1791,7 @@ class ListCommand(Command):
             short = "{path}{Type}",
             date = "{mtime} {path}{Type}",
             size = "{size:8} {path}{Type}",
-            si = "{Size:6.2b} {path}{Type}",
+            si = "{Size:7.2b} {path}{Type}",
             owner = "{user:8} {path}{Type}",
             group = "{group:8} {path}{Type}",
             long = '{mode:10} {user:6} {group:6} {size:8} {mtime} {path}{extra}',

@@ -250,7 +250,8 @@ def get_local_data(description, config, path, max_age):
     if config:
         if not path:
             path = to_path(DATA_DIR)
-        latest = read_latest(path / f"{config}.latest.nt")
+        path = path / f"{config}.latest.nt"
+        latest = read_latest(path)
         locked = (path /  f"{config}.lock").exists()
         mtime = latest.get('create last run')
         if not mtime:
@@ -339,7 +340,7 @@ def overdue(cmdline, args, settings, options):
 
     problem = False
     if cmdline["--message"]:
-        message = cmdline["--message"]
+        message = cmdline["--message"].replace(r'\n', '\n')
     if cmdline["--no-color"]:
         colorscheme = None
     if "verbose" in options:
@@ -399,28 +400,29 @@ def overdue(cmdline, args, settings, options):
                 locked = repo_data['locked']
                 report = report_as_overdue if overdue else report_as_current
 
-                if overdue or locked or not cmdline["--no-passes"]:
-                    if cmdline["--nt"]:
-                        output(nt.dumps([repo_data], default=str))
-                    else:
-                        saved_colorscheme = inform.colorscheme
-                        inform.colorscheme = colorscheme
-                        try:
-                            report(message.format(**repo_data))
-                        except ValueError as e:
-                            raise Error(e, culprit=(description, 'message'))
-                        except KeyError as e:
-                            raise Error(
-                                f"‘{e.args[0]}’ is an unknown key.",
-                                culprit=(description, 'message'),
-                                codicil=f"Choose from: {conjoin(repo_data.keys())}."
-                            )
-                        finally:
-                            inform.colorscheme = saved_colorscheme
+                with Quantity.prefs(spacer=' '):
+                    if overdue or locked or not cmdline["--no-passes"]:
+                        if cmdline["--nt"]:
+                            output(nt.dumps([repo_data], default=str))
+                        else:
+                            saved_colorscheme = inform.colorscheme
+                            inform.colorscheme = colorscheme
+                            try:
+                                report(message.format(**repo_data))
+                            except ValueError as e:
+                                raise Error(e, culprit=(description, 'message'))
+                            except KeyError as e:
+                                raise Error(
+                                    f"‘{e.args[0]}’ is an unknown key.",
+                                    culprit=(description, 'message'),
+                                    codicil=f"Choose from: {conjoin(repo_data.keys())}."
+                                )
+                            finally:
+                                inform.colorscheme = saved_colorscheme
 
-                if overdue:
-                    problem = True
-                    overdue_hosts[host] = mail_status_message.format(**repo_data)
+                    if overdue:
+                        problem = True
+                        overdue_hosts[host] = mail_status_message.format(**repo_data)
         except OSError as e:
             problem = True
             msg = os_error(e)

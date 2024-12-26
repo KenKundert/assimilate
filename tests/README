@@ -1,17 +1,186 @@
-Certain CI environments make it difficult or impossible to install all of
-the dependencies needed to test Assimilate.   This is common with two important
-dependencies: Borg and Fuse.
+The generic test code is held in test_assimilate.py.  These are pytest based 
+tests.  The actual test cases are held in assimilate.nt.  This is a NestedText 
+file that has the following basic structure:
 
-Borg is needed for virtually all tests, so no accommodations are made for any 
-testing if Borg is missing.
+    assimilate:
+        ❬scenario name❭:
+            initialization:
+                ❬test senario❭
+            tests:
+                ❬test name❭:
+                checks:
+                    ❬checks❭
 
-Fuse is needed by the mount and compare commands; it is used by Borg when 
-mounting remote archives.
+The scenarios are run in order, and then within each scenario the tests are run 
+in order.  There is also a control file: run-only.nt that can be used to control 
+which of the tests are actually run.
 
-You can skip tests dependent on Fuse by defining the MISSING_DEPENDENCIES 
-environment variable.  To do so, add the following lines to the tox.ini file:
+A scenario starts with an initialization phase, which is generally used to 
+create the files needed for the test.  This includes the assimilate 
+configuration files and any other files needed for the test.  A typical example 
+is::
 
-    [testenv:pytest]
-    setenv =                                 ← add
-        MISSING_DEPENDENCIES = fuse          ← add
-    commands = py.test -vv --cov {posargs}
+    druid — single config:
+        initialization:
+            create:
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > encryption: none
+
+                ~/REPO/:
+
+                ~/.config/assimilate/test.conf.nt:
+                    contents:
+                        > repository: ~/REPO/{config_name}
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/a:
+                    contents: aaa
+                    ctime: 2024-11-27
+
+                ~/b:
+                    contents: bbb
+                    ctime: 2024-11-26
+
+The scenario name, in this case ‘druid’, precedes the em dash.  The text that 
+follows the dash is a description that is ignored.  The name is generally chosen 
+at random and must be unique.  This example creates a few files, provides the 
+contents of thos files, and sets the creation time.  A directory will be created 
+in /tmp/pytest-of-❬username❭ for each scenario, and the files will be created 
+within that directory.  The test code then sets that directory as the home 
+directory, which allows assimilate to find the created configuration files.
+
+When specifying the contents of the file, if the first character specified as 
+´!’, the remainder of the contents are assumed to be a Python expression that is 
+evaluated.  This can be used as a simple way to create large files.  For 
+example:
+
+    create:
+        ~/nutz:
+            contents: !1000*'nutz\n'
+
+Each scenario contains a collection of tests.  For example:
+
+        tests:
+            ceasefire — create again:
+                initialization:
+                    remove: ~/b
+                run: assimilate
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains line: running command: create
+
+The test name, in this case ‘ceasefile’, precedes the em dash, with the text 
+following the dash being the description and is ignored.  The name is generally 
+chosen at random and must be unique.
+
+Each test may have an optional initialization section that can be used to create 
+and delete files.  It has a run section that specifies the command to run, and 
+it has a checks section that specifies checks to run on files contained in the 
+working directory.  In addition, checks can be applied to stdout, stderr, and 
+the exit status of the process used to run assimilate. The checks specify the 
+path to the file being checked, the type of check to run, and the pattern to 
+compare against.  The following type of checks are supported:
+
+    matches text:
+        The file contents must match the given pattern literally and completely.
+
+    matches regex:
+        The file contents must match the given regular expression pattern and 
+        starting from the beginning of the file.
+
+    contains text:
+        The literal pattern must be found in the file.
+
+    contains regex:
+        The regular expression pattern must be found in the file.
+
+    contains line:
+        The pattern must match a line in the file literally.
+
+    contains lines:
+        The patterns must match a lines in the file literally.  The order of the 
+        lines is not significant.
+
+    contains lines in order:
+        The patterns must match a lines in the file literally.  The order of the 
+        lines is significant.  If an error message of:
+
+            line missing from [❬N❭:..]
+
+        it means that the specified line was not found in the lines that remain 
+        after the previous line matched, which occurred on line number ❬N❭.
+
+    excludes text:
+        The given literal pattern must not be found anywhere in the file.
+
+    excludes regex:
+        The given regular expression pattern must not match anywhere in the 
+        file.
+
+    excludes line:
+        No line in the file much match the pattern literally.
+
+    excludes lines:
+        No line in the file much match any of the given patterns literally.
+
+You may have multiple checks applied to the same file, and the checks may be of 
+the same type.  For example:
+
+    checks:
+        ~/.local/share/assimilate/test.log:
+            contains regex: ^running command: list$
+            contains regex: ^        aid:{aid0}[a-f0-9]+$
+
+When specifying lines (contains lines, contains lines in order, excludes line), 
+the lines may be given as a list or as a multiline string.  If given as 
+a multiline string the split into a list at the line breaks.
+
+Regular expression patterns may contain named sub-patterns.  The text matched by 
+those sub-patterns may be used in subsequent regular expressions.  For example:
+
+    unplug — repo-list:
+        run: assimilate repo-list
+        checks:
+            stdout:
+                matches regex:
+                    > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                    > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+In this regular expression 4 named subexpressions are defined, aid0, ar0, aid1, 
+and ar1.  Those then become macros that can be used in subsequent commands and 
+patterns.  For example:
+
+    canyon — delete:
+        run: assimilate delete -a aid:{aid3}
+        checks:
+            ~/.local/share/assimilate/test.log:
+                contains text:
+                    > running:
+                    >     borg \
+                    >         delete \
+                    >         --repo=/{run_dir}/REPO/test \
+                    >         aid:{aid3}
+
+Here {aid3} is used in the assimilate command to specify precisely which archive 
+to delete, and it is used in the check pattern to assure that the correct 
+archive is deleted.
+
+This example also demonstrates another macro that is available, {run_dir}.  This 
+macro contains the path to the working directory without its leading slash.
+
+If you need to match literal patterns that contain braces, they must be doubled 
+up to escape them, otherwise they will be confused as macros. For example:
+
+            druggist — setting archive:
+                run: assimilate setting archive
+                checks:
+                    stdout:
+                        matches regex:
+                            >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
+                            >            ❬when resolved❭: .*-test-{{now}}
