@@ -3227,7 +3227,7 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches text:
+                        matches regex:
                             > .+ {run_dir}/
                             > .+ {run_dir}/.config/
                             > .+ {run_dir}/.config/assimilate/
