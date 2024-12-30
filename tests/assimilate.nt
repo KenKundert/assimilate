@@ -1947,7 +1947,7 @@ assimilate:
                             > running:
                             >     borg \
                             >         compact \
-                            >         --repo=/tmp/pytest-of-ken/pytest-0/test_assimilate_4_0/REPO/test
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -3335,6 +3335,25 @@ assimilate:
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
+            ticker — check --all  {{{2:
+                run: assimilate check --all
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: check
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
             larder — repo-list {{{2:
                 run: assimilate repo-list
                 checks:
@@ -3773,11 +3792,21 @@ assimilate:
                         contains text:
                             > running:
                             >     borg \
+                            >         create \
+                            >         --list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --exclude=.cache \
+                            >         --exclude=.local \
+                            >         --exclude=bu \
+                            >         --exclude=REPO \
+                            >         test \
+                            >         .
+                        contains text:
+                            > running:
+                            >     borg \
                             >         check \
-                            >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
-
                         contains text:
                             > running:
                             >     borg \
@@ -3785,7 +3814,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --keep-within=1d \
                             >         --match-archives=sh:test
-
                         contains text:
                             > running:
                             >     borg \
@@ -3812,15 +3840,12 @@ assimilate:
                             >         --exclude=REPO \
                             >         test \
                             >         .
-
                         contains text:
                             > running:
                             >     borg \
                             >         check \
-                            >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
-
                         contains text:
                             > running:
                             >     borg \
@@ -3828,7 +3853,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --keep-within=1d \
                             >         --match-archives=sh:test
-
                         contains text:
                             > running:
                             >     borg \
@@ -3862,7 +3886,6 @@ assimilate:
                             > running:
                             >     borg \
                             >         check \
-                            >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
 
