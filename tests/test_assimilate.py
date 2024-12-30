@@ -20,6 +20,8 @@ import nestedtext as nt
 import arrow
 import os
 import pytest
+import pwd
+import socket
 import re
 
 
@@ -193,7 +195,10 @@ class Checker:
         # expand run_dir and replace matches
         def expand(s):
             try:
-                return s.format(run_dir=run_dir, **matches).rstrip()
+                return s.format(
+                    run_dir=run_dir, hostname=hostname, username=username,
+                    **matches
+                ).rstrip()
             except KeyError as e:
                 raise KeyError(f"{e!s}: needs escaping in:\n{indent(s)}")
 
@@ -280,7 +285,12 @@ class Checker:
         directory = f"directory: {self.run_dir!s}" if self.run_dir else None
         match = f"match type: {match}"
 
-        if '\n' in expected and 'regex' not in match and 'in order' not in match:
+        if (
+            '\n' in expected and
+            'contains' not in match and
+            'regex' not in match and
+            'in order' not in match
+        ):
             new = []
             for e, r in zip(expected.splitlines(), realized.splitlines()):
                 okay = '✓' if e == r else '✗'
@@ -490,6 +500,16 @@ def add_script(home_dir):
     path = to_path(home_dir, SCRIPT_NAME)
     path.write_text(SCRIPT.format(home_dir=home_dir))
     path.chmod(0o777)
+
+# gethostname {{{1
+def gethostname():
+    return socket.gethostname().split(".")[0]
+hostname = gethostname()
+
+# getusername {{{1
+def getusername():
+    return pwd.getpwuid(os.getuid()).pw_name
+username = getusername()
 
 
 # MAIN {{{1

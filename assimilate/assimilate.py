@@ -180,6 +180,12 @@ class ConfigQueue:
             sub_configs = [name]
         self.configs = sub_configs
 
+        comment(
+            config = name,
+            sub_configs = ', '.join(sub_configs),
+            template = ("config: {config} => ({subconfigs})", "config: {config}")
+        )
+
         if self.composite_config_response == "first":
             self.remaining_configs = sub_configs[0:1]
         elif self.composite_config_response == "none":
@@ -508,12 +514,12 @@ class Assimilate:
                 patterns, roots, self.working_dir, "patterns",
                 skip_checks=skip_checks
             ):
-                borg_opts.extend(["--pattern", pattern])
+                borg_opts.append(f"--pattern={pattern}")
 
         excludes = self.values("excludes")
         if excludes:
             for exclude in check_excludes(excludes, roots, "excludes"):
-                borg_opts.extend(["--exclude", exclude])
+                borg_opts.append(f"--exclude={exclude}")
 
         patterns_froms = self.as_paths("patterns_from", must_exist=True)
         if patterns_froms:
@@ -521,13 +527,13 @@ class Assimilate:
                 patterns_froms, roots, self.working_dir, skip_checks=skip_checks
             )
             for patterns_from in patterns_froms:
-                borg_opts.extend(["--patterns-from", patterns_from])
+                borg_opts.append(f"--patterns-from={patterns_from}")
 
         exclude_froms = self.as_paths("exclude_from", must_exist=True)
         if exclude_froms:
             check_excludes_files(exclude_froms, roots)
             for exclude_from in exclude_froms:
-                borg_opts.extend(["--exclude-from", exclude_from])
+                borg_opts.append(f"--exclude-from={exclude_from}")
 
         if not skip_checks:
             check_roots(roots, self.working_dir)
@@ -613,8 +619,7 @@ class Assimilate:
                 val = self.value(name)
                 if val:
                     if name == "match_archives":
-                        if '--match-archives':
-                            borg_opts.extend([f"{opt}={v.strip()!s}" for v in self.value(name)])
+                        borg_opts.extend([f"{opt}={v.strip()!s}" for v in val])
                     elif "arg" in attrs and attrs["arg"]:
                         borg_opts.append(f"{opt}={val!s}")
                     else:
@@ -915,10 +920,10 @@ class Assimilate:
         if "archive" not in self.settings:
             self.settings["archive"] = "{host_name}-{user_name}-{config_name}-{{now}}"
         archive = self.settings["archive"]
-        if "match_archives" not in self.settings:
-            match_archives = archive.replace('{{now}}', '*')
-            match_archives = match_archives.replace('{{utcnow}}', '*')
-            self.settings["match_archives"] = ['sh:' + match_archives]
+        match_archives = archive.replace('{{now}}', '*')
+        match_archives = match_archives.replace('{{utcnow}}', '*')
+        self.settings["match_archives"] = ['sh:' + match_archives]
+        self.match_local_archives = 'sh:' + match_archives
         match_archives = self.settings["match_archives"]
         for ma in match_archives:
             prefix, _, identifier = ma.partition(':')

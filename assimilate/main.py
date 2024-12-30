@@ -40,15 +40,15 @@ Options:
 # Imports {{{1
 import os
 import sys
-from docopt import docopt
 from inform import (
     Error, Inform, LoggingCache, cull, display, error, os_error, terminate
 )
 from . import __released__, __version__
+from .assimilate import ConfigQueue, Assimilate
 from .command import Command
 from .configs import read_settings
 from .hooks import Hooks
-from .assimilate import ConfigQueue, Assimilate
+from .utilities import process_cmdline
 
 # Globals {{{1
 version = f"{__version__} ({__released__})"
@@ -85,7 +85,7 @@ def main():
                 raise Error(os_error(e), codicil="Does the current working directory exist?")
 
             # interpret command line
-            cmdline = docopt(expanded_synopsis, options_first=True, version=version)
+            cmdline = process_cmdline(expanded_synopsis, options_first=True, version=version)
             command = cmdline["<command>"]
             args = cmdline["<args>"]
             if cmdline["--mute"]:

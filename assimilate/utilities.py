@@ -23,9 +23,10 @@ import os
 import socket
 import sys
 import nestedtext as nt
+from docopt import docopt, DocoptExit
 from inform import (
     Error, conjoin, cull, error, full_stop, narrate, os_error, warn,
-    output as output_raw
+    output as output_raw, terminate
 )
 from .shlib import Run, set_prefs as set_shlib_prefs
 set_shlib_prefs(use_inform=True, log_cmd=True)
@@ -305,3 +306,11 @@ def table(rows):
     for row in rows:
         table.append('  '.join(f"{c:<{cols[i]}}" for i, c in enumerate(row)))
     return table
+
+# process_cmdline {{{1
+def process_cmdline(*args, **kwargs):
+    try:
+        return docopt(*args, **kwargs)
+    except DocoptExit as e:
+        sys.stderr.write(str(e) + '\n')
+        terminate(3)

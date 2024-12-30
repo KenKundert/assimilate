@@ -230,23 +230,53 @@ assimilate:
                         contains text: Reserve some repository storage space now for emergencies
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
-                            -     > running command: repo-create
-                            -
+                            -     > running:
+                            -     >     borg \
+                            -     >         repo-create \
+                            -     >         --repo=/{run_dir}/REPO/test \
+                            -     >         --make-parent-dirs \
+                            -     >         --encryption=none
 
             putter — create {{{2:
                 run: assimilate create
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         '{hostname}-{username}-test-{{now}}'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
-                            -     > running command: create
-                            -
+                            >     > running:
+                            >     >     borg \
+                            >     >         create \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         '--pattern=R /{run_dir}' \
+                            >     >         '--pattern=- /{run_dir}/.cache' \
+                            >     >         '--pattern=- /{run_dir}/.local' \
+                            >     >         '--pattern=- /{run_dir}/bu' \
+                            >     >         '--pattern=- /{run_dir}/REPO' \
+                            >     >         --stats \
+                            >     >         '{hostname}-{username}-test-{{now}}'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -271,12 +301,32 @@ assimilate:
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         '{hostname}-{username}-test-{{now}}'
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: create
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         create \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         '--pattern=R /{run_dir}' \
+                            >     >         '--pattern=- /{run_dir}/.cache' \
+                            >     >         '--pattern=- /{run_dir}/.local' \
+                            >     >         '--pattern=- /{run_dir}/bu' \
+                            >     >         '--pattern=- /{run_dir}/REPO' \
+                            >     >         --stats \
+                            >     >         '{hostname}-{username}-test-{{now}}'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -290,15 +340,32 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains lines in order:
-                            - running command: repo-list
-                            -     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
+                            > }}
+
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: repo-list
-                            -     >     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
-                            -
+                        contains text:
+                            >     > Borg-related environment variables: {{
+                            >     >     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
+                            >     > }}
+
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         repo-list \
+                            >     >         --json \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         '--match-archives=sh:{hostname}-{username}-test-*'
 
             ampere — delete {{{2:
                 run: assimilate delete -a {ar1}
@@ -307,8 +374,14 @@ assimilate:
                         matches regex:
                             > Done. Run "borg compact" to free space.
                             >
+
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: delete
+                        contains regex:
+                            > running:
+                            >     borg \\
+                            >         delete \\
+                            >         --match-archives={hostname}-{username}-test-.* \\
+                            >         --repo=/{run_dir}/REPO/test
                         excludes line: running command: compact
 
             bristly — repo-list {{{2:
@@ -358,8 +431,22 @@ assimilate:
                             > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid0}[a-f0-9]+$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*' \
+                            >         --json \
+                            >         --last=1
+                        contains regex:
+                            > running:
+                            >     borg \\
+                            >         list \\
+                            >         --repo=/{run_dir}/REPO/test \\
+                            >         --json-lines \\
+                            >         '--format={{path}}{{type}}' \\
+                            >         aid:{aid0}[a-f0-9]+$
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -371,12 +458,18 @@ assimilate:
                 run: assimilate break-lock
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: break-lock$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         break-lock \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: break-lock
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         break-lock \
+                            >     >         --repo=/{run_dir}/REPO/test
 
             rafter — prune :
                 run: assimilate prune
@@ -393,12 +486,18 @@ assimilate:
                 run: assimilate compact
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: compact$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: compact
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         compact \
+                            >     >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -407,16 +506,23 @@ assimilate:
             pullet — check {{{2:
                 run: assimilate check
                 checks:
-                    stderr:
-                        matches regex: ^archive.*
-
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: check$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: check
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         '--match-archives=sh:{hostname}-{username}-test-*'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -761,7 +867,13 @@ assimilate:
                         contains text: Reserve some repository storage space now for emergencies
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -778,13 +890,27 @@ assimilate:
                             > test check never run.
 
                     ~/.local/share/assimilate/test.log.nt:
-                        excludes line:     > running command: due
+                        excludes line:     > running command: due - fuxme
 
             clammy — create {{{2:
                 run: assimilate create
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         '{hostname}-{username}-test-{{now}}'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -800,7 +926,43 @@ assimilate:
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         '{hostname}-{username}-test-{{now}}'
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -819,7 +981,13 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-list$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -834,7 +1002,12 @@ assimilate:
                             > There is [0-9.]+ MB reserved space in this repository now.
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-space$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-space \
+                            >         --reserve=1048576 \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -850,7 +1023,12 @@ assimilate:
                             > Freed [0-9.]+ MB in repository.
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-space$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-space \
+                            >         --free \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -949,8 +1127,22 @@ assimilate:
                             > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid0}[a-f0-9]+$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*' \
+                            >         --json \
+                            >         --last=1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid0}
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -971,8 +1163,14 @@ assimilate:
                             - {run_dir}/b
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid1}
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid1}
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -984,7 +1182,11 @@ assimilate:
                 run: assimilate break-lock
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: break-lock$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         break-lock \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -995,12 +1197,38 @@ assimilate:
                 run: assimilate prune
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: prune$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: prune
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         prune \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --keep-within=1d \
+                            >     >         --keep-daily=7 \
+                            >     >         --keep-weekly=4 \
+                            >     >         --keep-monthly=6 \
+                            >     >         '--match-archives=sh:{hostname}-{username}-test-*'
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         compact \
+                            >     >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^prune last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -1009,7 +1237,11 @@ assimilate:
                 run: assimilate compact
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: compact$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1023,16 +1255,23 @@ assimilate:
             exult — check {{{2:
                 run: assimilate check
                 checks:
-                    stderr:
-                        matches regex: ^archive.*
-
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: check$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: check
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         '--match-archives=sh:{hostname}-{username}-test-*'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -1090,13 +1329,32 @@ assimilate:
                 run: assimilate mount
                 checks:
                     stderr:
-                        matches regex:
-                            > mount point is: /{run_dir}/ASSIMILATE
-                            > archive: {aid0} {ar0} .*
+                        matches regex: mount point is: /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         mount \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*' \
+                            >         /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         mount \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         '--match-archives=sh:{hostname}-{username}-test-*' \
+                            >     >         /{run_dir}/ASSIMILATE
+
                     ~/ASSIMILATE/{ar1}/{run_dir}/a:
                         matches text: aaa
+
                     ~/ASSIMILATE/{ar1}/{run_dir}/b:
                         matches text: bbb
+
                     ~/ASSIMILATE/{ar0}/{run_dir}/a:
                         matches text: aaa
 
@@ -1143,8 +1401,8 @@ assimilate:
                             > running:
                             >     borg \
                             >         delete \
-                            >         --repo=/{run_dir}/REPO/test \
-                            >         aid:{aid1}
+                            >         --match-archives=aid:{aid1} \
+                            >         --repo=/{run_dir}/REPO/test
 
                         contains text:
                             > running:
@@ -1170,7 +1428,13 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-list$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test-*'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1342,7 +1606,19 @@ assimilate:
                         contains text: Reserve some repository storage space now for emergencies
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-create$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=repokey-blake2-chacha20-poly1305
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1365,7 +1641,50 @@ assimilate:
                 run: assimilate create
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: create$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --compression=zstd,1 \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1385,7 +1704,50 @@ assimilate:
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: create
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --compression=zstd,1 \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1404,7 +1766,19 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-list$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1436,7 +1810,17 @@ assimilate:
                             > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: info$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-info \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1461,8 +1845,28 @@ assimilate:
                             > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid0}[a-f0-9]+$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         --json \
+                            >         --last=1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid0}
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1483,8 +1887,14 @@ assimilate:
                             - {run_dir}/b
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid1}
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid1}
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1496,7 +1906,17 @@ assimilate:
                 run: assimilate break-lock
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: break-lock$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         break-lock \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1507,7 +1927,27 @@ assimilate:
                 run: assimilate prune
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: prune$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/tmp/pytest-of-ken/pytest-0/test_assimilate_4_0/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1521,7 +1961,17 @@ assimilate:
                 run: assimilate compact
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: compact$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1535,9 +1985,6 @@ assimilate:
             waggle — check {{{2:
                 run: assimilate check --repair
                 checks:
-                    stderr:
-                        matches regex: ^archive.*
-
                     # stdout:
                     #      matches text:
                     #          > This is a potentially dangerous function.
@@ -1548,12 +1995,29 @@ assimilate:
                     #      sometimes borg prints this message, and some times it does not.
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: check$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_CHECK_I_KNOW_WHAT_I_AM_DOING': 'YES',
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
                     ~/.local/share/assimilate/test.log.nt:
-                        contains lines in order:
-                            -     > running command: check
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --match-archives=sh:test
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -1613,13 +2077,38 @@ assimilate:
                 run: assimilate mount
                 checks:
                     stderr:
-                        matches regex:
-                            > mount point is: /{run_dir}/ASSIMILATE
-                            > archive: {aid0} {ar0} .*
+                        matches regex: mount point is: /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         mount \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         mount \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --match-archives=sh:test \
+                            >     >         /{run_dir}/ASSIMILATE
+
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/a:
                         matches text: aaa
+
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/b:
                         matches text: bbb
+
                     ~/ASSIMILATE/{ar0}-{aid0}/{run_dir}/a:
                         matches text: aaa
 
@@ -1627,7 +2116,18 @@ assimilate:
                 run: assimilate umount
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: umount$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         umount \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         /{run_dir}/ASSIMILATE
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1658,7 +2158,24 @@ assimilate:
                 run: assimilate delete -a aid:{aid1}
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: delete$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         delete \
+                            >         --match-archives=aid:{aid1} \
+                            >         --repo=/{run_dir}/REPO/test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
+
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1677,7 +2194,19 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-list$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSPHRASE': '❬redacted❭',
+                            >     'BORG_DISPLAY_PASSPHRASE': 'no',
+                            > }}
+                        excludes text: roadhouse pause govern parry
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1775,7 +2304,13 @@ assimilate:
                             > === test2 ===
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: repo-create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --make-parent-dirs \
+                            >         --encryption=repokey-blake2-chacha20-poly1305
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -1783,7 +2318,13 @@ assimilate:
                             -
 
                     ~/.local/share/assimilate/test2.log:
-                        contains regex: ^running command: repo-create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --make-parent-dirs \
+                            >         --encryption=repokey-blake2-chacha20-poly1305
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -1819,7 +2360,48 @@ assimilate:
                             > === test2 ===
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: create$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSCOMMAND': 'echo "roadhouse pause govern parry"',
+                            > }}
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --compression=zstd,1 \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --match-archives=sh:test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -1830,7 +2412,48 @@ assimilate:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
                     ~/.local/share/assimilate/test2.log:
-                        contains regex: ^running command: create$
+                        contains text:
+                            > Borg-related environment variables: {{
+                            >     'BORG_PASSCOMMAND': 'echo "roadhouse pause govern parry"',
+                            > }}
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --compression=zstd,1 \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         test2
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --match-archives=sh:test2
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test2
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test2
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -1850,8 +2473,44 @@ assimilate:
                 run: assimilate -q
                 checks:
                     ~/.local/share/assimilate/test1.log:
-                        contains lines in order:
-                            - running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --compression=zstd,1 \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --match-archives=sh:test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -1862,8 +2521,44 @@ assimilate:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
                     ~/.local/share/assimilate/test2.log:
-                        contains lines in order:
-                            - running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         --compression=zstd,1 \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         test2
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --match-archives=sh:test2
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test2
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test2
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -1882,7 +2577,13 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test1.log:
-                        contains line: running command: repo-list
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --match-archives=sh:test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -1903,7 +2604,12 @@ assimilate:
                             > === test2 ===
 
                     ~/.local/share/assimilate/test1.log:
-                        contains line: running command: repo-space
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-space \
+                            >         --reserve=1048576 \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -1911,7 +2617,12 @@ assimilate:
                             -
 
                     ~/.local/share/assimilate/test2.log:
-                        contains line: running command: repo-space
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-space \
+                            >         --reserve=1048576 \
+                            >         --repo=/{run_dir}/REPO/test2
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -1937,7 +2648,12 @@ assimilate:
                             > After that, do not forget to reserve space again for next time!
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: repo-space$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-space \
+                            >         --free \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -1945,7 +2661,12 @@ assimilate:
                             -
 
                     ~/.local/share/assimilate/test2.log:
-                        contains regex: ^running command: repo-space$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-space \
+                            >         --free \
+                            >         --repo=/{run_dir}/REPO/test2
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -1983,13 +2704,16 @@ assimilate:
                             > === test2 ===
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: info$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-info \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
                             -     > running command: info
                             -
-
 
             faucet — list {{{2:
                 run: assimilate list
@@ -2010,8 +2734,22 @@ assimilate:
                             > archive: {aid0} {ar0} .*
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid0}[a-f0-9]+$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --match-archives=sh:test1 \
+                            >         --json \
+                            >         --last=1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid0}
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2033,8 +2771,14 @@ assimilate:
                             - {run_dir}/b
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: list$
-                        contains regex: ^        aid:{aid1}
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid1}
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2060,7 +2804,21 @@ assimilate:
                             > === test2 ===
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: prune$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2071,7 +2829,21 @@ assimilate:
                         contains regex: ^prune last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
                     ~/.local/share/assimilate/test2.log:
-                        contains regex: ^running command: prune$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         prune \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --keep-within=1d \
+                            >         --keep-daily=7 \
+                            >         --keep-weekly=4 \
+                            >         --keep-monthly=6 \
+                            >         --match-archives=sh:test2
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test2
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -2091,7 +2863,11 @@ assimilate:
                             > === test2 ===
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: compact$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2102,7 +2878,11 @@ assimilate:
                         contains regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
                     ~/.local/share/assimilate/test2.log:
-                        contains regex: ^running command: compact$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test2
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -2119,33 +2899,51 @@ assimilate:
                     stderr:
                         matches regex:
                             > === test1 ===
-                            > ^archive.*
                             >
                             > === test2 ===
-                            > ^archive.*
 
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: check$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --match-archives=sh:test1 \
+                            >         --verify-data
+
+                    ~/.local/share/assimilate/test2.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --match-archives=sh:test2 \
+                            >         --verify-data
 
                     ~/.local/share/assimilate/test1.log.nt:
-                        contains lines in order:
-                            -     > running command: check
-                            -
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test1 \
+                            >     >         --match-archives=sh:test1 \
+                            >     >         --verify-data
+
+                    ~/.local/share/assimilate/test2.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test2 \
+                            >     >         --match-archives=sh:test2 \
+                            >     >         --verify-data
 
                     ~/.local/share/assimilate/test1.latest.nt:
                         contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
-
-                    ~/.local/share/assimilate/test2.log:
-                        contains regex: ^running command: check$
-
-                    ~/.local/share/assimilate/test2.log.nt:
-                        contains lines in order:
-                            -     > running command: check
-                            -
-
-                    ~/.local/share/assimilate/test2.latest.nt:
-                        contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
-
 
 
             trestle — compare {{{2:
@@ -2201,13 +2999,38 @@ assimilate:
                 run: assimilate mount
                 checks:
                     stderr:
-                        matches regex:
-                            > mount point is: /{run_dir}/ASSIMILATE
-                            > archive: {aid0} {ar0} .*
+                        matches regex: mount point is: /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         mount \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --match-archives=sh:test1 \
+                            >         /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test1.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         mount \
+                            >     >         --repo=/{run_dir}/REPO/test1 \
+                            >     >         --match-archives=sh:test1 \
+                            >     >         /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test2.log:
+                        excludes line: running command: mount
+
+                    ~/.local/share/assimilate/test2.log.nt:
+                        excludes line:     > running command: mount
+
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/a:
                         matches text: aaa
+
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/b:
                         matches text: bbb
+
                     ~/ASSIMILATE/{ar0}-{aid0}/{run_dir}/a:
                         matches text: aaa
 
@@ -2215,7 +3038,12 @@ assimilate:
                 run: assimilate umount
                 checks:
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: umount$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         umount \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         /{run_dir}/ASSIMILATE
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2246,7 +3074,17 @@ assimilate:
                 run: assimilate -c test1 delete -a aid:{aid1}
                 checks:
                     ~/.local/share/assimilate/test1.log:
-                        contains regex: ^running command: delete$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         delete \
+                            >         --match-archives=aid:{aid1} \
+                            >         --repo=/{run_dir}/REPO/test1
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2264,7 +3102,13 @@ assimilate:
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
                     ~/.local/share/assimilate/test1.log:
-                        contains line: running command: repo-list
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --match-archives=sh:test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2272,7 +3116,7 @@ assimilate:
                             -
 
                     ~/.local/share/assimilate/test2.log:
-                        excludes line: running command: repo-list
+                        excludes line: running command: repo-list - fuxme
 
                     ~/.local/share/assimilate/test2.log.nt:
                         excludes line: > running command: repo-list
@@ -2338,7 +3182,13 @@ assimilate:
                         contains text: Reserve some repository storage space now for emergencies
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2349,7 +3199,21 @@ assimilate:
                 run: assimilate create
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         test
+                        excludes text: check
+                        excludes text: prune
+                        excludes text: compact
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2363,7 +3227,21 @@ assimilate:
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         test
+                        excludes text: check
+                        excludes text: prune
+                        excludes text: compact
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2377,7 +3255,21 @@ assimilate:
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         test
+                        excludes text: check
+                        excludes text: prune
+                        excludes text: compact
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2391,7 +3283,21 @@ assimilate:
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         test
+                        excludes text: check
+                        excludes text: prune
+                        excludes text: compact
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2405,7 +3311,21 @@ assimilate:
                 run: assimilate
                 checks:
                     ~/.local/share/assimilate/test.log:
-                        contains line: running command: create
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --stats \
+                            >         test
+                        excludes text: check
+                        excludes text: prune
+                        excludes text: compact
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2426,6 +3346,16 @@ assimilate:
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --oldest=1440m \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
+
             indicate — repo-list --first=3 {{{2:
                 run: assimilate repo-list --first=3
                 checks:
@@ -2435,6 +3365,15 @@ assimilate:
                             > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
                             > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
 
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --first=3 \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
             stockroom — repo-list --last=3 {{{2:
                 run: assimilate repo-list --last=3
@@ -2444,6 +3383,16 @@ assimilate:
                             > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --last=3 \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
             larder — repo-list --oldest=1d {{{2:
                 run: assimilate repo-list --oldest=1d
@@ -2456,6 +3405,16 @@ assimilate:
                             > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
                             > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --oldest=1440m \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
+
             elevate — repo-list --newest=1d {{{2:
                 run: assimilate repo-list --newest=1d
                 checks:
@@ -2467,11 +3426,31 @@ assimilate:
                             > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
                             > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --newest=1440m \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
+
             wrongdoer — repo-list --older=1d {{{2:
                 run: assimilate repo-list --older=1d
                 checks:
                     stdout:
                         matches regex:
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --older=1440m \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
             climb — repo-list --newer=1d {{{2:
                 run: assimilate repo-list --newer=1d
@@ -2483,6 +3462,16 @@ assimilate:
                             > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
                             > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
                             > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --newer=1440m \
+                            >         --json \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
             parade — list -a 4 {{{2:
                 run: assimilate list -a 4
@@ -2500,6 +3489,18 @@ assimilate:
                     stderr:
                         matches regex: archive: {aid4} {ar4} .*
 
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test
+
             expect — list -a 3 {{{2:
                 run: assimilate list -a 3 .config
                 checks:
@@ -2510,6 +3511,18 @@ assimilate:
 
                     stderr:
                         matches regex: archive: {aid3} {ar3} .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test
 
             gremlin — list -a 2 {{{2:
                 run: assimilate list --archive 2 --recursive .config
@@ -2523,6 +3536,18 @@ assimilate:
 
                     stderr:
                         matches regex: archive: {aid2} {ar2} .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test
 
             tombola — list -a 1 {{{2:
                 run: assimilate list -a 1
@@ -2540,6 +3565,18 @@ assimilate:
                     stderr:
                         matches regex: archive: {aid1} {ar1} .*
 
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test
+
             partitive — list -a 0 {{{2:
                 run: assimilate list -a 0
                 checks:
@@ -2556,22 +3593,62 @@ assimilate:
                     stderr:
                         matches regex: archive: {aid0} {ar0} .*
 
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test
+
             outlet — mount ASSIMILATE {{{2:
                 run: assimilate mount /{run_dir}/ASSIMILATE
                 checks:
                     stderr:
-                        matches regex:
-                            > mount point is: /{run_dir}/ASSIMILATE
-                            > archive: {aid0} {ar0} .*
+                        matches regex: mount point is: /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         mount \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         /{run_dir}/ASSIMILATE
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         mount \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --match-archives=sh:test \
+                            >     >         /{run_dir}/ASSIMILATE
+
                     ~/ASSIMILATE/test-{aid1}/{run_dir}/a:
                         matches text: aaa
+
                     ~/ASSIMILATE/test-{aid1}/{run_dir}/b:
                         matches text: bbb
+
                     ~/ASSIMILATE/test-{aid0}/{run_dir}/a:
                         matches text: aaa
 
             virtue — umount ASSIMILATE {{{2:
                 run: assimilate umount /{run_dir}/ASSIMILATE
+
+                checks:
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         umount \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         /{run_dir}/ASSIMILATE
 
     analytic — single config, src_dirs, relative working_dir {{{1:
         initialization:
@@ -2658,7 +3735,14 @@ assimilate:
                         contains text: Reserve some repository storage space now for emergencies
 
                     ~/.local/share/assimilate/test.log:
-                        contains regex: ^running command: repo-create$
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
+
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2690,13 +3774,23 @@ assimilate:
                             > running:
                             >     borg \
                             >         check \
+                            >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
                         contains text:
                             > running:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --match-archives=sh:test
+
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
             hectare — create --progress {{{2:
                 run: assimilate create --progress
@@ -2709,14 +3803,37 @@ assimilate:
                         contains text:
                             > running:
                             >     borg \
-                            >         check \
+                            >         create \
+                            >         --progress \
                             >         --repo=/{run_dir}/REPO/test \
+                            >         --exclude=.cache \
+                            >         --exclude=.local \
+                            >         --exclude=bu \
+                            >         --exclude=REPO \
+                            >         test \
+                            >         .
+
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
                         contains text:
                             > running:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --match-archives=sh:test
+
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
             malady — create --progress {{{2:
                 run: assimilate create --stats
@@ -2731,14 +3848,37 @@ assimilate:
                         contains text:
                             > running:
                             >     borg \
-                            >         check \
+                            >         create \
                             >         --repo=/{run_dir}/REPO/test \
+                            >         --exclude=.cache \
+                            >         --exclude=.local \
+                            >         --exclude=bu \
+                            >         --exclude=REPO \
+                            >         --stats \
+                            >         test \
+                            >         .
+
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
                         contains text:
                             > running:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
+                            >         --keep-within=1d \
+                            >         --match-archives=sh:test
+
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
             warder — create --fast {{{2:
                 run: assimilate create --fast
@@ -2778,17 +3918,47 @@ assimilate:
             softwood — check --repair  {{{2:
                 run: assimilate check --repair
                 checks:
-                    stderr:
-                        contains regex:
-                            > archive: {aid0} {ar0} .*
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         --repair
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --match-archives=sh:test \
+                            >     >         --repair
 
             vixen — check --verify-data  {{{2:
                 run: assimilate check --verify-data
                 checks:
-                    stderr:
-                        matches regex:
-                            > archive: {aid0} {ar0} .*
-                            >
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --match-archives=sh:test
+
 
             valency — compact --progress  {{{2:
                 run: assimilate compact --progress
@@ -2805,8 +3975,8 @@ assimilate:
                             > running:
                             >     borg \
                             >         delete \
-                            >         --repo=/{run_dir}/REPO/test \
-                            >         aid:{aid3}
+                            >         --match-archives=aid:{aid3} \
+                            >         --repo=/{run_dir}/REPO/test
 
                         contains text:
                             > running:
@@ -2822,8 +3992,8 @@ assimilate:
                             > running:
                             >     borg \
                             >         delete \
-                            >         --repo=/{run_dir}/REPO/test \
-                            >         aid:{aid2}
+                            >         --match-archives=aid:{aid2} \
+                            >         --repo=/{run_dir}/REPO/test
                         excludes text:   compact
 
             respond — due --since-backup ❬since❭ --message ❬msg❭ {{{2:

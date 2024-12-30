@@ -25,7 +25,6 @@ import sys
 from textwrap import dedent, fill
 import arrow
 from contextlib import contextmanager
-from docopt import docopt
 from inform import (
     Color,
     Error,
@@ -55,7 +54,7 @@ from .shlib import (
     Cmd, Run, cwd, lsd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
 )
 from .utilities import (
-    gethostname, output, pager, read_latest, table, two_columns,
+    gethostname, output, pager, process_cmdline, read_latest, table, two_columns,
     update_latest, when,
 )
 
@@ -193,7 +192,12 @@ def find_archive(settings, options):
     return desc_and_id(archive)
 
 # archive_filter_options() {{{2
-def archive_filter_options(given_options):
+def archive_filter_options(settings, given_options, default):
+    archive = "--archive" in given_options and given_options["--archive"]
+    if archive:
+        archive, description = find_archive(settings, given_options)
+        return [f"--match-archives={archive}"]
+
     processed_options = []
     age_opts = ('--older', '--oldest', '--newer', '--newest')
     seen = []
@@ -218,6 +222,12 @@ def archive_filter_options(given_options):
 
     if given_options.get('--deleted'):
         processed_options.append('--deleted')
+
+    if not processed_options:
+        if default == "latest":
+            processed_options = ['--last=1']
+        elif default != 'all':
+            raise NotImplementedError
     return processed_options
 
 
@@ -448,7 +458,7 @@ class BorgCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args, options_first=True)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args, options_first=True)
         borg_args = cmdline["<borg_args>"]
 
         # run borg
@@ -481,7 +491,7 @@ class BreakLockCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        docopt(cls.USAGE, argv=[command] + args)
+        process_cmdline(cls.USAGE, argv=[command] + args)
 
         # run borg
         borg = settings.run_borg(
@@ -516,7 +526,7 @@ class CheckCommand(Command):
                                         newest-range
             -O, --oldest <range>        only consider archives between oldest and
                                         oldest+range
-            -A, --all                   check all available archives
+            -*, --all                   check all available archives
             -e, --include-external      check all archives in repository, not just
                                         those associated with this configuration
             -r, --repair                attempt to repair any inconsistencies found
@@ -539,7 +549,7 @@ class CheckCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         check_all = cmdline["--all"]
         include_external_archives = cmdline["--include-external"]
         verify = ["--verify-data"] if cmdline["--verify-data"] else []
@@ -550,14 +560,7 @@ class CheckCommand(Command):
             os.environ['BORG_CHECK_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
 
         # identify archive or archives to check
-        borg_opts = archive_filter_options(cmdline)
-        if not borg_opts:
-            if check_all:
-                archive = None
-            else:
-                archive, description = find_archive(settings, cmdline)
-                if description:
-                    display(f'archive: {description}')
+        borg_opts = archive_filter_options(settings, cmdline, default='latest')
 
         # run borg
         borg = settings.run_borg(
@@ -611,7 +614,7 @@ class CompactCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         borg_opts = []
         if cmdline["--progress"] or settings.show_progress:
             borg_opts.append("--progress")
@@ -701,7 +704,7 @@ class CompareCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         mount_point = settings.as_path("default_mount_point")
         if not mount_point:
             raise Error("must specify default_mount_point setting to use this command.")
@@ -823,7 +826,7 @@ class ConfigsCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # check command line for errors
-        docopt(cls.USAGE, argv=[command] + args)
+        process_cmdline(cls.USAGE, argv=[command] + args)
 
         configs = list(settings.configs)
         if settings.composite_configs:
@@ -875,7 +878,7 @@ class CreateCommand(Command):
         repo_size = None
 
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         borg_opts = []
         show_stats = cmdline["--stats"] or settings.show_stats
         if cmdline["--list"]:
@@ -1073,18 +1076,13 @@ class DeleteCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-        borg_opts = archive_filter_options(cmdline)
-        if not borg_opts:
-            archive, description = find_archive(settings, cmdline)
-            if description:
-                display(f'archive: {description}')
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
+        borg_opts = archive_filter_options(settings, cmdline, default='latest')
         list_opt = ['--list'] if 'dry-run' in options else []
 
         # run borg
         borg = settings.run_borg(
             cmd = "delete",
-            args = [archive],
             assimilate_opts = options,
             borg_opts = borg_opts + list_opt,
             strip_archive_matcher = True,
@@ -1142,7 +1140,7 @@ class DiffCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         archive1 = cmdline["<archive1>"]
         archive2 = cmdline["<archive2>"]
         path = cmdline['<path>']
@@ -1257,7 +1255,7 @@ class DueCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         email = cmdline["--email"]
         config = settings.config_name
         since_backup_thresh = cmdline.get("--since-backup")
@@ -1395,7 +1393,7 @@ class DueCommand(Command):
     @classmethod
     def run_late(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         email = cmdline["--email"]
 
         # determine whether to give message for oldest or all configs
@@ -1529,7 +1527,7 @@ class ExtractCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         paths = cmdline["<path>"]
         borg_opts = []
         if cmdline["--list"]:
@@ -1590,7 +1588,7 @@ class HelpCommand(Command):
     @classmethod
     def run_early(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
 
         from .help import HelpMessage
 
@@ -1631,7 +1629,7 @@ class InfoCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         fast = cmdline["--fast"]
         if cmdline["--archive"]:
             archive, description = find_archive(settings, cmdline)
@@ -1770,7 +1768,7 @@ class ListCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         path = cmdline["<path>"]
         recursive = cmdline["--recursive"]
 
@@ -1968,7 +1966,7 @@ class LogCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        docopt(cls.USAGE, argv=[command] + args)
+        process_cmdline(cls.USAGE, argv=[command] + args)
 
         try:
             pager(settings.logfile.read_text())
@@ -2043,7 +2041,7 @@ class MountCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         mount_point = cmdline["<mount_point>"]
         if mount_point:
             mount_point = settings.to_path(mount_point, resolve=False)
@@ -2052,14 +2050,7 @@ class MountCommand(Command):
         if not mount_point:
             raise Error("must specify directory to use as mount point.")
         display("mount point is:", mount_point)
-        if cmdline["--archive"]:
-            borg_opts = [f"--match-archives={cmdline['--archive']}"]
-        else:
-            borg_opts = archive_filter_options(cmdline)
-            if not borg_opts:
-                archive, description = find_archive(settings, cmdline)
-                if description:
-                    display(f'archive: {description}')
+        borg_opts = archive_filter_options(settings, cmdline, default='all')
         include_external_archives = cmdline["--include-external"]
 
         # create mount point if it does not exist
@@ -2099,7 +2090,7 @@ class OverdueCommand(Command):
 
     @classmethod
     def run_early(cls, command, args, settings, options):
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         informer = get_informer()
         prev_stream_policy = informer.stream_policy
         if cmdline['--nt']:
@@ -2140,7 +2131,7 @@ class PruneCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline["--include-external"]
         borg_opts = []
         #KSK if cmdline["--stats"] or settings.show_stats:
@@ -2225,7 +2216,7 @@ class RepoCreateCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         borg_opts = []
         if cmdline["--reserve"]:
             try:
@@ -2281,14 +2272,15 @@ class RepoListCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline["--include-external"]
 
         # run borg
+        borg_opts = archive_filter_options(settings, cmdline, default='all')
         borg = settings.run_borg(
             cmd = "repo-list",
             assimilate_opts = options,
-            borg_opts = archive_filter_options(cmdline) + ['--json'],
+            borg_opts = borg_opts + ['--json'],
             strip_archive_matcher = include_external_archives,
         )
         if not borg.status:
@@ -2337,7 +2329,7 @@ class RepoSpaceCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         borg_opts = []
         if cmdline["--reserve"]:
             try:
@@ -2421,7 +2413,7 @@ class RestoreCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         paths = cmdline["<path>"]
         borg_opts = []
         if cmdline["--list"]:
@@ -2476,7 +2468,7 @@ class SettingsCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         show_available = cmdline["--available"]
         width = 26
         leader = (width+2)*' '
@@ -2572,7 +2564,7 @@ class UmountCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         mount_point = cmdline["<mount_point>"]
         if mount_point:
             mount_point = settings.to_path(mount_point, resolve=False)
@@ -2637,18 +2629,13 @@ class UndeleteCommand(Command):
     @classmethod
     def run(cls, command, args, settings, options):
         # read command line
-        cmdline = docopt(cls.USAGE, argv=[command] + args)
-        borg_opts = archive_filter_options(cmdline)
-        if not borg_opts:
-            archive, description = find_archive(settings, cmdline)
-            if description:
-                display(f'archive: {description}')
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
+        borg_opts = archive_filter_options(settings, cmdline, default='all')
         list_opt = ['--list'] if 'dry-run' in options else []
 
         # run borg
         borg = settings.run_borg(
             cmd = "undelete",
-            args = [archive],
             assimilate_opts = options,
             borg_opts = borg_opts + list_opt,
             strip_archive_matcher = True,

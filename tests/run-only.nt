@@ -67,7 +67,7 @@ cases:
     # {assimilate: {assimilate: {druid:*}}, checks: *}
     # {assimilate: {assimilate: {shaman:*}}, checks: *}
     # {assimilate: {assimilate: {beautify:*}}, checks: *}
-    # {assimilate: {assimilate: {skirting:*}}, checks: *}
+    # {assimilate: {assimilate: {daemon:*}}, checks: *}
     # {assimilate: {assimilate: {hornet:*}}, checks: *}
     # {assimilate: {assimilate: {analytic:*}}, checks: *}
     # {assimilate: {assimilate: {retract:*}}, checks: *}
