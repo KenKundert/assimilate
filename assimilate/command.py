@@ -560,7 +560,8 @@ class CheckCommand(Command):
             os.environ['BORG_CHECK_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
 
         # identify archive or archives to check
-        borg_opts = archive_filter_options(settings, cmdline, default='latest')
+        default = 'all' if check_all else 'latest'
+        borg_opts = archive_filter_options(settings, cmdline, default=default)
 
         # run borg
         borg = settings.run_borg(

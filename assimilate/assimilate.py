@@ -19,6 +19,7 @@
 # Imports {{{1
 import errno
 import os
+import sys
 import arrow
 from inform import (
     Color,
@@ -82,6 +83,7 @@ from .shlib import (
     set_prefs as set_shlib_prefs
 )
 from .utilities import getfullhostname, gethostname, getusername, output
+import nestedtext as nt
 
 # Globals {{{1
 borg_commands_with_dryrun = "create delete extract prune upgrade recreate undelete".split()
@@ -949,12 +951,8 @@ class Assimilate:
                 report = True
                 try:
                     # check to see if the process is still running
-                    lock_contents = lockfile.read_text()
-                    pid = None
-                    for line in lock_contents.splitlines():
-                        name, _, value = line.partition("=")
-                        if name.strip().lower() == "pid":
-                            pid = int(value.strip())
+                    lock_contents = nt.load(lockfile, dict)
+                    pid = lock_contents.get('pid')
                     assert pid > 0
                     os.kill(pid, 0)     # does not actually kill the process
                 except ProcessLookupError as e:
@@ -969,12 +967,12 @@ class Assimilate:
             # create lockfile
             now = arrow.now()
             pid = os.getpid()
-            lockfile.write_text(
-                dedent(f"""
-                    started = {now!s}
-                    pid = {pid}
-                """).lstrip()
+            contents = dict(
+                started = str(now),
+                cmdline = ' '.join(sys.argv),
+                pid = pid
             )
+            nt.dump(contents, lockfile)
 
         # open logfile
         # do this after checking lock so we do not overwrite logfile
