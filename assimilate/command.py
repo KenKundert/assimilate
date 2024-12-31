@@ -93,7 +93,7 @@ def get_available_archives(settings):
     try:
         data = json.loads(borg.stdout)
         return data["archives"]
-    except json.decoder.JSONDecodeError as e:
+    except json.decoder.JSONDecodeError as e:  # pragma: no cover
         raise Error("Could not decode output of Borg list command.", codicil=e)
 
 
@@ -104,7 +104,7 @@ def get_latest_archive(settings):
         data = json.loads(borg.stdout)
         if data["archives"]:
             return data["archives"][-1]
-    except json.decoder.JSONDecodeError as e:
+    except json.decoder.JSONDecodeError as e:  # pragma: no cover
         raise Error("Could not decode output of Borg list command.", codicil=e)
 
 # find_archive() {{{2
@@ -343,11 +343,7 @@ class Command:
     @classmethod
     def commands(cls):
         for cmd in cls.__subclasses__():
-            if hasattr(cmd, "NAMES"):
-                yield cmd
-            for sub in cmd.commands():
-                if hasattr(sub, "NAMES"):
-                    yield sub
+            yield cmd
 
     @classmethod
     def commands_sorted(cls):
@@ -2218,26 +2214,33 @@ class RepoCreateCommand(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
-        borg_opts = []
+
+        # run borg repo-create
+        borg = settings.run_borg(
+            cmd="repo-create",
+            assimilate_opts = cmdline
+        )
+        if borg.status:
+            return borg.status
+
+        # run borg repo-space
         if cmdline["--reserve"]:
             try:
                 space = Quantity(cmdline["--reserve"], binary=True, ignore_sf=False)
                 if space.units and space.units not in ["B", "bytes", "byte"]:
                     raise Error('expected bytes.', culprit="--reserve")
                 space = space.render(prec="full", show_units=False)
-                borg_opts.extend(["--reserve", space])
             except QuantiPhyError as e:
                 raise Error(e, culprit=cmdline["--reserve"])
 
-        # run borg
-        borg = settings.run_borg(
-            cmd="repo-create",
-            borg_opts = borg_opts,
-            assimilate_opts = cmdline
-        )
-        out = borg.stderr or borg.stdout
-        if out:
-            output(out.rstrip())
+            borg = settings.run_borg(
+                cmd="repo-space",
+                borg_opts = [f"--reserve={space}"],
+                assimilate_opts = cmdline
+            )
+            out = borg.stderr or borg.stdout
+            if out:
+                output(out.rstrip())
 
         settings.date_file.touch()
         return borg.status

@@ -226,9 +226,6 @@ assimilate:
             binding — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
-                    stdout:
-                        contains text: Reserve some repository storage space now for emergencies
-
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -237,6 +234,7 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
+                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -863,9 +861,6 @@ assimilate:
             albino — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
-                    stdout:
-                        contains text: Reserve some repository storage space now for emergencies
-
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -874,6 +869,7 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
+                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1602,15 +1598,13 @@ assimilate:
             epicenter — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
-                    stdout:
-                        contains text: Reserve some repository storage space now for emergencies
-
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > Borg-related environment variables: {{
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
                             > }}
+                        excludes text: borg-space
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2294,9 +2288,6 @@ assimilate:
             tundra — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
-                    stdout:
-                        contains text: Reserve some repository storage space now for emergencies
-
                     stderr:
                         matches text:
                             > === test1 ===
@@ -2311,6 +2302,7 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test1 \
                             >         --make-parent-dirs \
                             >         --encryption=repokey-blake2-chacha20-poly1305
+                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -3178,9 +3170,6 @@ assimilate:
             pantry — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
-                    stdout:
-                        contains text: Reserve some repository storage space now for emergencies
-
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -3189,6 +3178,7 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
+                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -3750,9 +3740,6 @@ assimilate:
             annual — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
-                    stdout:
-                        contains text: Reserve some repository storage space now for emergencies
-
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -3761,6 +3748,7 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
+                        excludes text: borg-space
 
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -4236,10 +4224,26 @@ assimilate:
 
         tests:
             crumb — repo-create {{{2:
-                run: assimilate repo-create
+                run: assimilate repo-create --reserve=1MiB
                 checks:
                     stdout:
-                        contains text: Reserve some repository storage space now for emergencies
+                        contains text: There is 67.11 MB reserved space in this repository now.
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-space \
+                            >         --reserve=1048576 \
+                            >         --repo=/{run_dir}/REPO/test
+
 
             decimate — create {{{2:
                 initialization:

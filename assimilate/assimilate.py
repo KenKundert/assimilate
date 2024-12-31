@@ -968,8 +968,8 @@ class Assimilate:
             now = arrow.now()
             pid = os.getpid()
             contents = dict(
-                started = str(now),
                 cmdline = ' '.join(sys.argv),
+                started = str(now),
                 pid = pid
             )
             nt.dump(contents, lockfile)
