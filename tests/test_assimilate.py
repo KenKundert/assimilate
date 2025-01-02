@@ -394,6 +394,16 @@ def run_tests(suite, category, scenario, initialization, tests, home_dir, subTes
             cmd = test['run']
             if cmd == "BREAK":
                 break
+
+            # add test name to command if command is assimilate
+            try:
+                cmd, args = cmd.split(maxsplit=1)
+                if cmd == "assimilate":
+                    cmd = f"{cmd} --name={test_name}"
+                cmd = f"{cmd} {args}"
+            except ValueError:
+                pass
+
             try:
                 cmd = cmd.format(run_dir=run_dir, **matches)
             except (ValueError, KeyError) as e:
@@ -501,12 +511,12 @@ def add_script(home_dir):
     path.write_text(SCRIPT.format(home_dir=home_dir))
     path.chmod(0o777)
 
-# gethostname {{{1
+# gethostname {{{2
 def gethostname():
     return socket.gethostname().split(".")[0]
 hostname = gethostname()
 
-# getusername {{{1
+# getusername {{{2
 def getusername():
     return pwd.getpwuid(os.getuid()).pw_name
 username = getusername()

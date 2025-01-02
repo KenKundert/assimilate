@@ -244,6 +244,7 @@ class Assimilate:
         # read shared setting if not already available
         if shared_settings is None:
             shared_settings = read_settings('shared')
+        self.run_name = kwargs.pop('run_name', None)
 
         # reset the logfile so anything logged after this is placed in the
         # logfile for this config
@@ -754,7 +755,6 @@ class Assimilate:
                 )
             if narrating:
                 modes = "soeW1"
-                display("\nRunning Borg {} command ...".format(cmd))
             else:
                 modes = "sOEW1"
             narrate(
@@ -983,12 +983,15 @@ class Assimilate:
         # create composite logfile
         if log_command:
             sect = 3*'{'
+            description = self.settings.get('cmd_name')
+            if self.run_name:
+                description = f"{description} ({self.run_name})"
             kwargs = dict(
                 retain_temp = True,
                 keep_for = '1w',
                 day_header = f'D MMMM YYYY  {sect}1',
                 entry_header = f'h:mm A  {sect}2',
-                description = self.settings.get('cmd_name'),
+                description = description,
                 editor = 'vim',
             )
             kwargs.update(self.dict_values('logging'))

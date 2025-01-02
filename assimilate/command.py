@@ -161,10 +161,11 @@ def find_archive(settings, options):
                     return desc_and_id(newer_archive)
             older_archive = newer_archive
         if older_archive:
-            warn(
-                f'archive younger than {time_thresh} ({target.humanize()}) was not found.',
-                codicil='Using youngest that is older than given date or age.'
-            )
+            if first_after:
+                warn(
+                    f'archive younger than {time_thresh} ({target.humanize()}) was not found.',
+                    codicil='Using youngest that is older than given date or age.'
+                )
             return desc_and_id(older_archive)
         raise Error(
             "no archives available."
@@ -512,7 +513,7 @@ class CheckCommand(Command):
 
         Options:
             -a, --archive <archive>     name of the archive to mount
-            -A, --after <date_or_age>   use first archive newer than given
+            -A, --after <date_or_age>   use first archive younger than given
             -B, --before <date_or_age>  use first archive older than given
             -f, --first <N>             consider first N archives that remain
             -l, --last <N>              consider last N archives that remain
@@ -524,7 +525,7 @@ class CheckCommand(Command):
                                         oldest+range
             -*, --all                   check all available archives
             -e, --include-external      check all archives in repository, not just
-                                        those associated with this configuration
+                                        those associated with chosen configuration
             -r, --repair                attempt to repair any inconsistencies found
             -v, --verify-data           perform a full integrity verification (slow)
 
@@ -592,7 +593,7 @@ class CompactCommand(Command):
             assimilate compact [options]
 
         Options:
-            -p, --progress        shows Borg progress
+            -p, --progress          shows Borg progress
 
         This command frees repository space by compacting segments.
 
@@ -645,7 +646,7 @@ class CompareCommand(Command):
 
         Options:
             -a, --archive <archive>     name of the archive to compare against
-            -A, --after <date_or_age>   use first archive newer than given
+            -A, --after <date_or_age>   use first archive younger than given
             -B, --before <date_or_age>  use first archive older than given
             -i, --interactive           perform an interactive comparison
 
@@ -1042,7 +1043,7 @@ class DeleteCommand(Command):
 
         Options:
             -a, --archive <archive>     name of the archive to mount
-            -A, --after <date_or_age>   use first archive newer than given
+            -A, --after <date_or_age>   use first archive younger than given
             -B, --before <date_or_age>  use first archive older than given
             -f, --first <N>             consider first N archives that remain
             -l, --last <N>              consider last N archives that remain
@@ -1053,8 +1054,9 @@ class DeleteCommand(Command):
             -O, --oldest <range>        only consider archives between oldest and
                                         oldest+range
             -e, --include-external      include all archives in repository, not just
-                                        those associated with this configuration
+                                        those associated with chosen configuration
             -F, --fast                  skip compacting
+            --list                      list deleted archives
 
         The delete command deletes the specified archives.  If no archive is
         specified, the latest is deleted.
@@ -1075,14 +1077,15 @@ class DeleteCommand(Command):
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         borg_opts = archive_filter_options(settings, cmdline, default='latest')
-        list_opt = ['--list'] if 'dry-run' in options else []
+        list_opt = ['--list'] if cmdline['--list'] or 'dry-run' in options else []
+        include_external_archives = cmdline["--include-external"]
 
         # run borg
         borg = settings.run_borg(
             cmd = "delete",
             assimilate_opts = options,
             borg_opts = borg_opts + list_opt,
-            strip_archive_matcher = True,
+            strip_archive_matcher = include_external_archives,
         )
         out = borg.stderr or borg.stdout
         if out and not ('borg compact' in borg.stderr and settings.compact_after_delete):
@@ -1459,7 +1462,7 @@ class ExtractCommand(Command):
 
         Options:
             -a, --archive <archive>     name of the archive to use
-            -A, --after <date_or_age>   use first archive newer than given
+            -A, --after <date_or_age>   use first archive younger than given
             -B, --before <date_or_age>  use first archive older than given
             -f, --force                 extract even if it might overwrite
                                         the original file
@@ -1696,7 +1699,7 @@ class ListCommand(Command):
 
         Options:
             -a, --archive <archive>     name of the archive to use
-            -A, --after <date_or_age>   use first archive newer than given
+            -A, --after <date_or_age>   use first archive younger than given
             -B, --before <date_or_age>  use first archive older than given
             -c, --no-color              do not color based on health
             -s, --short                 use short listing format
@@ -1982,7 +1985,7 @@ class MountCommand(Command):
 
         Options:
             -a, --archive <archive>     name of the archive to use
-            -A, --after <date_or_age>   use first archive newer than given
+            -A, --after <date_or_age>   use first archive younger than given
             -B, --before <date_or_age>  use first archive older than given
             -f, --first <N>             consider first N archives that remain
             -l, --last <N>              consider last N archives that remain
@@ -1994,7 +1997,7 @@ class MountCommand(Command):
                                         oldest+range
             -e, --include-external      when mounting all archives, do
                                         not limit archives to only those
-                                        associated with this configuration
+                                        associated with chosen configuration
 
         You can mount a repository or archive using:
 
@@ -2108,7 +2111,7 @@ class PruneCommand(Command):
 
         Options:
             -e, --include-external   prune all archives in repository, not just
-                                     those associated with this configuration
+                                     those associated with chosen configuration
             -f, --fast               skip compacting
             -l, --list               show fate of each archive
             -s, --stats              show Borg statistics
@@ -2265,7 +2268,7 @@ class RepoListCommand(Command):
             -O, --oldest <range>    only consider archives between oldest and
                                     oldest+range
             -e, --include-external  list all archives in repository, not just
-                                    those associated with this configuration
+                                    those associated with chosen configuration
             -d, --deleted           only archives archives marked for deletion
         """
     ).strip()
@@ -2372,7 +2375,7 @@ class RestoreCommand(Command):
 
         Options:
             -a, --archive <archive>           name of the archive to use
-            -A, --after <date_or_age>         use first archive newer than given
+            -A, --after <date_or_age>         use first archive younger than given
             -B, --before <date_or_age>        use first archive older than given
             -l, --list                        list the files and directories
                                               as they are processed
@@ -2608,7 +2611,7 @@ class UndeleteCommand(Command):
 
         Options:
             -a, --archive <archive>     name of the archive to mount
-            -A, --after <date_or_age>   use first archive newer than given
+            -A, --after <date_or_age>   use first archive younger than given
             -B, --before <date_or_age>  use first archive older than given
             -f, --first <N>             consider first N archives that remain
             -l, --last <N>              consider last N archives that remain
@@ -2619,11 +2622,16 @@ class UndeleteCommand(Command):
             -O, --oldest <range>        only consider archives between oldest and
                                         oldest+range
             -e, --include-external      include all archives in repository, not just
-                                        those associated with this configuration
+                                        those associated with chosen configuration
+            --list                      list undeleted archives
 
         You can apply the undelete command to any archives deleted with the
         delete or prune commands.  However, undeleting archives is only possible
         before compacting.
+
+        All archives that were selected and are marked for deletion will be
+        undeleted (they will no longer be marked for deletion).  If no archives
+        are selected, all archives marked for deletion will be undeleted.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -2634,15 +2642,18 @@ class UndeleteCommand(Command):
     def run(cls, command, args, settings, options):
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
+        list_opt = ['--list'] if cmdline['--list'] or 'dry-run' in options else []
+        include_external_archives = cmdline["--include-external"]
         borg_opts = archive_filter_options(settings, cmdline, default='all')
-        list_opt = ['--list'] if 'dry-run' in options else []
+        borg_opts.append("--match-archives=sh:*")
+            # adding this to end makes the default to undelete all
 
         # run borg
         borg = settings.run_borg(
             cmd = "undelete",
             assimilate_opts = options,
             borg_opts = borg_opts + list_opt,
-            strip_archive_matcher = True,
+            strip_archive_matcher = include_external_archives,
         )
         out = borg.stderr or borg.stdout
         if out:

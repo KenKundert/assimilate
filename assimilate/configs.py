@@ -573,7 +573,19 @@ BORG_SETTINGS = dict(
         validator = as_integer,
     ),
     match_archives = dict(
-        cmds = ["analyze", "check", "delete", "info", "mount", "prune", "recreate", "repo-list", "tag", "transfer"],
+        cmds = [
+            "analyze",
+            "check",
+            "delete",
+            "info",
+            "mount",
+            "prune",
+            "recreate",
+            "repo-list",
+            "tag",
+            "transfer",
+            "undelete"
+        ],
         arg = "PATTERNS",
         desc = "only consider archive names that match the given glob pattern",
         validator = as_lines,

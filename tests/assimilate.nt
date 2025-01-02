@@ -167,6 +167,7 @@ assimilate:
                             >     -h, --help                        Output basic usage information.
                             >     -m, --mute                        Suppress all output.
                             >     -n, --narrate                     Send Assimilate and Borg narration to stdout.
+                            >     -N, --name <name>                 Apply <name> to this invocation in nt log file
                             >     -q, --quiet                       Suppress optional output.
                             >     -r, --relocated                   Acknowledge that repository was relocated.
                             >     -v, --verbose                     Make Borg more verbose.
@@ -795,6 +796,7 @@ assimilate:
                             >     -h, --help                        Output basic usage information.
                             >     -m, --mute                        Suppress all output.
                             >     -n, --narrate                     Send Assimilate and Borg narration to stdout.
+                            >     -N, --name <name>                 Apply <name> to this invocation in nt log file
                             >     -q, --quiet                       Suppress optional output.
                             >     -r, --relocated                   Acknowledge that repository was relocated.
                             >     -v, --verbose                     Make Borg more verbose.
@@ -855,7 +857,7 @@ assimilate:
                             >     -O, --oldest <range>    only consider archives between oldest and
                             >                             oldest+range
                             >     -e, --include-external  list all archives in repository, not just
-                            >                             those associated with this configuration
+                            >                             those associated with chosen configuration
                             >     -d, --deleted           only archives archives marked for deletion
 
             albino — repo-create {{{2:
@@ -994,8 +996,7 @@ assimilate:
                 run: assimilate repo-space --reserve=1MiB
                 checks:
                     stdout:
-                        contains regex:
-                            > There is [0-9.]+ MB reserved space in this repository now.
+                        matches text: There is 67.11 MB reserved space in this repository now.
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -1531,6 +1532,7 @@ assimilate:
                             >     -h, --help                        Output basic usage information.
                             >     -m, --mute                        Suppress all output.
                             >     -n, --narrate                     Send Assimilate and Borg narration to stdout.
+                            >     -N, --name <name>                 Apply <name> to this invocation in nt log file
                             >     -q, --quiet                       Suppress optional output.
                             >     -r, --relocated                   Acknowledge that repository was relocated.
                             >     -v, --verbose                     Make Borg more verbose.
@@ -1591,7 +1593,7 @@ assimilate:
                             >     -O, --oldest <range>    only consider archives between oldest and
                             >                             oldest+range
                             >     -e, --include-external  list all archives in repository, not just
-                            >                             those associated with this configuration
+                            >                             those associated with chosen configuration
                             >     -d, --deleted           only archives archives marked for deletion
 
 
@@ -3482,6 +3484,74 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
 
+            template — list --after=1d {{{2:
+                run: assimilate list --after=1d
+                checks:
+                    stderr:
+                        matches regex:
+                            > archive: {aid4} test .*
+
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         --json
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid4}
+
+            hound — list --before=0m {{{2:
+                run: assimilate list --before=0m
+                checks:
+                    stderr:
+                        matches regex:
+                            > archive: {aid0} test .*
+
+                    stdout:
+                        matches text:
+                            > {run_dir}/
+                            > {run_dir}/.config/
+                            > {run_dir}/.config/assimilate/
+                            > {run_dir}/.config/assimilate/shared.conf.nt
+                            > {run_dir}/.config/assimilate/test.conf.nt
+                            > {run_dir}/a
+                            > {run_dir}/b
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         --json
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --json-lines \
+                            >         '--format={{path}}{{type}}' \
+                            >         aid:{aid0}
+
             parade — list -a 4 {{{2:
                 run: assimilate list -a 4
                 checks:
@@ -3761,8 +3831,6 @@ assimilate:
                 checks:
                     stderr:
                         matches text:
-                            >
-                            > Running Borg create command ...
                             > - bu
                             > A .config/assimilate/shared.conf.nt
                             > A .config/assimilate/test.conf.nt
@@ -3812,8 +3880,10 @@ assimilate:
                 run: assimilate create --progress
                 checks:
                     stderr:
-                        contains line:
-                            > Running Borg create command ...
+                        contains lines in order:
+                            - Saving files cache
+                            - Saving chunks cache
+                            - Saving cache config
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3852,7 +3922,6 @@ assimilate:
                 checks:
                     stderr:
                         contains lines in order:
-                            > Running Borg create command ...
                             > Repository: /{run_dir}/REPO/test
                             > Archive name: test
 
@@ -3908,7 +3977,7 @@ assimilate:
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
                             > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
 
-            facial — repo-list {{{2:
+            facial — list {{{2:
                 run: assimilate list
                 checks:
                     stdout:
@@ -3975,8 +4044,19 @@ assimilate:
                 run: assimilate compact --progress
                 checks:
                     stderr:
-                        contains line:
-                            > Running Borg compact command ...
+                        contains lines in order:
+                            - Computing used/wanted chunks 0.0%
+                            - Computing used/wanted chunks 25.0%
+                            - Computing used/wanted chunks 50.0%
+                            - Computing used/wanted chunks 75.0%
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact \
+                            >         --progress \
+                            >         --repo=/{run_dir}/REPO/test
 
             canyon — delete  {{{2:
                 run: assimilate delete -a aid:{aid3}
@@ -4048,8 +4128,6 @@ assimilate:
                     stderr:
                         matches regex:
                             > archive: {aid0} {ar0} .*
-                            >
-                            > Running Borg extract command \.\.\.
                             > \.config
                             > \.config/assimilate
                             > \.config/assimilate/shared\.conf\.nt
@@ -4062,8 +4140,6 @@ assimilate:
                     stderr:
                         matches regex:
                             > archive: {aid0} {ar0} .*
-                            >
-                            > Running Borg extract command \.\.\.
                             > \.config
                             > \.config/assimilate
                             > \.config/assimilate/shared\.conf\.nt
@@ -4074,7 +4150,9 @@ assimilate:
                 run: assimilate prune --list
                 checks:
                     stderr:
-                        contains line: Running Borg prune command ...
+                        matches regex:
+                            > Keeping archive.*:\s+{ar0} .+ \[{aid0}[0-9a-f]+\]
+                            > Keeping archive.*:\s+{ar1} .+ \[{aid1}[0-9a-f]+\]
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -4511,5 +4589,197 @@ assimilate:
                             >      long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
                             >
                             > default format: short
+
+    phosphate — external archives{{{1:
+        initialization:
+            create:
+                ~/:
+                    mtime: 2024-11-20T00:00:00
+
+                ~/.config/:
+                    mtime: 2024-11-21T00:00:00
+
+                ~/.config/assimilate/:
+                    mtime: 2024-11-22T00:00:00
+
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > default config: test1
+                        > encryption: none
+                    mtime: 2024-11-23T00:00:00
+
+                ~/REPO/:
+
+                ~/.config/assimilate/test1.conf.nt:
+                    contents:
+                        > repository: ~/REPO/test
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+                    mtime: 2024-11-24T00:00:00
+
+                ~/.config/assimilate/test2.conf.nt:
+                    contents:
+                        > repository: ~/REPO/test
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+                    mtime: 2024-11-24T00:00:00
+
+                ~/a:
+                    contents: aaa
+                    mtime: 2024-11-27T00:00:00
+
+                ~/b:
+                    contents: bbb
+                    mtime: 2024-11-26T00:00:00
+
+                ~/c:
+                    contents: ccc
+                    mtime: 2024-11-25T00:00:00
+
+        tests:
+            megaphone — repo-create {{{2:
+                run: assimilate repo-create
+                checks:
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
+
+
+            creel — create (test1) {{{2:
+                run: assimilate create
+
+            demijohn — repo-list (test1) {{{2:
+                run: assimilate repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 0   aid:(?P<aid1a>\w+)  (?P<ar1a>[^ ]+)   .*
+
+            circuit — create (test2) {{{2:
+                run: assimilate --config test2 create
+
+            forge — repo-list (test2) {{{2:
+                run: assimilate -ctest2 repo-list
+                checks:
+                    stdout:
+                        matches regex:
+                            > 0   aid:(?P<aid2a>\w+)  (?P<ar2a>[^ ]+)   .*
+
+            liberate — repo-list (both) {{{2:
+                run: assimilate repo-list --include-external
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:{aid1a}  {ar1a}   .*
+                            > aid:{aid2a}  {ar2a}   .*
+
+            candidate — delete (wrong repo) {{{2:
+                run: assimilate delete --list --archive=aid:{aid2a}
+                checks:
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         delete \
+                            >         --match-archives=aid:{aid2a} \
+                            >         --list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test1-*'
+
+            stoop — delete (wrong repo) {{{2:
+                run: assimilate -ctest2 delete --list --archive=aid:{aid1a}
+                checks:
+                    ~/.local/share/assimilate/test2.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         delete \
+                            >         --match-archives=aid:{aid1a} \
+                            >         --list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         '--match-archives=sh:{hostname}-{username}-test2-*'
+
+            dummy — delete --dry-run (all archives) {{{2:
+                run: assimilate --dry-run delete --include-external --archive=sh:*
+                checks:
+                    stderr:
+                        matches regex:
+                            > Would delete: {ar1a} .+ \[{aid1a}[0-9a-f]+\] \(1/2\)
+                            > Would delete: {ar2a} .+ \[{aid2a}[0-9a-f]+\] \(2/2\)
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         delete \
+                            >         '--match-archives=sh:*' \
+                            >         --list \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --dry-run
+
+            language — repo-list (both) {{{2:
+                run: assimilate repo-list --include-external
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:{aid1a}  {ar1a}   .*
+                            > aid:{aid2a}  {ar2a}   .*
+
+            profane — delete (all archives) {{{2:
+                run: assimilate delete --list --include-external --archive=sh:*
+                checks:
+                    stderr:
+                        matches regex:
+                            > Deleted archive: {ar1a} .+ \[{aid1a}[0-9a-f]+\] \(1/2\)
+                            > Deleted archive: {ar2a} .+ \[{aid2a}[0-9a-f]+\] \(2/2\)
+                            > Done. Run "borg compact" to free space.
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         delete \
+                            >         '--match-archives=sh:*' \
+                            >         --list \
+                            >         --repo=/{run_dir}/REPO/test
+
+            dustman — repo-list (both) {{{2:
+                run: assimilate repo-list --include-external
+
+            invert — undelete (all archives) {{{2:
+                run: assimilate undelete --list --include-external
+                checks:
+                    stderr:
+                        matches regex:
+                            > Undeleted archive: {ar1a} .+ \[{aid1a}[0-9a-f]+\] \(1/2\)
+                            > Undeleted archive: {ar2a} .+ \[{aid2a}[0-9a-f]+\] \(2/2\)
+                            > Done.
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         undelete \
+                            >         '--match-archives=sh:*' \
+                            >         --list \
+                            >         --repo=/{run_dir}/REPO/test
+
+            focus — repo-list (both) {{{2:
+                run: assimilate repo-list --include-external
+                checks:
+                    stdout:
+                        matches regex:
+                            > aid:{aid1a}  {ar1a}   .*
+                            > aid:{aid2a}  {ar2a}   .*
 
 #  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:

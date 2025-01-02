@@ -14,6 +14,7 @@ Options:
     -h, --help                        Output basic usage information.
     -m, --mute                        Suppress all output.
     -n, --narrate                     Send Assimilate and Borg narration to stdout.
+    -N, --name <name>                 Apply <name> to this invocation in nt log file
     -q, --quiet                       Suppress optional output.
     -r, --relocated                   Acknowledge that repository was relocated.
     -v, --verbose                     Make Borg more verbose.
@@ -125,7 +126,7 @@ def main():
             while queue:
                 with Assimilate(
                     cmdline["--config"], options, shared_settings,
-                    queue=queue, cmd_name=cmd_name
+                    queue=queue, cmd_name=cmd_name, run_name=cmdline["--name"]
                 ) as settings:
                     try:
                         exit_status = cmd.execute(

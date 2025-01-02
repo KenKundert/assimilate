@@ -71,6 +71,7 @@ cases:
     # {assimilate: {assimilate: {hornet:*}}, checks: *}
     # {assimilate: {assimilate: {analytic:*}}, checks: *}
     # {assimilate: {assimilate: {retract:*}}, checks: *}
+    # {assimilate: {assimilate: {phosphate:*}}, checks: *}
 
 # skip_until:
 #     # when present it causes all tests to be skipped until it finds a match
