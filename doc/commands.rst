@@ -539,6 +539,9 @@ something like this:
 With composite configurations the message is printed for each component config 
 unless --oldest is specified, in which case only the oldest is displayed.
 
+The *due* command differs from the :ref:`overdue <overdue>` command in that 
+*due* only reports on the active config or configs, whereas *overdue* can report 
+any *Assimilate* or *Emborg* orchestrated backup, even those on remote hosts.
 
 .. _extract:
 
@@ -799,6 +802,10 @@ configurations where neither the source files nor the destination repository are
 local.
 
 This command and its configuration are describe in :ref:`monitoring <assimilate_overdue>`.
+
+The *overdue* command differs from the :ref:`due <due>` command in that *due* 
+only reports on the active config or configs, whereas *overdue* can report any 
+*Assimilate* or *Emborg* orchestrated backup, even those on remote hosts.
 
 
 .. _prune:

@@ -130,6 +130,13 @@ assimilate:
                         >     - - ~/.local
                         >     - - ~/bu
                         >     - - ~/REPO
+                        > logging:
+                        >     keep for: 1w
+                        >     max entries: 20
+                        >     day header: D MMMM YYYY  {{{{{{1
+                        >     entry header: h:mm A  {{{{{{2
+                        >     description: {cmd_name}
+                        >     editor: vim
 
                 ~/a:
                     contents:
@@ -557,14 +564,27 @@ assimilate:
                     stdout:
                         matches regex:
                             >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
-                            >            ❬when resolved❭: .+-.+-test-{{now}}
+                            >            ❬when resolved❭: {hostname}-{username}-test-{{now}}
                             >                   cmd_name: settings
                             >                 config_dir: /{run_dir}/\.config/assimilate
                             >                config_name: test
                             >                 encryption: none
                             >                   home_dir: /{run_dir}
                             >                    log_dir: /{run_dir}/\.local/share/assimilate
+                            >                    logging: keep_for: 1w
+                            >                             max_entries: 20
+                            >                             day_header: D MMMM YYYY  {{{{{{{{{{{{1
+                            >                             entry_header: h:mm A  {{{{{{{{{{{{2
+                            >                             description: {{cmd_name}}
+                            >                             editor: vim
+                            >            ❬when resolved❭: keep_for: 1w
+                            >                             max_entries: 20
+                            >                             day_header: D MMMM YYYY  {{{{{{1
+                            >                             entry_header: h:mm A  {{{{{{2
+                            >                             description: settings
+                            >                             editor: vim
                             >             match_archives: - sh:{{host_name}}-{{user_name}}-{{config_name}}-\*
+                            >            ❬when resolved❭: - sh:{hostname}-{username}-test-\*
                             >                   patterns: - R ~
                             >                             - - ~/\.cache
                             >                             - - ~/\.local

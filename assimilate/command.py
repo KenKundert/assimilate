@@ -2530,8 +2530,8 @@ class SettingsCommand(Command):
                 output(f"{key:>{width + len_color_codes}}: {v}")
                 try:
                     if "{" in v and k not in settings.do_not_expand:
-                        rv = settings.value(k)
-                        if rv != v and not is_collection(rv):
+                        rv = settings.resolve_any(k)
+                        if rv != v:
                             # settings.value() does not resolve collections
                             rv = render(rv)
                             key = "❬when resolved❭"

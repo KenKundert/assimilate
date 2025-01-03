@@ -37,6 +37,7 @@ from inform import (
     indent,
     is_str,
     is_collection,
+    is_mapping,
     join,
     log,
     narrate,
@@ -443,8 +444,10 @@ class Assimilate:
         return [self.resolve(name, v) for v in values]
 
     # get dict values {{{2
-    def dict_values(self, name, default=()):
-        """Gets value of list setting."""
+    def dict_values(self, name, default=None):
+        """Gets value of dict setting."""
+        if default is None:
+            default = {}
         values = Collection(
             self.settings.get(name, default),
             split_lines,
@@ -455,6 +458,17 @@ class Assimilate:
         if name in self.do_not_expand:
             return values
         return {k:self.resolve(name, v) for k,v in values.items()}
+
+    # resolve all values {{{2
+    def resolve_any(self, name):
+        """Calls value(), values(), or dict_values() as appropriate for requested value"""
+        value = self.settings.get(name)
+        if is_str(value):
+            return self.value(name)
+        if is_mapping(value):
+            return self.dict_values(name)
+        if is_collection(value):
+            return self.values(name)
 
     # resolve {{{2
     def resolve(self, name, value):

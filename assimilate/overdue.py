@@ -144,12 +144,12 @@ def as_seconds(arg, units=None):
 validate_settings = Schema(
     dict(
         max_age = as_seconds,
-        root = as_abs_path,
+        sentinel_root = as_abs_path,
         message = as_string,
         repositories = {
             str: dict(
                 config = as_name,
-                repo = as_path,
+                sentinel_dir = as_path,
                 host = as_string,
                 max_age = as_seconds,
                 notify = as_emails,
@@ -177,7 +177,7 @@ def get_local_data(description, config, path, max_age):
             raise Error('create time is not available.', culprit=path)
     else:
         if not path:
-           raise Error("‘repo’ setting is required.", culprit=description)
+           raise Error("‘sentinel_dir’ setting is required.", culprit=description)
         paths = list(path.glob("index.*"))
         if not paths:
             raise Error("no sentinel file found.", culprit=path)
@@ -233,7 +233,7 @@ def overdue(cmdline, args, settings, options):
         raise Error("no ‘overdue’ settings found.", culprit=settings.config_name)
     default_max_age = od_settings.get("max_age", as_seconds('28h'))
     repositories = od_settings.get("repositories")
-    root = od_settings.get("root")
+    root = od_settings.get("sentinel_root")
     message = od_settings.get("message", terse_status_message)
 
     if cmdline["--message"]:
@@ -266,7 +266,7 @@ def overdue(cmdline, args, settings, options):
     # check age of repositories
     for description, params in repositories.items():
         config = params.get('config')
-        repo = params.get('repo')
+        sentinel_dir = params.get('sentinel_dir')
         max_age = params.get('max_age') or default_max_age
         notify = params.get('notify') or default_notify or []
         host = params.get('host')
@@ -275,13 +275,13 @@ def overdue(cmdline, args, settings, options):
         failed = False
         try:
             if host:
-                ignoring = ("max_age", "repo")
+                ignoring = ("max_age", "sentinel_dir")
                 if not cmdline["--local"]:
                     repos_data = get_remote_data(description, host, config, command)
             else:
                 ignoring = ("command",)
                 repos_data = get_local_data(
-                    description, config, cull([root, repo]), max_age
+                    description, config, cull([root, sentinel_dir]), max_age
                 )
             ignored = set(ignoring) & params.keys()
             if ignored:

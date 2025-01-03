@@ -83,14 +83,14 @@ as it can use ssh to query remote backups.  It uses the :ref:`overdue setting`
 setting to specify the desired configs.
 
 | *max_age* (how old a repository must be to constitute failure)
-| *root* (default directory for repositories)
+| *sentinel_root* (default directory for sentinel files)
 | *message* (a template for the message to be printed for each repository)
 | *repositories* (details and overrides for each repository)
 
 For each repository, you can specify the following repository-specific settings:
 
 | *config* (name of the *Assimilate* config for the repository)
-| *repo* (a path to the repository)
+| *sentinel_dir* (a path to the directory containing the sentinel file)
 | *host* (the remote host for repositories of interest)
 | *max_age* (how old a repository must be to constitute failure)
 | *notify* (email address -- mail is sent to this person upon failure)
@@ -102,19 +102,26 @@ Local client configs:
 
     In this case you are running the *overdue* command on the machine that 
     contains the files being backed up.  You need to specify its *Assimilate 
-    config*.  You would also specify the *repo* if the config being backed up is 
-    not one of your own, in which case you would specify the directory that 
-    contains Assimilate's *config*.latest.nt file (typically 
-    ~user/.local/share/assimilate).  You would also need read permission for 
-    this directory.  In this case the name *repo* is a bit of a misnomer.  It is 
-    not pointing to a *Borg* repository, it is pointing to the *Assimilate* data 
-    directory.  If *repo* is a relative directory, it is relative to *root*.
+    config*.  You would also specify the *sentinel_dir* if the config being 
+    backed up is not one of your own, in which case you would specify the 
+    directory that contains Assimilate's *config*.latest.nt file (typically 
+    ~user/.local/share/assimilate).  The sentinel directory combined with the 
+    config name specifies the sentinel file: 
+    ``❬sentinel_dir❭/❬config❭.latest.nt``, which must be readable.
+    If *sentinel_dir* is a relative directory, it is relative to 
+    *sentinel_root*.
 
 Local server repositories:
     In this case you are running the *overdue* command on the machine that is 
     the destination of the backups.  Here you must not specify the *config*.  
-    Instead, specify the *repo* as the destination directory for the *Borg*
-    repository.
+    Instead, specify the *sentinel_dir* as the destination directory for the 
+    *Borg* repository.
+
+    One limitation of this type is that *overdue* reports on the status of the 
+    repository, not on any specific config that deposits to the repository.  So, 
+    for example, if two machines are depositing archives to the same repository, 
+    and the backups on one machine begins failing, it will likely not be noticed 
+    because the second machine will continue refreshing the repository.
 
 Remote repositories:
     In this case you are running the *overdue* command on a remote machine that 
@@ -147,7 +154,7 @@ while also monitoring the repositories on a backups server.
                 config: home
             earth (root):
                 config: root
-                repo: /root/.local/share/assimilate
+                sentinel dir: /root/.local/share/assimilate
             sol:
                 host: sol
 
@@ -166,15 +173,15 @@ The dictionary for each repository may contain the following fields:
     repositories, in which case it specifies a normal *Assimilate* config.  It 
     also can be specified for remote repositories.
 
-*repo*:
+*sentinel_dir*:
     The path to the repository.  For local client configs this is the path to 
     the *Assimilate* data directory, typically 
     ``~user/.local/share/assimilate``.  It is not necessary to specify this path 
     for configs in your own account.  For local server repositories this is the 
     path to a *Borg* repository.
 
-    If a relative path is given, it is combined with *root* and the combination 
-    specifies the absolute path to the repository.
+    If a relative path is given, it is combined with *sentinel_root* and the 
+    combination specifies the absolute path to the repository.
 
 *host*:
     The name of remote host for remote repositories.
@@ -194,11 +201,11 @@ The dictionary for each repository may contain the following fields:
 
 In addition, there are some shared settings available:
 
-*root*:
-    The directory used as the root when converting relative paths given in 
-    *repositories* to absolute paths.  Must be an absolute path.  If given it is 
-    combined with *repo* from the repository specification to form the path to 
-    the repository.
+*sentinel_root*:
+    The directory used as the root when converting a relative path given in 
+    *sentinel_dir* to an absolute path.  Must be an absolute path.  If given it 
+    is combined with *sentinel_dir* from the repository specification to form 
+    the path to the repository.
 
 *max_age*:
     The default maximum age.  It is used if a maximum age is not given for 
@@ -305,34 +312,42 @@ by *Assimilate*.
 
 .. code-block:: nestedtext
 
-    to email: root@continuum.com
-    from email: dumper@continuum.com
-    max age: 12h
-    repo root: /mnt/borg-backups/repositories
-    colorscheme: dark
-    message: {description}: {Age} ago{locked: (currently active)}{overdue: — PAST DUE}
-    repositories:
-        mercury (/):
-            repo: mercury-root-root
-        venus (/):
-            repo: venus-root-root
-        earth (/):
-            repo: earth-root-root
-        mars (/):
-            repo: mars-root-root
-        jupiter (/):
-            repo: jupiter-root-root
-        saturn (/):
-            repo: saturn-root-root
-        uranus (/):
-            repo: uranus-root-root
-        neptune (/):
-            repo: neptune-root-root
-        pluto (/):
-            repo: pluto-root-root
+    notify: root@continuum.com
+    notify from: dumper@continuum.com
+    overdue:
+        max age: 12h
+        sentinel_root: /mnt/borg-backups/repositories
+        colorscheme: dark
+        message: {description}: {Age} ago{locked: (currently active)}{overdue: — PAST DUE}
+        repositories:
+            mercury (/):
+                sentinel dir: mercury-root-root
+            venus (/):
+                sentinel dir: venus-root-root
+            earth (/):
+                sentinel dir: earth-root-root
+            mars (/):
+                sentinel dir: mars-root-root
+            jupiter (/):
+                sentinel dir: jupiter-root-root
+            saturn (/):
+                sentinel dir: saturn-root-root
+            uranus (/):
+                sentinel dir: uranus-root-root
+            neptune (/):
+                sentinel dir: neptune-root-root
+            pluto (/):
+                sentinel dir: pluto-root-root
 
 The *overdue* command should be run daily, at which time `root@continuum.com` 
 receives an email if there are any that are delinquent.
+
+In this example the *overdue* command is expected to run from *cron* with any 
+delinquent backups reported by email.  The *crontab* entry might look something 
+like this::
+
+    0 8 * * *  assimilate --quiet overdue --mail
+
 
 
 .. _client_overdue:
@@ -348,26 +363,31 @@ control the server and so cannot run *overdue* there.  For example:
 
 .. code-block:: nestedtext
 
-    to email: root@continuum.com
-    from email: dumper@continuum.com
-    max age: 36h
-    colorscheme: dark
-    message: {description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
-    repositories:
-        earth (cache):
-            config: cache
-            max age: 15m
-        earth (home):
-            config: home
-        earth (root):
-            config: root
-            repo: /root/.local/share/assimilate
+    notifier: notify-send -u critical {prog_name} "{msg}"
+    overdue:
+        max age: 36h
+        message: {description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
+        repositories:
+            earth (cache):
+                config: cache
+                max age: 15m
+            earth (home):
+                config: home
+            earth (root):
+                config: root
+                sentinel_dir: /root/.local/share/assimilate
 
-Notice that one repository, *root*, is not owned by you and so the files used to 
+Notice that one config, *root*, is not owned by you and so the files used to 
 monitor the backup are not contained in your data directory for *Assimilate*.  
 In this case you must explicitly specify the path to the appropriate 
 *Assimilate* data directory and assure that the `root.latest.nt` file is 
 readable.
+
+In this example the *overdue* command is expected to run from *cron* with any 
+delinquent backups reported with an on-screen notification.  The *crontab* entry 
+might look something like this::
+
+    12 * * * *  assimilate --quiet overdue --notify
 
 
 .. _remote_overdue:
@@ -382,16 +402,19 @@ example:
 
 .. code-block:: nestedtext
 
-    max age: 36h
-    repositories:
-        earth (home):
-            config: home
-        sol:
-            host: sol
+    overdue:
+        max age: 36h
+        repositories:
+            earth (home):
+                config: home
+            sol:
+                host: sol
+                command: emborg-overdue
 
 In this example both a local client repository and a remote repository are 
 configured.  In addition, since this command is only expected to run 
-interactively, no email address are specified.
+interactively, no email address is needed.  The *sol* host is still using 
+*Emborg* and so the *command* field was specified.
 
 
 .. _monitoring_services:
