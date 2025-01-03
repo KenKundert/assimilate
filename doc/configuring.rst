@@ -1146,6 +1146,16 @@ none, one, or both.  Generally, one uses just one: *notifier* if you primarily
 use *Assimilate* interactively and *notify* if used from cron or anacron.
 
 
+.. _overdue setting:
+
+overdue
+~~~~~~~
+
+*overdue* is a dictionary setting that contains the information needed by the 
+:ref:`overdue command <overdue>`.  Detailed information about this setting can 
+be found in :ref:`monitoring <assimilate_overdue>`.
+
+
 .. _passcommand:
 
 passcommand

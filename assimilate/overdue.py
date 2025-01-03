@@ -4,21 +4,18 @@ This command show you when all of your configurations were last backed up and
 can notify you if backups have not been run recently.  It can be run either from
 the server (the destination) or from the client (the source). It
 simply lists those archives marking those are out-of-date.  If you specify
---mail, email is sent that describes the situation if a backup is overdue.
+mail, email is sent that describes the situation if a backup is overdue.
 
 Usage:
     assimilate overdue [options]
 
 Options:
-    -c, --no-color       Do not color the output
-    -h, --help           Output basic usage information
     -l, --local          Only report on local repositories
     -m, --mail           Send mail message if backup is overdue
     -n, --notify         Send notification if backup is overdue
     -N, --nt             Output summary in NestedText format
     -p, --no-passes      Do not show hosts that are not overdue
     -M, --message <msg>  Status message template for each repository
-    --version            Show software version
 
 The program requires a special configuration file, which defaults to
 overdue.conf.nt.  It should be placed in the configuration directory, typically
@@ -35,8 +32,8 @@ The message given by --message may contain the following keys in braces:
     overdue: is the back-up overdue, a boolean.
     locked: is the back-up currently active, a boolean.
 
-The status message is a Python formatted string, and so the various fields can include
-formatting directives.  For example:
+The status message is a Python formatted string, and so the various fields can
+include formatting directives.  For example:
 - strings than include field width and justification, ex. {description:>20}
 - quantities can include width, precision, form and units, ex. {age:0.1phours}
 - datetimes can include Arrow formats, ex: {mtime:DD MMM YY @ H:mm A}
@@ -44,7 +41,7 @@ formatting directives.  For example:
 """
 
 # LICENSE {{{1
-# Copyright (C) 2018-2024 Kenneth S. Kundert
+# Copyright (C) 2018-2025 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,7 +62,7 @@ import os
 import pwd
 import socket
 import arrow
-import functools
+from collections import defaultdict
 from inform import (
     Color,
     Error,
@@ -75,20 +72,22 @@ from inform import (
     dedent,
     display,
     error,
-    fatal,
-    get_informer,
     get_prog_name,
     os_error,
-    terminate,
+    plural,
     truth,
     warn,
 )
 import nestedtext as nt
 from quantiphy import Quantity, UnitConversion
-from voluptuous import Schema, Invalid, MultipleInvalid
-from .preferences import CONFIG_DIR, DATA_DIR, OVERDUE_FILE
+from voluptuous import Schema
+from .configs import (
+    add_setting, add_parents_of_non_identifier_keys,
+    as_emails, as_path, as_abs_path, as_string, as_name
+)
+from .preferences import DATA_DIR
 from .shlib import Run, to_path, set_prefs as set_shlib_prefs
-from .utilities import output, read_latest, report_voluptuous_errors
+from .utilities import output, read_latest
 
 # GLOBALS {{{1
 set_shlib_prefs(use_inform=True, log_cmd=True)
@@ -99,7 +98,6 @@ now = arrow.now()
 OVERDUE_USAGE = __doc__
 
 # colors {{{2
-default_colorscheme = "dark"
 current_color = "green"
 overdue_color = "red"
 
@@ -118,7 +116,7 @@ terse_status_message = "{description}: {updated}{locked: (currently active)}{ove
 
 mail_status_message = dedent("""
     Backup of {description} is overdue:
-       the backup sentinel file has not changed in {age:0.1phours}.
+       The sentinel file has not changed in {age:0.1phours}.
 """, strip_nl='b')
 
 error_message = dedent(f"""
@@ -128,76 +126,6 @@ error_message = dedent(f"""
 """, strip_nl='b')
 
 # VALIDATORS {{{1
-# as_string {{{2
-# raise error if value is not simple text
-def as_string(arg):
-    if isinstance(arg, dict):
-        raise Invalid('expected text, found key-value pair')
-    if isinstance(arg, list):
-        raise Invalid('expected text, found list item')
-    return arg
-
-# as_identifier {{{2
-# raise error if value is not an identifier
-def as_identifier(arg):
-    arg = as_string(arg).strip()
-    if not arg.isidentifier():
-        raise Invalid(f"expected an identifier, found {arg}")
-    return arg
-
-# as_command {{{2
-# a command is an identifier than may contain dashes
-def as_command(arg):
-    arg = as_string(arg).strip()
-    if arg.replace('-', '_').isidentifier and arg[0] != '-':
-        return arg
-    raise Invalid(f"expected a command, found {arg}")
-
-# as_email {{{2
-# raise error if value is not an email address
-# only performs simple-minded tests
-def as_email(arg):
-    email = as_string(arg).strip()
-    user, _, host = email.partition('@')
-    if '.' in host and '@' not in host:
-        return arg
-    raise Invalid(f"expected email address, found {arg}")
-
-# as_path {{{2
-# raise error if value is not text
-# coverts it to a path while expanding ~, env vars
-def as_path(arg):
-    arg = as_string(arg)
-    return to_path(arg)
-
-# as_abs_path {{{2
-# raise error if value is not text
-# coverts it to a path while expanding ~, env vars
-def as_abs_path(arg):
-    arg = as_string(arg)
-    path = to_path(arg)
-    if not path.is_absolute():
-        raise Invalid("expected absolute path.")
-    return path
-
-# as_enum {{{2
-# decorator used to specify the choices that are valid for an enum
-def as_enum(*choices):
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(arg):
-            arg = as_string(arg).lower()
-            if arg not in choices:
-                raise Invalid(f"expected {conjoin(choices, conj=' or ')}.")
-            return func(arg)
-        return wrapper
-    return decorator
-
-# as_colorscheme {{{2
-@as_enum("'light", "'dark", "'none")
-def as_colorscheme(arg):
-    return None if  arg == "none" else arg
-
 # time conversions {{{2
 UnitConversion('s', 'sec second seconds')
 UnitConversion('s', 'm min minute minutes', 60)
@@ -212,36 +140,26 @@ def as_seconds(arg, units=None):
     arg = as_string(arg)
     return Quantity(arg, units or 'h').scale('s')
 
-# normalize_key {{{2
-# converts key to snake case
-# downcase; replace whitespace and dashes with underscores
-def normalize_key(key, parent_keys):
-    if parent_keys == ("repositories",):
-        return key
-    return '_'.join(key.lower().replace('-', '_').split())
-
-
 # SCHEMA {{{1
 validate_settings = Schema(
     dict(
-        to_email = as_email,
-        from_email = as_email,
         max_age = as_seconds,
         root = as_abs_path,
-        color_scheme = as_colorscheme,
         message = as_string,
         repositories = {
             str: dict(
-                config = as_command,
+                config = as_name,
                 repo = as_path,
                 host = as_string,
                 max_age = as_seconds,
-                to_email = as_email,
-                command = as_command,
+                notify = as_emails,
+                command = as_string,
             )
         }
     )
 )
+add_setting("overdue", "settings for the overdue command", validate_settings)
+add_parents_of_non_identifier_keys("overdue", "repositories")
 
 # UTILITIES {{{1
 # get_local_data {{{2
@@ -280,17 +198,21 @@ def get_local_data(description, config, path, max_age):
 
 # get_remote_data {{{2
 def get_remote_data(name, host, config, cmd):
-    cmd = cmd or "assimilate"
+    cmd = cmd or "assimilate overdue"
     display(f"\n{name}:")
     config = ['--config', config] if config else []
     try:
-        ssh = Run(['ssh', host] + config + [cmd, 'overdue', '--nt'], 'sOEW1')
+        ssh = Run(['ssh', host] + config + cmd.split() + ['--nt'], 'sOEW1')
         for repo_data in nt.loads(ssh.stdout, top=list):
+            if 'description' not in repo_data:
+                repo_data['description'] = repo_data.get('host', '')
             if 'mtime' in repo_data:
                 repo_data['mtime'] = arrow.get(repo_data['mtime'])
             if 'overdue' in repo_data:
                 repo_data['overdue'] = truth(repo_data['overdue'] == 'yes')
-            if 'age' in repo_data:
+            if 'hours' in repo_data:
+                repo_data['age'] = as_seconds(repo_data['hours'])
+            elif 'age' in repo_data:
                 repo_data['age'] = as_seconds(repo_data['age'])
             if 'max_age' in repo_data:
                 repo_data['max_age'] = as_seconds(repo_data['max_age'])
@@ -304,46 +226,18 @@ def get_remote_data(name, host, config, cmd):
 
 # MAIN {{{1
 def overdue(cmdline, args, settings, options):
-    inform = get_informer()
-
-    # read the settings file
-    config_file = options.get('config')
-    if config_file:
-        if '.' not in config_file:
-            config_file += '.conf.nt'
-    else:
-        config_file = OVERDUE_FILE
-    settings_file = to_path(CONFIG_DIR, config_file)
-
-    try:
-        keymap = {}
-        settings = nt.load(
-            settings_file, top=dict, keymap=keymap, normalize_key=normalize_key
-        )
-        settings = validate_settings(settings)
-    except MultipleInvalid as e:  # report schema violations
-        report_voluptuous_errors(e, keymap, settings_file)
-        terminate()
-    except nt.NestedTextError as e:
-        e.terminate()
-    except OSError as e:
-        fatal(os_error(e))
-
     # gather needed settings
-    default_to_email = settings.get("to_email")
-    default_max_age = settings.get("max_age", as_seconds('28h'))
-    from_email = settings.get("from_email", f"{username}@{hostname}")
-    repositories = settings.get("repositories")
-    root = settings.get("root")
-    colorscheme = settings.get("color_scheme", default_colorscheme)
-    colorscheme = None if colorscheme == "none" else colorscheme
-    message = settings.get("message", terse_status_message)
+    default_notify = settings.notify
+    od_settings = settings.overdue
+    if not od_settings:
+        raise Error("no ‘overdue’ settings found.", culprit=settings.config_name)
+    default_max_age = od_settings.get("max_age", as_seconds('28h'))
+    repositories = od_settings.get("repositories")
+    root = od_settings.get("root")
+    message = od_settings.get("message", terse_status_message)
 
-    problem = False
     if cmdline["--message"]:
         message = cmdline["--message"].replace(r'\n', '\n')
-    if cmdline["--no-color"]:
-        colorscheme = None
     if "verbose" in options:
         message = verbose_status_message
 
@@ -355,26 +249,30 @@ def overdue(cmdline, args, settings, options):
         notify=cmdline['--notify'] and not Color.isTTY()
     )
 
-    overdue_hosts = {}
+    overdue_by_recipient = defaultdict(list)
+    exit_status = 0
 
-    def send_mail(recipient, subject, message):
-        if cmdline["--mail"]:
-            if cmdline['--verbose']:
+    def send_mail(recipients, subject, body):
+        if recipients:
+            if 'verbose' in options:
                 display(f"Reporting to {recipient}.\n")
-            mail_cmd = ["mailx", "-r", from_email, "-s", subject, recipient]
-            Run(mail_cmd, stdin=message, modes="soeW0")
+            mail_cmd = ["mail", "-s", subject] + recipients
+            if settings.notify_from:
+                mail_cmd += ["-r", settings.notify_from]
+            Run(mail_cmd, stdin=body, modes="soeW0")
+        else:
+            raise Error('must specify notify setting to send mail.')
 
     # check age of repositories
     for description, params in repositories.items():
         config = params.get('config')
         repo = params.get('repo')
-        max_age = params.get('max_age')
-        max_age = max_age if max_age else default_max_age
-        to_email = params.get('to_email')
-        to_email = default_to_email if not to_email else to_email
+        max_age = params.get('max_age') or default_max_age
+        notify = params.get('notify') or default_notify or []
         host = params.get('host')
         command = params.get('command')
 
+        failed = False
         try:
             if host:
                 ignoring = ("max_age", "repo")
@@ -388,10 +286,7 @@ def overdue(cmdline, args, settings, options):
             ignored = set(ignoring) & params.keys()
             if ignored:
                 culprit = (
-                    settings_file, "repositories", description,
-                    '{}-{}'.format(*nt.get_line_numbers(
-                        ("repositories", description), keymap=keymap)
-                    )
+                    "overdue", "repositories", description,
                 )
                 warn(f"ignoring {conjoin(sorted(ignored))}.", culprit=culprit)
 
@@ -400,6 +295,7 @@ def overdue(cmdline, args, settings, options):
                 repo_data['updated'] = repo_data['mtime'].humanize()
                 overdue = repo_data['overdue']
                 locked = repo_data['locked']
+                description = repo_data['description']
                 report = report_as_overdue if overdue else report_as_current
 
                 with Quantity.prefs(spacer=' '):
@@ -407,8 +303,6 @@ def overdue(cmdline, args, settings, options):
                         if cmdline["--nt"]:
                             output(nt.dumps([repo_data], default=str))
                         else:
-                            saved_colorscheme = inform.colorscheme
-                            inform.colorscheme = colorscheme
                             try:
                                 report(message.format(**repo_data))
                             except ValueError as e:
@@ -419,42 +313,31 @@ def overdue(cmdline, args, settings, options):
                                     culprit=(description, 'message'),
                                     codicil=f"Choose from: {conjoin(repo_data.keys())}."
                                 )
-                            finally:
-                                inform.colorscheme = saved_colorscheme
 
                     if overdue:
-                        problem = True
-                        overdue_hosts[host] = mail_status_message.format(**repo_data)
+                        exit_status = max(exit_status, 1)
+                        msg = mail_status_message.format(**repo_data)
+                        for email in notify:
+                            overdue_by_recipient[email].append(msg)
         except OSError as e:
-            problem = True
-            msg = os_error(e)
-            error(msg)
-            if to_email:
+            failed = os_error(e)
+            error(failed)
+        except Error as e:
+            failed = str(e)
+            e.report()
+        if failed:
+            exit_status = max(exit_status, 2)
+            if cmdline["--mail"]:
                 send_mail(
-                    to_email,
+                    notify,
                     f"{get_prog_name()} error",
                     error_message.format(msg),
                 )
-        except Error as e:
-            problem = True
-            e.report()
-            if to_email:
-                send_mail(
-                    to_email,
-                    f"{get_prog_name()} error",
-                    error_message.format(str(e)),
-                )
 
-    if overdue_hosts:
-        if len(overdue_hosts) > 1:
-            subject = "backups are overdue"
-        else:
-            subject = "backup is overdue"
-        messages = '\n\n'.join(overdue_hosts.values())
-        notify = settings.get('notify')
-        if notify:
-            send_mail(notify, subject, messages)
-        else:
-            raise Error('must specify notify setting to send mail.')
+    if cmdline["--mail"]:
+        for recipient, msgs in overdue_by_recipient.items():
+            subject = f"{plural(msgs):backup/ is/s are} overdue"
+            body = '\n'.join(msgs)
+            send_mail([recipient], subject, body)
 
-    terminate(problem)
+    return exit_status

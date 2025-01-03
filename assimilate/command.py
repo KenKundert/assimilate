@@ -1,7 +1,7 @@
 # Commands
 
 # License {{{1
-# Copyright (C) 2016-2024 Kenneth S. Kundert
+# Copyright (C) 2016-2025 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ from inform import (
     get_informer,
     indent,
     is_collection,
-    is_mapping,
     is_str,
     join,
     log,
@@ -248,7 +247,7 @@ def list_archives(data, cmdline):
         date = each.get('time', '')
         if date:
             date = arrow.get(date)
-            date = f" {date.format('YYYY-MM-DD h:mm A')} ({date.humanize()})"
+            date = f"{date.format('YYYY-MM-DD h:mm A')} ({date.humanize()})"
         archive = each.get('archive', '')
         if no_index:
             archives.append((f"aid:{id}", archive, date))
@@ -2089,7 +2088,7 @@ class OverdueCommand(Command):
     LOG_COMMAND = True
 
     @classmethod
-    def run_early(cls, command, args, settings, options):
+    def run(cls, command, args, settings, options):
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         informer = get_informer()
         prev_stream_policy = informer.stream_policy
@@ -2486,9 +2485,7 @@ class SettingsCommand(Command):
 
         def render(value):
             val = nt.dumps(value, default=str)
-            if is_collection(v) or is_mapping(v) or '\n' in val:
-                val = '↓\n' + val
-            elif val.startswith('> ') and not str(v).startswith('> '):
+            if val.startswith('> ') and not str(v).startswith('> '):
                 return val[2:]
             return indent(val, stops=7, first=-7)
 
@@ -2533,12 +2530,14 @@ class SettingsCommand(Command):
                 output(f"{key:>{width + len_color_codes}}: {v}")
                 try:
                     if "{" in v and k not in settings.do_not_expand:
-                        v = settings.value(k)
-                        v = render(v)
-                        key = "❬when resolved❭"
-                        output(resolved(
-                            f"{key:>{width}}: {v}"
-                        ))
+                        rv = settings.value(k)
+                        if rv != v and not is_collection(rv):
+                            # settings.value() does not resolve collections
+                            rv = render(rv)
+                            key = "❬when resolved❭"
+                            output(resolved(
+                                f"{key:>{width}}: {rv}"
+                            ))
                 except Error:
                     pass
 

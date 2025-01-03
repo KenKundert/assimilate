@@ -1,7 +1,7 @@
 # Hooks
 
 # License {{{1
-# Copyright (C) 2018-2024 Kenneth S. Kundert
+# Copyright (C) 2018-2025 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 # Imports {{{1
 from inform import Error, full_stop, log, os_error
-from .configs import ASSIMILATE_SETTINGS
+from .configs import add_setting, as_string
 import requests
 
 # Hooks base class {{{1
@@ -28,8 +28,7 @@ class Hooks:
     def provision_hooks(cls):
         for subclass in cls.__subclasses__():
             for k, v in subclass.ASSIMILATE_SETTINGS.items():
-                assert k not in ASSIMILATE_SETTINGS
-                ASSIMILATE_SETTINGS[k] = dict(desc=v, validator=False)
+                add_setting(k, desc=v, validator=as_string)
 
     def __init__(self, settings):
         self.active_hooks = []

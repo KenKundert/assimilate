@@ -68,6 +68,8 @@ command, it is good hygiene to run the :ref:`prune <prune>`, :ref:`compact
 <due>` or :ref:`info <info>` command can be used to determine when each were 
 last run.
 
+Both the *due* and *info* commands report on the status of the active config.
+
 
 .. _assimilate_overdue:
 
@@ -75,14 +77,11 @@ Overdue
 -------
 
 *Assimilate* provides the *overdue* command that can be used to determine which 
-of your repositories are overdue for backup.  This is useful if you are 
-supporting many repositories as it can use ssh to query remote backups.  It 
-reads its own settings file, typically `overdue.conf`, contained in the 
-:ref:`Assimilate configuration directory <configuring_assimilate>`,  that is 
-also a NestedText_ file and may contain the following settings:
+of your repositories are overdue for backup.  It can report on many configs, not 
+just the active config.  This is useful if you are supporting many repositories 
+as it can use ssh to query remote backups.  It uses the :ref:`overdue setting` 
+setting to specify the desired configs.
 
-| *to_email* (email address -- mail is sent to this person upon failure)
-| *from_email* (email address -- mail is sent from this person upon failure)
 | *max_age* (how old a repository must be to constitute failure)
 | *root* (default directory for repositories)
 | *message* (a template for the message to be printed for each repository)
@@ -93,36 +92,41 @@ For each repository, you can specify the following repository-specific settings:
 | *config* (name of the *Assimilate* config for the repository)
 | *repo* (a path to the repository)
 | *host* (the remote host for repositories of interest)
-
-You can also override or modify many of the non-repository-specific settings.
+| *max_age* (how old a repository must be to constitute failure)
+| *notify* (email address -- mail is sent to this person upon failure)
+| *command* (command used on remote hosts to generate an overdue report)
 
 There are three different types of repositories supported:
 
-Local client repositories:
+Local client configs:
 
-    In this case you are running the *overdue* command on the machine that is 
-    the source of the backups.  You need to specify its *Assimilate config*.  
-    You would also specify the *repo* if the config being backed up is not one 
-    of your own, in which case you would specify the directory that contains 
-    Assimilate's *config*.latest.nt file (typically 
-    ~user/.local/share/assimilate).
+    In this case you are running the *overdue* command on the machine that 
+    contains the files being backed up.  You need to specify its *Assimilate 
+    config*.  You would also specify the *repo* if the config being backed up is 
+    not one of your own, in which case you would specify the directory that 
+    contains Assimilate's *config*.latest.nt file (typically 
+    ~user/.local/share/assimilate).  You would also need read permission for 
+    this directory.  In this case the name *repo* is a bit of a misnomer.  It is 
+    not pointing to a *Borg* repository, it is pointing to the *Assimilate* data 
+    directory.  If *repo* is a relative directory, it is relative to *root*.
 
 Local server repositories:
     In this case you are running the *overdue* command on the machine that is 
     the destination of the backups.  Here you must not specify the *config*.  
-    Instead, specify the *repo* as the destination directory for the 
+    Instead, specify the *repo* as the destination directory for the *Borg*
     repository.
 
 Remote repositories:
-    In this case you are running the *overdue* command on a machine that is the 
-    neither the source nor the destination of the backups.  Here you must 
-    specify the *host*, which gives the name of the machine where a child 
-    overdue process will be run.  The results from this run is then incorporated 
-    into the results from the parent overdue process.  The overdue command must 
-    be configured to run properly on this remote host.  Normally, the 
-    *overdue.conf.nt* configuration is used for the remote overdue process, but 
-    you can use *config* to specify a different config.  The name used for the 
-    *assimilate* command on the remote host can be specified with *command*.
+    In this case you are running the *overdue* command on a remote machine that 
+    contains one or more *Borg* repositories.  Here you must specify the *host*, 
+    which gives the name of the machine where a child overdue process will be 
+    run.  The results from this run is then incorporated into the results from 
+    the parent overdue process.  The overdue command must be configured to run 
+    properly on this remote host.
+    The name used for the *assimilate* command on the remote host can be 
+    specified with *command*.  The default *command* is ``assimilate overdue``.  
+    You may also specify *command* as ``emborg-overdue`` to use *Emborg* to 
+    query the repositories.
 
 Here is an example config that contains three local client repositories 
 (*earch*) and one remote repository (*sol*).  This would be a typical settings 
@@ -131,22 +135,21 @@ while also monitoring the repositories on a backups server.
 
 .. code-block:: nestedtext
 
-    to email: root@continuum.com
-    from email: dumper@continuum.com
-    max age: 36h
-    colorscheme: dark
-    message: {description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
-    repositories:
-        earth (cache):
-            config: cache
-            max age: 15m
-        earth (home):
-            config: home
-        earth (root):
-            config: root
-            repo: /root/.local/share/assimilate
-        sol:
-            host: sol
+    notify: admin@solsystem.com
+    overdue:
+        max age: 36h
+        message: {description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
+        repositories:
+            earth (cache):
+                config: cache
+                max age: 15m
+            earth (home):
+                config: home
+            earth (root):
+                config: root
+                repo: /root/.local/share/assimilate
+            sol:
+                host: sol
 
 *repositories* is a dictionary (a collection of key-value pairs) whose keys 
 contain a brief description of each repository and whose values are also 
@@ -154,22 +157,21 @@ dictionaries that give the details for each repository.  The description of
 a repository is an arbitrary string but should be very concise and must be 
 unique.  It is included in the email that is sent when problems occur to 
 identify the backup source.  It is a good idea for it to contain both the host 
-name and the source directory being backed up.
+name and the name of the config or the source directory being backed up.
 
 The dictionary for each repository may contain the following fields:
 
 *config*:
     The name of a local *Assimilate* config.  Used primarily for local client 
     repositories, in which case it specifies a normal *Assimilate* config.  It 
-    also can be specified for remote repositories, in which case it specifies 
-    the name of an *Assimilate overdue* config.
+    also can be specified for remote repositories.
 
 *repo*:
-    The path to the repository.  For local client repositories this is the path 
-    to the *Assimilate* data directory, typically 
+    The path to the repository.  For local client configs this is the path to 
+    the *Assimilate* data directory, typically 
     ``~user/.local/share/assimilate``.  It is not necessary to specify this path 
     for configs in your own account.  For local server repositories this is the 
-    path to the *Borg* repository.
+    path to a *Borg* repository.
 
     If a relative path is given, it is combined with *root* and the combination 
     specifies the absolute path to the repository.
@@ -177,9 +179,9 @@ The dictionary for each repository may contain the following fields:
 *host*:
     The name of remote host for remote repositories.
 
-*to_email*:
+*notify*:
     An email address, an email is sent to this address if there is an issue.
-    If given it overrides the shared *to_email*.
+    If given it overrides the shared :ref:`notify`.
 
 *max_age*:
     The maximum age.  If the backup is older it is considered over due.
@@ -191,15 +193,6 @@ The dictionary for each repository may contain the following fields:
     *assimilate*.
 
 In addition, there are some shared settings available:
-
-*from_email*:
-    Email address of the account running the checks.  This will be the sender 
-    address on any email sent as a result of an over due back-up.
-
-*to_email*:
-    The default email address of the account monitoring the checks.  This will 
-    be the recipient address on any email sent as a result of an over due 
-    back-up.  Can be overridden in the individual repositories.
 
 *root*:
     The directory used as the root when converting relative paths given in 
@@ -229,11 +222,6 @@ In addition, there are some shared settings available:
        max age: 36
 
     Hours are assumed if no units are given.
-
-*colorscheme*:
-    The color scheme of your terminal.  If your terminal uses a dark background, 
-    specify *dark*.  May be *dark*, *light*, or *none*.  If *none*, the output 
-    is not colored.
 
 *message*:
     A template that specifies a one-line summary for each host.  The string may 
@@ -273,13 +261,13 @@ and add something like the following:
 
 .. code-block:: text
 
-    34 5 * * * assimilate overdue --quiet --mail
+    34 5 * * * assimilate --quiet overdue --mail
 
 or:
 
 .. code-block:: text
 
-    34 5 * * * assimilate overdue --quiet --notify
+    34 5 * * * assimilate --quiet overdue --notify
 
 to your crontab.
 

@@ -1,7 +1,7 @@
 # Assimilate Settings
 
 # License {{{1
-# Copyright (C) 2018-2024 Kenneth S. Kundert
+# Copyright (C) 2018-2025 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -378,21 +378,23 @@ class Assimilate:
             pass
         try:
             if self.notify and not Color.isTTY():
-                Run(
-                    ["mail", "-s", f"{PROGRAM_NAME} failed on {username}@{hostname}"]
-                    + self.notify.split(),
-                    stdin=dedent(f"""\
-                        {PROGRAM_NAME} fails.
-
-                        command: {cmd}
-                        config: {self.config_name}
-                        source: {username}@{fullhostname}:{', '.join(str(d) for d in self.src_dirs)}
-                        destination: {self.repository!s}
-                        error message:
-                    """) + indent(msg) + "\n",
-                    modes="soeW",
-                    encoding="ascii",
-                )
+                to_run = ["mail", "-s", f"{PROGRAM_NAME} failed on {username}@{hostname}"]
+                if self.notify_from:
+                    to_run.extend(["-r", self.notify_from])
+                to_run.extend(self.notify)
+                report = {
+                    "source": PROGRAM_NAME,
+                    "message": msg,
+                    "command": cmd,
+                    "config": self.config_name,
+                    "user": username,
+                    "host": fullhostname,
+                    "roots": self.roots,
+                    "destination":  self.repository,
+                    "time": arrow.now(),
+                }
+                message = nt.dumps(report, default=str)
+                Run(to_run, stdin=message, modes="soeW")
         except Error:
             pass
         try:

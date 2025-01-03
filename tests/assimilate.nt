@@ -335,8 +335,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -388,14 +388,14 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
             prodigy — repo-list --deleted {{{2:
                 run: assimilate repo-list --deleted
                 checks:
                     stdout:
                         matches regex:
-                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
 
             ascend — undelete {{{2:
                 run: assimilate undelete -a {ar1}
@@ -409,8 +409,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
             informer — list {{{2:
                 run: assimilate list
@@ -548,9 +548,7 @@ assimilate:
                 run: assimilate overdue
                 checks:
                     stderr:
-                        matches text:
-                            > assimilate error:
-                            >     /{run_dir}/.config/assimilate/overdue.conf.nt: no such file or directory.
+                        matches text: assimilate error: test: no ‘overdue’ settings found.
                     status: 2
 
             profile — settings {{{2:
@@ -566,12 +564,8 @@ assimilate:
                             >                 encryption: none
                             >                   home_dir: /{run_dir}
                             >                    log_dir: /{run_dir}/\.local/share/assimilate
-                            >             match_archives: ↓
-                            >                             - sh:{{host_name}}-{{user_name}}-{{config_name}}-\*
-                            >            ❬when resolved❭: ↓
-                            >                             - sh:.+-.+-test-\*
-                            >                   patterns: ↓
-                            >                             - R ~
+                            >             match_archives: - sh:{{host_name}}-{{user_name}}-{{config_name}}-\*
+                            >                   patterns: - R ~
                             >                             - - ~/\.cache
                             >                             - - ~/\.local
                             >                             - - ~/bu
@@ -644,6 +638,9 @@ assimilate:
                             >                             not available
                             >                   notifier: notification program
                             >                     notify: email address to notify when things go wrong
+                            >                notify_from: the email address of the sender for
+                            >                             notifications
+                            >                    overdue: settings for the overdue command
                             >                passcommand: command used by Borg to acquire the passphrase
                             >                 passphrase: passphrase for encryption key (if specified,
                             >                             Avendesora is not used)
@@ -975,8 +972,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -1422,7 +1419,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -1443,7 +1440,7 @@ assimilate:
                 checks:
                     stdout:
                         contains regex:
-                            > aid:{aid0}  {ar0}   .*
+                            > aid:{aid0}  {ar0}  .*
 
             pension — borg repo-list {{{2:
                 run: assimilate borg -r @repo repo-list
@@ -1758,8 +1755,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -2187,7 +2184,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -2214,7 +2211,7 @@ assimilate:
                 checks:
                     stdout:
                         contains regex:
-                            > aid:{aid0}  {ar0}   .*
+                            > aid:{aid0}  {ar0}  .*
 
             dinosaur — borg repo-list {{{2:
                 run: assimilate borg --repo @repo repo-list
@@ -2567,8 +2564,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test1.log:
                         contains text:
@@ -3093,7 +3090,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test1.log:
                         contains text:
@@ -3120,7 +3117,7 @@ assimilate:
                 checks:
                     stdout:
                         contains regex:
-                            > aid:{aid0}  {ar0}   .*
+                            > aid:{aid0}  {ar0}  .*
 
                     stderr:
                         matches text:
@@ -3351,11 +3348,11 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 4   aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
-                            > 3   aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
-                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 4   aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+) *
+                            > 3   aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)  .*
+                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3372,9 +3369,9 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
-                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
-                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)  .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)  .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3391,9 +3388,9 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3410,11 +3407,11 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
-                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
-                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
-                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)  .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)  .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3431,11 +3428,11 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
-                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
-                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
-                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)  .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)  .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3468,11 +3465,11 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)   .*
-                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
-                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
-                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)  .*
+                            > aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)  .*
+                            > aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
+                            > aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3741,6 +3738,10 @@ assimilate:
                         > prune after create: 'yes
                         > compact after delete: 'yes
                         > keep_within: 1d
+                        > overdue:
+                        >     repositories:
+                        >         test:
+                        >             config: test
 
                 ~/REPO/:
 
@@ -3754,12 +3755,6 @@ assimilate:
                         >     > .local
                         >     > bu
                         >     > REPO
-
-                ~/.config/assimilate/overdue.conf.nt:
-                    contents:
-                        > repositories:
-                        >     test:
-                        >         config: test
 
                 ~/a:
                     contents:
@@ -3834,7 +3829,6 @@ assimilate:
                             > - bu
                             > A .config/assimilate/shared.conf.nt
                             > A .config/assimilate/test.conf.nt
-                            > A .config/assimilate/overdue.conf.nt
                             > d .config/assimilate
                             > d .config
                             > - REPO
@@ -3972,10 +3966,10 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 3   aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)   .*
-                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)   .*
-                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)   .*
-                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)   .*
+                            > 3   aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)  .*
+                            > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
+                            > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
+                            > 0   aid:(?P<aid0>\w+)  (?P<ar0>[^ ]+)  .*
 
             facial — list {{{2:
                 run: assimilate list
@@ -3987,7 +3981,6 @@ assimilate:
                             > .config/assimilate/
                             > .config/assimilate/shared.conf.nt
                             > .config/assimilate/test.conf.nt
-                            > .config/assimilate/overdue.conf.nt
                             > a
                             > b
 
@@ -4132,7 +4125,6 @@ assimilate:
                             > \.config/assimilate
                             > \.config/assimilate/shared\.conf\.nt
                             > \.config/assimilate/test\.conf\.nt
-                            > \.config/assimilate/overdue\.conf\.nt
 
             embargo — restore --list .config {{{2:
                 run: assimilate restore --list .config
@@ -4144,7 +4136,6 @@ assimilate:
                             > \.config/assimilate
                             > \.config/assimilate/shared\.conf\.nt
                             > \.config/assimilate/test\.conf\.nt
-                            > \.config/assimilate/overdue\.conf\.nt
 
             tassel — prune --list  {{{2:
                 run: assimilate prune --list
@@ -4666,7 +4657,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid1a>\w+)  (?P<ar1a>[^ ]+)   .*
+                            > 0   aid:(?P<aid1a>\w+)  (?P<ar1a>[^ ]+)  .*
 
             circuit — create (test2) {{{2:
                 run: assimilate --config test2 create
@@ -4676,15 +4667,15 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > 0   aid:(?P<aid2a>\w+)  (?P<ar2a>[^ ]+)   .*
+                            > 0   aid:(?P<aid2a>\w+)  (?P<ar2a>[^ ]+)  .*
 
             liberate — repo-list (both) {{{2:
                 run: assimilate repo-list --include-external
                 checks:
                     stdout:
                         matches regex:
-                            > aid:{aid1a}  {ar1a}   .*
-                            > aid:{aid2a}  {ar2a}   .*
+                            > aid:{aid1a}  {ar1a}  .*
+                            > aid:{aid2a}  {ar2a}  .*
 
             candidate — delete (wrong repo) {{{2:
                 run: assimilate delete --list --archive=aid:{aid2a}
@@ -4734,8 +4725,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > aid:{aid1a}  {ar1a}   .*
-                            > aid:{aid2a}  {ar2a}   .*
+                            > aid:{aid1a}  {ar1a}  .*
+                            > aid:{aid2a}  {ar2a}  .*
 
             profane — delete (all archives) {{{2:
                 run: assimilate delete --list --include-external --archive=sh:*
@@ -4779,7 +4770,7 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            > aid:{aid1a}  {ar1a}   .*
-                            > aid:{aid2a}  {ar2a}   .*
+                            > aid:{aid1a}  {ar1a}  .*
+                            > aid:{aid2a}  {ar2a}  .*
 
 #  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:

@@ -2,7 +2,7 @@
 #
 
 # LICENSE {{{1
-# Copyright (C) 2018-2024 Kenneth S. Kundert
+# Copyright (C) 2018-2025 Kenneth S. Kundert
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,9 +58,9 @@ def as_identifier(arg):
 # a name is an identifier that uses dashes rather than underscores
 def as_name(arg):
     arg = as_string(arg)
-    if not arg.replace('-', '_').isidentifier():
-        raise Invalid(f"expected name, found {arg}")
-    return arg
+    if arg.replace('-', '_').isidentifier() and arg[0] != '-':
+        return arg
+    raise Invalid(f"expected name, found {arg}")
 
 # as_email {{{2
 # raise error if value is not an email address
@@ -72,12 +72,13 @@ def as_email(arg):
         return arg
     raise Invalid(f"expected email address, found {arg}")
 
-# as_path {{{2
-# raise error if value is not text
-# coverts it to a path while expanding ~, env vars
-def as_path(arg):
-    arg = as_string(arg)
-    return to_path(arg)
+# as_emails {{{2
+# raise error if value is not one or more email addresses
+def as_emails(arg):
+    emails = as_list(arg)
+    for email in emails:
+        as_email(email)
+    return emails
 
 # as_integer {{{2
 # raise error if value is a string that cannot be cast to an integer
@@ -111,6 +112,18 @@ def as_lines(arg):
         as_string(each)
     return [line.strip() for line in arg]
 
+# as_list {{{2
+# raise error if value is not a list of strings
+# converts a string to a list by splitting on whitespace
+def as_list(arg):
+    if isinstance(arg, str):
+        arg = arg.split()
+    if isinstance(arg, dict):
+        raise Invalid('expected list')
+    for each in arg:
+        as_string(each)
+    return [line.strip() for line in arg]
+
 # as_identifiers {{{2
 # raise error if value is not a list of identifiers
 # converts a string to a list by splitting on whitespace
@@ -122,6 +135,23 @@ def as_identifiers(arg):
     for each in arg:
         as_identifier(each)
     return arg
+
+# as_path {{{2
+# raise error if value is not text
+# coverts it to a path while expanding ~, env vars
+def as_path(arg):
+    arg = as_string(arg)
+    return to_path(arg.strip())
+
+# as_abs_path {{{2
+# raise error if value is not text
+# coverts it to a path while expanding ~, env vars
+def as_abs_path(arg):
+    arg = as_string(arg)
+    path = to_path(arg.strip())
+    if not path.is_absolute():
+        raise Invalid("expected absolute path.")
+    return path
 
 # as_paths {{{2
 # raise error if value is not a list of strings
@@ -157,7 +187,7 @@ def as_patterns(arg):
 # as_dict {{{2
 # raise error if value is not a dictionary
 # converts an empty string to an empty dictionary
-# only one level is supported; all values must be strings
+# only one level is supported; all keys must be names, all values must be strings
 def as_dict(arg):
     # converts empty field to empty dictionary
     if isinstance(arg, str) and arg.strip() == "":
@@ -165,6 +195,7 @@ def as_dict(arg):
     if not isinstance(arg, dict):
         raise Invalid('expected key-value pair')
     for key, value in arg.items():
+        as_name(key)
         if not is_str(value):
             raise Invalid(f"expected string as value to ‘{key}’.")
     return arg
@@ -215,12 +246,19 @@ def as_colorscheme(arg):
 # normalize_key {{{2
 # converts key to snake case
 # downcase; replace whitespace and dashes with underscores
+parents_of_non_identifier_keys = [
+    ("command_aliases",)
+]
+
+def add_parents_of_non_identifier_keys(*parents):
+    parents_of_non_identifier_keys.append(parents)
+
 def normalize_key(key, parent_keys):
-    if parent_keys == ("command_aliases",):
+    if parent_keys in parents_of_non_identifier_keys:
         return key.lower()
     return '_'.join(key.lower().replace('-', '_').split())
 
-# GLOBALS {{{1
+# SETTINGS {{{1
 # Reserved settings {{{2
 # These are read only settings created by Assimilate
 RESERVED_SETTINGS = dict(
@@ -281,7 +319,7 @@ ASSIMILATE_SETTINGS = dict(
     ),
     default_config = dict(
         desc = "default Assimilate configuration",
-        validator = as_identifier,
+        validator = as_name,
     ),
     default_mount_point = dict(
         desc = "directory to use as mount point if one is not specified",
@@ -346,6 +384,10 @@ ASSIMILATE_SETTINGS = dict(
     ),
     notify = dict(
         desc = "email address to notify when things go wrong",
+        validator = as_emails,
+    ),
+    notify_from = dict(
+        desc = "the email address of the sender for notifications",
         validator = as_email,
     ),
     passcommand = dict(
@@ -437,6 +479,11 @@ ASSIMILATE_SETTINGS = dict(
         validator = as_dict,
     ),
 )
+
+# add_setting() {{{3
+def add_setting(name, desc, validator):
+    assert name not in ASSIMILATE_SETTINGS
+    ASSIMILATE_SETTINGS[name] = dict(desc=desc, validator=validator)
 
 # Borg settings {{{2
 BORG_SETTINGS = dict(
@@ -669,21 +716,23 @@ INITIAL_HOME_CONFIG_FILE_CONTENTS = dedent(
 )
 
 # SCHEMA {{{1
-schema = {
-    'include': as_path,
-    Extra: as_string
-}
-schema.update({
-    k:v['validator']
-    for k, v in ASSIMILATE_SETTINGS.items()
-    if v['validator'] is not False
-})
-schema.update({
-    k:v['validator']
-    for k, v in BORG_SETTINGS.items()
-    if v['validator'] is not False
-})
-validate_assimilate_settings = Schema(schema)
+# build_validator() {{{2
+def build_validator():
+    schema = {
+        'include': as_path,
+        Extra: as_string
+    }
+    schema.update({
+        k:v['validator']
+        for k, v in ASSIMILATE_SETTINGS.items()
+        if v['validator'] is not False
+    })
+    schema.update({
+        k:v['validator']
+        for k, v in BORG_SETTINGS.items()
+        if v['validator'] is not False
+    })
+    return Schema(schema)
 
 
 # CODE {{{1
@@ -704,8 +753,16 @@ def get_available_configs(keep_shared=False):
         config_files = lsf(get_config_dir(), select="*.conf.nt")
         configs = {p.name[:-8]: p for p in config_files}
 
-        # eliminate non-configs
-        configs.pop('overdue', None)
+        # warn about non-compliant config names
+        for name, path in configs.items():
+            try:
+                as_name(name)
+            except Invalid:
+                warn(
+                    "improper name for config file.",
+                    culprit = path,
+                    codicil = "name should consist only of letters, digits and dashes"
+                )
         available_configs.update(configs)
 
     if keep_shared:
@@ -753,7 +810,7 @@ def read_settings(name, config_dir=None, shared_settings=None):
 
     # read the settings file
     if name in configs:
-        new_settings = read_config(configs[name], validate_assimilate_settings)
+        new_settings = read_config(configs[name], build_validator())
     else:
         new_settings = {}  # this can happen for name == 'shared'
 
