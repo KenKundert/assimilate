@@ -69,34 +69,6 @@ def two_columns(col1, col2, width=16, indent=True):
         return "%s%-*s  %s" % (indent, width, col1, col2)
 
 
-# error_source {{{1
-def error_source():
-    """Source of error
-    Reads stack trace to determine filename and line number of error.
-    """
-    import traceback
-
-    try:
-        # return filename and lineno
-        # context and content are also available
-        import sys
-
-        exc_cls, exc, tb = sys.exc_info()
-        trace = traceback.extract_tb(tb)
-        filename, line, context, text = trace[-1]
-    except SyntaxError:
-        # extract_stack() does not work on binary encrypted files. It generates
-        # a syntax error that indicates that the file encoding is missing
-        # because the function tries to read the file and sees binary data. This
-        # is not a problem with ascii encrypted files as we don't actually show
-        # code, which is gibberish, but does not require an encoding. In this
-        # case, extract the line number from the trace.
-        from .gpg import get_active_python_file
-
-        filename = get_active_python_file()
-        line = tb.tb_next.tb_lineno
-    return filename, "line %s" % line
-
 # when {{{1
 def when(time, relative_to=None, as_past=None, as_future=None):
     """Converts time into a human friendly description of a time difference
