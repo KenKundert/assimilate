@@ -300,7 +300,7 @@ class Assimilate:
                 "Configuration directory created:",
                 f"    {parent!s}",
                 "Includes example settings files. Edit them to suit your needs.",
-                "Search for and replace any fields delimited with ⟪ and ⟫.",
+                "Search for and replace any fields delimited with ❬ and ❭.",
                 "Delete any configurations you do not need.",
                 sep="\n",
             )

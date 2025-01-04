@@ -1114,7 +1114,8 @@ They will be replaced by their value:
  |  *user_name*: The user name of the person that started *Assimilate*
  |  *prog_name*: The name of the *Assimilate* program.
 
-The notifier is only used if the command is not running from a TTY.
+The notifier is only used if the standard output from *Assimilate* does not go 
+directly to a terminal window (a TTY).
 
 Use of *notifier* requires that you have a notification daemon installed (ex: 
 `Dunst <https://wiki.archlinux.org/title/Dunst>`_).  The notification daemon 

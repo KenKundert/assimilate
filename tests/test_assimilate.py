@@ -58,7 +58,7 @@ def de_dup(key, state):
             state[key] = 1
         state[key] += 1
         return f"{key} #{state[key]}"
-    raise KeyError  # do not allow duplicates at the top level
+    raise KeyError(key)  # do not allow duplicates at the top level
 
 def normalize_key(key, parent_keys):
     num_parents = len(parent_keys)
@@ -166,6 +166,19 @@ scenario_schema = Schema({
 })
 
 # UTILITIES {{{1
+# expand_macro() {{{2
+def expand_macro(macro, run_dir, matches):
+    # expand run_dir, replace matches, and convert ⟪ and ⟫ to { and }
+    try:
+        return macro.format(
+            run_dir=run_dir, hostname=hostname, username=username,
+            **matches
+        ).rstrip().replace('⟪', '{').replace('⟫', '}')
+    except KeyError as e:
+        raise KeyError(f"{e!s}: needs escaping in:\n{indent(macro)}")
+    except ValueError as e:
+        raise ValueError(f"{e!s} in:\n{indent(macro)}")
+
 # Checker class {{{2
 # Used to determine whether generated file contains expected text.
 class Checker:
@@ -192,22 +205,12 @@ class Checker:
         if match_type in ['contains_lines', 'contains_lines_in_order', 'excludes_lines']:
             expected = as_lines(expected)
 
-        # expand run_dir and replace matches
-        def expand(s):
-            try:
-                return s.format(
-                    run_dir=run_dir, hostname=hostname, username=username,
-                    **matches
-                ).rstrip()
-            except KeyError as e:
-                raise KeyError(f"{e!s}: needs escaping in:\n{indent(s)}")
-
         run_dir = self.run_dir_wo_leading_slash
         if is_str(expected):
-            expected = expand(expected)
+            expected = expand_macro(expected, run_dir, matches)
         else:
             assert is_collection(expected)
-            expected = (expand(e) for e in expected)
+            expected = (expand_macro(e, run_dir, matches) for e in expected)
 
         # check the match_type
         if match_type == 'matches_text':
@@ -384,7 +387,10 @@ def run_tests(suite, category, scenario, initialization, tests, home_dir, subTes
     with cd(home_dir):
         add_script(home_dir)
         if initialization:
-            file_ops(initialization)
+            try:
+                file_ops(initialization)
+            except Exception as e:
+                raise AssertionError(f"{scenario}: {e!s}") from None
 
         for test_name, test in tests.items():
             assert test_name not in names_seen, f"{test_name}: duplicate test name"
@@ -405,9 +411,9 @@ def run_tests(suite, category, scenario, initialization, tests, home_dir, subTes
                 pass
 
             try:
-                cmd = cmd.format(run_dir=run_dir, **matches)
+                cmd = expand_macro(cmd, run_dir, matches)
             except (ValueError, KeyError) as e:
-                raise AssertionError(f"{full_test_name}: {e.__class__.__name__}: {e!s}")
+                raise AssertionError(f"{full_test_name}: {e.__class__.__name__}: {e!s}") from None
             checker = Checker(full_test_name, cmd, home_dir)
 
             os.umask(DEFAULT_UMASK)
@@ -437,7 +443,7 @@ def run_tests(suite, category, scenario, initialization, tests, home_dir, subTes
                     checker.check('matches_text', '0', matches)
 
                 for path, check in checks.items():
-                    path = path.format(run_dir=run_dir, **matches)
+                    path = expand_macro(path, run_dir, matches)
                     try:
                         if path == 'stderr':
                             checker.set_realized(path, response.stderr)
@@ -458,7 +464,7 @@ def run_tests(suite, category, scenario, initialization, tests, home_dir, subTes
                             for match, expected in check.items():
                                 checker.check(match, expected, matches)
                     except OSError as e:
-                         raise AssertionError(f"{full_test_name}: {os_error(e)}")
+                         raise AssertionError(f"{full_test_name}: {os_error(e)}") from None
 
             termination = test.get('termination')
             if termination:
@@ -480,6 +486,7 @@ def file_ops(operations):
                 else:
                     path.parent.mkdir(parents=True, exist_ok=True)
                     contents = attributes.get("contents", "")
+                    contents = expand_macro(contents, None, {})
                     path.write_text(contents)
 
                 mode = attributes.get("mode", None)

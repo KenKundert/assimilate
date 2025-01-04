@@ -13,48 +13,51 @@ assimilate:
                             > Configuration directory created:
                             >     /{run_dir}/.config/assimilate
                             > Includes example settings files. Edit them to suit your needs.
-                            > Search for and replace any fields delimited with ⟪ and ⟫.
+                            > Search for and replace any fields delimited with ❬ and ❭.
                             > Delete any configurations you do not need.
 
                     ~/.config/assimilate/shared.conf.nt:
                         contains lines in order:
-                            > default config: ⟪default-config⟫
-                            > composite configs: ⟪composite-configs⟫
-                            > default mount point: ~/ASSIMILATE
-                            > notify: ⟪your-email-address⟫
-                            > notifier: notify-send -u normal {{prog_name}} "{{msg}}"
-                            > prune after create: 'yes
-                            > check after create: 'latest
-                            > compact after delete: 'yes
-                            > exclude if present: .nobackup
-                            > exclude caches: 'yes
-                            > exclude nodump: 'yes
-                            > command aliases:
-                            >     repo-list:
-                            >         - archives
-                            >         - recent --last=20
-                            >     list: paths
-                            > logging:
-                            >     keep for: 1w
-                            >     max entries: 20
-                            > list formats:
-                            >     name: {{path}}
-                            >     short: {{path}}{{Type}}
-                            >     date: {{MTime:ddd YYYY-MM-DD HH:mm:ss}} {{path}}{{Type}}
-                            >     size: {{size:8}} {{path}}{{Type}}
-                            >     si: {{Size:7.2b}} {{path}}{{Type}}
-                            >     owner: {{user:8}} {{path}}{{Type}}
-                            >     group: {{group:8}} {{path}}{{Type}}
-                            >     long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
-                            > default list format: short
+                            - default config: ❬default-config❭
+                            - composite configs: ❬composite-configs❭
+                            - default mount point: ~/ASSIMILATE
+                            - notify: ❬your-email-address❭
+                            - notifier: notify-send -u normal ⟪prog_name⟫ "⟪msg⟫"
+                            - prune after create: 'yes
+                            - check after create: 'latest
+                            - compact after delete: 'yes
+                            - exclude if present: .nobackup
+                            - exclude caches: 'yes
+                            - exclude nodump: 'yes
+                            - command aliases:
+                            -     repo-list:
+                            -         - archives
+                            -         - recent --last=20
+                            -     list: paths
+                            - logging:
+                            -     keep for: 1w
+                            -     max entries: 20
+                            - default list format: short
+                            - list formats:
+                            -     name: ⟪path⟫
+                            -     short: ⟪path⟫⟪Type⟫
+                            -     date: ⟪MTime:ddd YYYY-MM-DD HH:mm:ss⟫ ⟪path⟫⟪Type⟫
+                            -     size: ⟪size:8⟫ ⟪path⟫⟪Type⟫
+                            -     si: ⟪Size:7.2b⟫ ⟪path⟫⟪Type⟫
+                            -     owner: ⟪user:8⟫ ⟪path⟫⟪Type⟫
+                            -     group: ⟪group:8⟫ ⟪path⟫⟪Type⟫
+                            -     long: ⟪mode:10⟫ ⟪user:6⟫ ⟪group:6⟫ ⟪size:8⟫ ⟪mtime⟫ ⟪path⟫⟪extra⟫
+                            - overdue:
+                            -     max age: 36 h
+                            -     message: ⟪description⟫: ⟪updated⟫ ago⟪locked: (currently active)⟫⟪overdue: — PAST DUE⟫
 
                     ~/.config/assimilate/root.conf.nt:
                         contains lines in order:
-                            > repository: ⟪host⟫:⟪path⟫/{{host_name}}-{{user_name}}-{{config_name}}
-                            > archive: {{host_name}}-{{{{now}}}}
-                            > encryption: ⟪encryption⟫
-                            > passphrase: ⟪passcode⟫
-                            > pass command: ⟪command⟫
+                            > repository: ❬host❭:❬path❭/⟪host_name⟫-⟪user_name⟫-⟪config_name⟫
+                            > archive: ⟪host_name⟫-⟪⟪now⟫⟫
+                            > encryption: ❬encryption❭
+                            > passphrase: ❬passcode❭
+                            > pass command: ❬command❭
                             >     - R /etc
                             >     - R /home
                             >     - R /root
@@ -75,11 +78,11 @@ assimilate:
 
                     ~/.config/assimilate/home.conf.nt:
                         contains lines in order:
-                            > repository: ⟪host⟫:⟪path⟫/{{host_name}}-{{user_name}}-{{config_name}}
-                            > archive: {{config_name}}-{{{{now}}}}
-                            > encryption: ⟪encryption⟫
-                            > passphrase: ⟪passcode⟫
-                            > pass command: ⟪command⟫
+                            > repository: ❬host❭:❬path❭/⟪host_name⟫-⟪user_name⟫-⟪config_name⟫
+                            > archive: ⟪config_name⟫-⟪⟪now⟫⟫
+                            > encryption: ❬encryption❭
+                            > passphrase: ❬passcode❭
+                            > pass command: ❬command❭
                             > patterns:
                             >     - R ~
                             >     - - ~/.cache
@@ -96,7 +99,7 @@ assimilate:
                     ~/.config/assimilate/cache.conf.nt:
                         contains lines in order:
                             > repository: ~/.cache/backups
-                            > archive: {{config_name}}-{{{{now}}}}
+                            > archive: ⟪config_name⟫-⟪⟪now⟫⟫
                             > encryption: none
                             > patterns:
                             >     - R ~
@@ -123,7 +126,7 @@ assimilate:
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
+                        > repository: ~/REPO/⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -133,9 +136,9 @@ assimilate:
                         > logging:
                         >     keep for: 1w
                         >     max entries: 20
-                        >     day header: D MMMM YYYY  {{{{{{1
-                        >     entry header: h:mm A  {{{{{{2
-                        >     description: {cmd_name}
+                        >     day header: D MMMM YYYY  ⟪⟪⟪⟪⟪⟪1
+                        >     entry header: h:mm A  ⟪⟪⟪⟪⟪⟪2
+                        >     description: ⟪cmd_name⟫
                         >     editor: vim
 
                 ~/a:
@@ -268,7 +271,7 @@ assimilate:
                             >         '--pattern=- /{run_dir}/bu' \
                             >         '--pattern=- /{run_dir}/REPO' \
                             >         --stats \
-                            >         '{hostname}-{username}-test-{{now}}'
+                            >         '{hostname}-{username}-test-⟪now⟫'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -282,7 +285,7 @@ assimilate:
                             >     >         '--pattern=- /{run_dir}/bu' \
                             >     >         '--pattern=- /{run_dir}/REPO' \
                             >     >         --stats \
-                            >     >         '{hostname}-{username}-test-{{now}}'
+                            >     >         '{hostname}-{username}-test-⟪now⟫'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -292,14 +295,14 @@ assimilate:
                 checks:
                     stdout:
                         matches text:
-                            >      name: {{path}}
-                            >     short: {{path}}{{Type}}
-                            >      date: {{mtime}} {{path}}{{Type}}
-                            >      size: {{size:8}} {{path}}{{Type}}
-                            >        si: {{Size:7.2b}} {{path}}{{Type}}
-                            >     owner: {{user:8}} {{path}}{{Type}}
-                            >     group: {{group:8}} {{path}}{{Type}}
-                            >      long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
+                            >      name: ⟪path⟫
+                            >     short: ⟪path⟫⟪Type⟫
+                            >      date: ⟪mtime⟫ ⟪path⟫⟪Type⟫
+                            >      size: ⟪size:8⟫ ⟪path⟫⟪Type⟫
+                            >        si: ⟪Size:7.2b⟫ ⟪path⟫⟪Type⟫
+                            >     owner: ⟪user:8⟫ ⟪path⟫⟪Type⟫
+                            >     group: ⟪group:8⟫ ⟪path⟫⟪Type⟫
+                            >      long: ⟪mode:10⟫ ⟪user:6⟫ ⟪group:6⟫ ⟪size:8⟫ ⟪mtime⟫ ⟪path⟫⟪extra⟫
                             >
                             > default format: short
 
@@ -318,7 +321,7 @@ assimilate:
                             >         '--pattern=- /{run_dir}/bu' \
                             >         '--pattern=- /{run_dir}/REPO' \
                             >         --stats \
-                            >         '{hostname}-{username}-test-{{now}}'
+                            >         '{hostname}-{username}-test-⟪now⟫'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains text:
@@ -332,7 +335,7 @@ assimilate:
                             >     >         '--pattern=- /{run_dir}/bu' \
                             >     >         '--pattern=- /{run_dir}/REPO' \
                             >     >         --stats \
-                            >     >         '{hostname}-{username}-test-{{now}}'
+                            >     >         '{hostname}-{username}-test-⟪now⟫'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -347,9 +350,9 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
-                            > }}
+                            > ⟫
 
                         contains text:
                             > running:
@@ -361,9 +364,9 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains text:
-                            >     > Borg-related environment variables: {{
+                            >     > Borg-related environment variables: ⟪
                             >     >     'BORG_RELOCATED_REPO_ACCESS_IS_OK': 'YES',
-                            >     > }}
+                            >     > ⟫
 
                         contains text:
                             >     > running:
@@ -451,7 +454,7 @@ assimilate:
                             >         list \\
                             >         --repo=/{run_dir}/REPO/test \\
                             >         --json-lines \\
-                            >         '--format={{path}}{{type}}' \\
+                            >         '--format=⟪path⟫⟪type⟫' \\
                             >         aid:{aid0}[a-f0-9]+$
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -563,8 +566,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
-                            >            ❬when resolved❭: {hostname}-{username}-test-{{now}}
+                            >                    archive: ⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-⟪⟪now⟫⟫
+                            >            ❬when resolved❭: {hostname}-{username}-test-⟪now⟫
                             >                   cmd_name: settings
                             >                 config_dir: /{run_dir}/\.config/assimilate
                             >                config_name: test
@@ -573,24 +576,24 @@ assimilate:
                             >                    log_dir: /{run_dir}/\.local/share/assimilate
                             >                    logging: keep_for: 1w
                             >                             max_entries: 20
-                            >                             day_header: D MMMM YYYY  {{{{{{{{{{{{1
-                            >                             entry_header: h:mm A  {{{{{{{{{{{{2
-                            >                             description: {{cmd_name}}
+                            >                             day_header: D MMMM YYYY  ⟪⟪⟪⟪⟪⟪1
+                            >                             entry_header: h:mm A  ⟪⟪⟪⟪⟪⟪2
+                            >                             description: ⟪cmd_name⟫
                             >                             editor: vim
                             >            ❬when resolved❭: keep_for: 1w
                             >                             max_entries: 20
-                            >                             day_header: D MMMM YYYY  {{{{{{1
-                            >                             entry_header: h:mm A  {{{{{{2
+                            >                             day_header: D MMMM YYYY  ⟪⟪⟪1
+                            >                             entry_header: h:mm A  ⟪⟪⟪2
                             >                             description: settings
                             >                             editor: vim
-                            >             match_archives: - sh:{{host_name}}-{{user_name}}-{{config_name}}-\*
+                            >             match_archives: - sh:⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-\*
                             >            ❬when resolved❭: - sh:{hostname}-{username}-test-\*
                             >                   patterns: - R ~
                             >                             - - ~/\.cache
                             >                             - - ~/\.local
                             >                             - - ~/bu
                             >                             - - ~/REPO
-                            >                 repository: ~/REPO/{{config_name}}
+                            >                 repository: ~/REPO/⟪config_name⟫
                             >            ❬when resolved❭: ~/REPO/test
 
             druggist — setting archive {{{2:
@@ -598,8 +601,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
-                            >            ❬when resolved❭: .*-test-{{now}}
+                            >                    archive: ⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-⟪⟪now⟫⟫
+                            >            ❬when resolved❭: .*-test-⟪now⟫
 
             nettle — settings --available {{{2:
                 run: assimilate settings --available
@@ -771,7 +774,7 @@ assimilate:
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
+                        > repository: ~/REPO/⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -925,7 +928,7 @@ assimilate:
                             >         --exclude-caches \
                             >         --exclude-nodump \
                             >         --exclude-if-present=.nobackup \
-                            >         '{hostname}-{username}-test-{{now}}'
+                            >         '{hostname}-{username}-test-⟪now⟫'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -955,7 +958,7 @@ assimilate:
                             >         --exclude-caches \
                             >         --exclude-nodump \
                             >         --exclude-if-present=.nobackup \
-                            >         '{hostname}-{username}-test-{{now}}'
+                            >         '{hostname}-{username}-test-⟪now⟫
                         contains text:
                             > running:
                             >     borg \
@@ -1155,7 +1158,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid0}
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -1183,7 +1186,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid1}
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -1503,9 +1506,9 @@ assimilate:
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
-                        > archive: {config_name}
-                        > match archives: id:{config_name}
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -1619,10 +1622,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: borg-space
                         excludes text: roadhouse pause govern parry
                         contains text:
@@ -1655,10 +1658,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -1718,10 +1721,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -1780,10 +1783,10 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -1824,10 +1827,10 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -1859,10 +1862,10 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -1878,7 +1881,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid0}
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -1906,7 +1909,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid1}
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -1920,10 +1923,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -1941,10 +1944,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -1975,10 +1978,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2009,11 +2012,11 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_CHECK_I_KNOW_WHAT_I_AM_DOING': 'YES',
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2094,10 +2097,10 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2130,10 +2133,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2172,10 +2175,10 @@ assimilate:
                 checks:
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2208,10 +2211,10 @@ assimilate:
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
-                            > }}
+                            > ⟫
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2271,9 +2274,9 @@ assimilate:
 
                 ~/.config/assimilate/test1.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
-                        > archive: {config_name}
-                        > match archives: id:{config_name}
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -2283,9 +2286,9 @@ assimilate:
 
                 ~/.config/assimilate/test2.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
-                        > archive: {config_name}
-                        > match archives: id:{config_name}
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -2372,9 +2375,9 @@ assimilate:
 
                     ~/.local/share/assimilate/test1.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSCOMMAND': 'echo "roadhouse pause govern parry"',
-                            > }}
+                            > ⟫
                         contains text:
                             > running:
                             >     borg \
@@ -2424,9 +2427,9 @@ assimilate:
 
                     ~/.local/share/assimilate/test2.log:
                         contains text:
-                            > Borg-related environment variables: {{
+                            > Borg-related environment variables: ⟪
                             >     'BORG_PASSCOMMAND': 'echo "roadhouse pause govern parry"',
-                            > }}
+                            > ⟫
                         contains text:
                             > running:
                             >     borg \
@@ -2759,7 +2762,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test1 \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid0}
 
                     ~/.local/share/assimilate/test1.log.nt:
@@ -2788,7 +2791,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test1 \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid1}
 
                     ~/.local/share/assimilate/test1.log.nt:
@@ -3165,9 +3168,9 @@ assimilate:
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
-                        > archive: {config_name}
-                        > match archives: id:{config_name}
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -3532,7 +3535,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid4}
 
             hound — list --before=0m {{{2:
@@ -3566,7 +3569,7 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --json-lines \
-                            >         '--format={{path}}{{type}}' \
+                            >         '--format=⟪path⟫⟪type⟫' \
                             >         aid:{aid0}
 
             parade — list -a 4 {{{2:
@@ -3767,8 +3770,8 @@ assimilate:
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
-                        > archive: {config_name}
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
                         > src dirs: .
                         > excludes:
                         >     > .cache
@@ -4101,7 +4104,7 @@ assimilate:
                         excludes text:   compact
 
             respond — due --since-backup ❬since❭ --message ❬msg❭ {{{2:
-                run: assimilate due --since-backup 0  --message '{{config}}: {{cmd}} {{action}} {{since}} {{elapsed}}'
+                run: assimilate due --since-backup 0  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since⟫ ⟪elapsed⟫'
                 checks:
                     stdout:
                         matches regex: ^test: backup backup 0d .*
@@ -4109,7 +4112,7 @@ assimilate:
                     status: 1
 
             agony — due --since-check ❬since❭ --message ❬msg❭ {{{2:
-                run: assimilate due --since-check 0h  --message '{{config}}: {{cmd}} {{action}} {{since:0.1ph}} {{elapsed}}'
+                run: assimilate due --since-check 0h  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since:0.1ph⟫ ⟪elapsed⟫'
                 checks:
                     stdout:
                         matches regex: ^test: check check 0h .*
@@ -4117,7 +4120,7 @@ assimilate:
                     status: 1
 
             resume — due --since-squeeze ❬since❭ --message ❬msg❭ {{{2:
-                run: assimilate due --since-squeeze 0Y  --message '{{config}}: {{cmd}} {{action}} {{since:0.0ps}} {{elapsed}}'
+                run: assimilate due --since-squeeze 0Y  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since:0.0ps⟫ ⟪elapsed⟫'
                 checks:
                     stdout:
                         matches regex: ^test: prune squeeze \d+s .*
@@ -4225,7 +4228,7 @@ assimilate:
                             > test: .* ago
 
             locket — overdue --message {{{2:
-                run: assimilate overdue --message="{{description}}\n{{max_age}}\n{{mtime}}\n{{age}}\n{{updated}}\n{{overdue:past due/up to date}}\n{{locked:active/not active}}"
+                run: assimilate overdue --message="⟪description⟫\n⟪max_age⟫\n⟪mtime⟫\n⟪age⟫\n⟪updated⟫\n⟪overdue:past due/up to date⟫\n⟪locked:active/not active⟫"
                 checks:
                     stderr:
                         matches regex:
@@ -4290,7 +4293,7 @@ assimilate:
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
-                        > repository: ~/REPO/{config_name}
+                        > repository: ~/REPO/⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -4396,10 +4399,10 @@ assimilate:
                             > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate
                             > -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
                             > -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
-                            > -rw------- .+ 4000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
-                            > -rw------- .+ 400000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
-                            > -rw------- .+ 40000 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/c
-                            > Total size = 444151B.
+                            > -rw------- .+ 3999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
+                            > -rw------- .+ 399999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
+                            > -rw------- .+ 39999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/c
+                            > Total size = 444148B.
 
             surpass — list --name {{{2:
                 run: assimilate list --name
@@ -4468,7 +4471,7 @@ assimilate:
                             > 3.91KiB {run_dir}/a
                             > 39.1KiB {run_dir}/c
                             >  391KiB {run_dir}/b
-                            > Total size = 444151B.
+                            > Total size = 444148B.
 
             relegate — list --sort-by-size --reverse-sort {{{2:
                 run: assimilate list --sort-by-size --reverse-sort
@@ -4486,7 +4489,7 @@ assimilate:
                             >      0B {run_dir}/.config/assimilate/
                             >      0B {run_dir}/.config/
                             >      0B {run_dir}/
-                            > Total size = 444151B.
+                            > Total size = 444148B.
 
             coquette — list --sort-by-owner {{{2:
                 run: assimilate list --sort-by-owner
@@ -4539,7 +4542,7 @@ assimilate:
                             > {run_dir}/a
                             > {run_dir}/c
                             > {run_dir}/b
-                            > Total size = 444151B.
+                            > Total size = 444148B.
 
             coyote — list --format {{{2:
                 run: assimilate list --format size
@@ -4554,10 +4557,10 @@ assimilate:
                             >        0 {run_dir}/.config/assimilate/
                             >       37 {run_dir}/.config/assimilate/shared.conf.nt
                             >      114 {run_dir}/.config/assimilate/test.conf.nt
-                            >     4000 {run_dir}/a
-                            >   400000 {run_dir}/b
-                            >    40000 {run_dir}/c
-                            > Total size = 444151B.
+                            >     3999 {run_dir}/a
+                            >   399999 {run_dir}/b
+                            >    39999 {run_dir}/c
+                            > Total size = 444148B.
 
             sphere — list ❬path❭ {{{2:
                 run: assimilate list .config
@@ -4590,14 +4593,14 @@ assimilate:
                 checks:
                     stdout:
                         matches text:
-                            >      name: {{path}}
-                            >     short: {{path}}{{Type}}
-                            >      date: {{mtime}} {{path}}{{Type}}
-                            >      size: {{size:8}} {{path}}{{Type}}
-                            >        si: {{Size:7.2b}} {{path}}{{Type}}
-                            >     owner: {{user:8}} {{path}}{{Type}}
-                            >     group: {{group:8}} {{path}}{{Type}}
-                            >      long: {{mode:10}} {{user:6}} {{group:6}} {{size:8}} {{mtime}} {{path}}{{extra}}
+                            >      name: ⟪path⟫
+                            >     short: ⟪path⟫⟪Type⟫
+                            >      date: ⟪mtime⟫ ⟪path⟫⟪Type⟫
+                            >      size: ⟪size:8⟫ ⟪path⟫⟪Type⟫
+                            >        si: ⟪Size:7.2b⟫ ⟪path⟫⟪Type⟫
+                            >     owner: ⟪user:8⟫ ⟪path⟫⟪Type⟫
+                            >     group: ⟪group:8⟫ ⟪path⟫⟪Type⟫
+                            >      long: ⟪mode:10⟫ ⟪user:6⟫ ⟪group:6⟫ ⟪size:8⟫ ⟪mtime⟫ ⟪path⟫⟪extra⟫
                             >
                             > default format: short
 

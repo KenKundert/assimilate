@@ -174,13 +174,15 @@ archive is deleted.
 This example also demonstrates another macro that is available, {run_dir}.  This 
 macro contains the path to the working directory without its leading slash.
 
-If you need to match literal patterns that contain braces, they must be doubled 
-up to escape them, otherwise they will be confused as macros. For example:
+If you need to match literal patterns that contain braces you can use ⟪ and ⟫ as 
+a substitute for { and }.  They are replaced after the macros are interpolated 
+and so they will not be confused as interpolations.  If you do not use ⟪ and ⟫, 
+you will need to double up the braces to escape them.  For example:
 
             druggist — setting archive:
                 run: assimilate setting archive
                 checks:
                     stdout:
                         matches regex:
-                            >                    archive: {{host_name}}-{{user_name}}-{{config_name}}-{{{{now}}}}
-                            >            ❬when resolved❭: .*-test-{{now}}
+                            >                    archive: ⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-⟪⟪now⟫⟫
+                            >            ❬when resolved❭: .*-test-⟪now⟫

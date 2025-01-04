@@ -55,21 +55,21 @@ DEFAULT_ENCRYPTION = "none"
 # Initial contents of files {{{2
 # Shared settings {{{3
 INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
-    # example shared settings file
-    # edit this file as desired
+    # These settings are common to all configurations
+        ## edit this file as desired
 
-    default config: ⟪default-config⟫
-    composite configs: ⟪composite-configs⟫
-        # delete this line or leave empty if no composite configs
+    default config: ❬default-config❭
+    composite configs: ❬composite-configs❭
+        ## delete this line or leave empty if there are no composite configs
 
     # mount
     default mount point: ~/ASSIMILATE
 
-    # specify notify if running from cron and notifier if interactively
-    notify: ⟪your-email-address⟫
-        # who to notify when things go wrong, requires working mailx command
+    # how to notify you if things go wrong
+    notify: ❬your-email-address❭
+        ## who to notify when things go wrong, requires working mail command
     notifier: notify-send -u normal {prog_name} "{msg}"
-        # interactive notifier program
+        ## interactive notifier program
 
     # composite commands
     prune after create: 'yes
@@ -88,10 +88,13 @@ INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
             - recent --last=20
         list: paths
 
+    # composite log file
     logging:
         keep for: 1w
         max entries: 20
 
+    # list formats
+    default list format: short
     list formats:
         name: {path}
         short: {path}{Type}
@@ -102,7 +105,24 @@ INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
         group: {group:8} {path}{Type}
         long: {mode:10} {user:6} {group:6} {size:8} {mtime} {path}{extra}
 
-    default list format: short
+    # overdue command
+    overdue:
+        max age: 36 h
+        message: {description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
+        # repositories:
+        #     # local
+        #     cache@❬host❭ (/home/❬user❭):
+        #         config: cache
+        #         max age: 15m
+        #     home@❬host❭ (/home/❬user❭):
+        #         config: home2
+        #     root@❬host❭ (/):
+        #         config: root
+        #         sentinel dir: ~root/.local/share/assimilate
+        #
+        #     # remote
+        #     ❬remote-host❭:
+        #         host: ❬remote-host❭
 """, strip_nl='l')
 
 # Root settings {{{3
@@ -114,12 +134,12 @@ INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
     # Edit this file as desired, remove it if not needed.
 
     # repository
-    repository: ⟪host⟫:⟪path⟫/{host_name}-{user_name}-{config_name}
+    repository: ❬host❭:❬path❭/{host_name}-{user_name}-{config_name}
     archive: {host_name}-{{now}}
-    encryption: ⟪encryption⟫
-    passphrase: ⟪passcode⟫
+    encryption: ❬encryption❭
+    passphrase: ❬passcode❭
         # passphrase that unlocks encryption key
-    pass command: ⟪command⟫
+    pass command: ❬command❭
         # alternately, command that provides passphrase
 
     patterns:
@@ -155,12 +175,12 @@ INITIAL_HOME_CONFIG_FILE_CONTENTS = dedent("""
     # Edit this file as desired, remove it if not needed.
 
     # repository
-    repository: ⟪host⟫:⟪path⟫/{host_name}-{user_name}-{config_name}
+    repository: ❬host❭:❬path❭/{host_name}-{user_name}-{config_name}
     archive: {config_name}-{{now}}
-    encryption: ⟪encryption⟫
-    passphrase: ⟪passcode⟫
+    encryption: ❬encryption❭
+    passphrase: ❬passcode❭
         # passphrase that unlocks encryption key
-    pass command: ⟪command⟫
+    pass command: ❬command❭
         # alternately, command that provides passphrase
 
     patterns:
