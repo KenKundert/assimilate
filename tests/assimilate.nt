@@ -882,23 +882,23 @@ assimilate:
                             > By default all archives will listed, however you can limit the
                             > number shown using various command line options.
                             >
-                            > Select the oldest N archives using --first=N.
-                            > Select the youngest N archives using --last=N.
+                            > Select the oldest N archives using ––first=N.
+                            > Select the youngest N archives using ––last=N.
                             >
-                            > Select the archives older than a given date or time using --older.
-                            > Select the archives younger than a given date or time using --newer.
+                            > Select the archives older than a given date or time using ––older.
+                            > Select the archives younger than a given date or time using ––newer.
                             > The date may be given using a variety of formats:
                             >
-                            >     $ assimilate repo-list --before 2021-04-01
+                            >     $ assimilate repo-list ––before 2021-04-01
                             >
                             > or given as a relative time:
                             >
-                            >     $ assimilate repo-list --before 1w
+                            >     $ assimilate repo-list ––before 1w
                             >
                             > Finally you can select archives that were created within a specified
-                            > time of the first (--newest) or last (--oldest) archive created:
+                            > time of the first (––newest) or last (––oldest) archive created:
                             >
-                            >     $ assimilate repo-list --oldest 1y
+                            >     $ assimilate repo-list ––oldest 1y
 
             albino — repo-create {{{2:
                 run: assimilate repo-create
@@ -1638,23 +1638,23 @@ assimilate:
                             > By default all archives will listed, however you can limit the
                             > number shown using various command line options.
                             >
-                            > Select the oldest N archives using --first=N.
-                            > Select the youngest N archives using --last=N.
+                            > Select the oldest N archives using ––first=N.
+                            > Select the youngest N archives using ––last=N.
                             >
-                            > Select the archives older than a given date or time using --older.
-                            > Select the archives younger than a given date or time using --newer.
+                            > Select the archives older than a given date or time using ––older.
+                            > Select the archives younger than a given date or time using ––newer.
                             > The date may be given using a variety of formats:
                             >
-                            >     $ assimilate repo-list --before 2021-04-01
+                            >     $ assimilate repo-list ––before 2021-04-01
                             >
                             > or given as a relative time:
                             >
-                            >     $ assimilate repo-list --before 1w
+                            >     $ assimilate repo-list ––before 1w
                             >
                             > Finally you can select archives that were created within a specified
-                            > time of the first (--newest) or last (--oldest) archive created:
+                            > time of the first (––newest) or last (––oldest) archive created:
                             >
-                            >     $ assimilate repo-list --oldest 1y
+                            >     $ assimilate repo-list ––oldest 1y
 
             epicenter — repo-create {{{2:
                 run: assimilate repo-create
