@@ -555,17 +555,17 @@ class CheckCommand(Command):
             --find-lost-archives        look for orphaned archives (slow)
 
         The most recently created archive is checked if one is not specified
-        unless --all is given, in which case all archives are checked.
+        unless ––all is given, in which case all archives are checked.
 
-        You can select individual archives to check using the --archive, --before,
-        and --after command line options.  See the help message for list command
+        You can select individual archives to check using the ––archive, ––before,
+        and ––after command line options.  See the help message for list command
         for details on how to select individual archives.
 
-        You can select groups archives to check using the --first, --last,
-        --newer, --older, --newest, and --oldest options.  See the help message
+        You can select groups archives to check using the ––first, ––last,
+        ––newer, ––older, ––newest, and ––oldest options.  See the help message
         for repo-list command for details on how to select multiple archives.
 
-        Be aware that the --repair option is considered a dangerous operation
+        Be aware that the ––repair option is considered a dangerous operation
         that might result in the complete loss of corrupt archives.  It is
         recommended that you create a backup copy of your repository and check
         your hardware for the source of the corruption before using this
@@ -697,7 +697,7 @@ class CompareCommand(Command):
 
             $ assimilate compare
 
-        The --interactive option allows you to manage those differences.
+        The ––interactive option allows you to manage those differences.
         Specifically, it will open an interactive file comparison tool that
         allows you to compare the contents of your files and copy differences
         from the files in the archive to your local files:
@@ -708,10 +708,10 @@ class CompareCommand(Command):
         being the most recent.  If you do not you will use the most recent
         archive.
 
-            $ assimilate compare --archive continuum-2020-12-04T17:41:28
-            $ assimilate compare --archive 2
-            $ assimilate compare --before 2020-12-04
-            $ assimilate compare --before 1w
+            $ assimilate compare ––archive continuum-2020-12-04T17:41:28
+            $ assimilate compare ––archive 2
+            $ assimilate compare ––before 2020-12-04
+            $ assimilate compare ––before 1w
 
         See the help message for list command for more detail on how to select
         an archive.
@@ -1105,19 +1105,19 @@ class DeleteCommand(Command):
         The delete command deletes the specified archives.  If no archive is
         specified, the latest is deleted.
 
-        You can select individual archives to delete using the --archive,
-        --before, and --after command line options.  See the help message for
+        You can select individual archives to delete using the ––archive,
+        ––before, and ––after command line options.  See the help message for
         list command for details on how to select individual archives.
 
-        You can select groups archives to delete using the --first, --last,
-        --newer, --older, --newest, and --oldest options.  See the help message
+        You can select groups archives to delete using the ––first, ––last,
+        ––newer, ––older, ––newest, and ––oldest options.  See the help message
         for repo-list command for details on how to select multiple archives.
 
         The disk space associated with deleted archives is not reclaimed until
         the compact command is run.  You can specify that a compaction is
         performed as part of the deletion by setting compact_after_delete.  If
-        set, the --fast flag causes the compaction to be skipped.  If not set,
-        the --fast flag has no effect.
+        set, the ––fast flag causes the compaction to be skipped.  If not set,
+        the ––fast flag has no effect.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1535,10 +1535,10 @@ class ExtractCommand(Command):
         being the most recent.  If you do not you will use the most recent
         archive.
 
-            $ assimilate compare --archive continuum-2020-12-04T17:41:28
-            $ assimilate compare --archive 2
-            $ assimilate compare --before 2020-12-04
-            $ assimilate compare --before 1w
+            $ assimilate compare –-archive continuum-2020-12-04T17:41:28
+            $ assimilate compare ––archive 2
+            $ assimilate compare ––before 2020-12-04
+            $ assimilate compare ––before 1w
 
         See the help message for list command for more detail on how to select
         an archive.
@@ -1551,7 +1551,7 @@ class ExtractCommand(Command):
         Normally, extract refuses to run if your current directory is the
         working directory used by Assimilate so as to avoid overwriting an
         existing file.  If your intent is to overwrite the existing file, you
-        can specify the --force option.  Or, consider using the restore command;
+        can specify the ––force option.  Or, consider using the restore command;
         it overwrites the existing file regardless of what directory you run
         from.
 
@@ -1659,7 +1659,6 @@ class InfoCommand(Command):
         Options:
             -a, --archive <archive>  the archive to report on
             -f, --fast               only report local information
-
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1776,34 +1775,34 @@ class ListCommand(Command):
 
         You can specify a particular archive if you wish:
 
-            assimilate list --archive=kundert-2018-12-05T12:54:26
+            assimilate list ––archive=kundert-2018-12-05T12:54:26
 
         You can specify the archive by its id (found using repo-list):
 
-            assimilate list --archive={aid}:724e7444
+            assimilate list ––archive={aid}:724e7444
 
         Or you can specify the archive by index, with 0 being the most recent
         archive, 1 being the next most recent, etc.
 
-            assimilate list --archive 14
+            assimilate list ––archive 14
 
         Negative indices can be used (here you must use the full name of the
-        option and the equals sign, i.e.: --archive=-N):
+        option and the equals sign, i.e.: ––archive=-N):
 
-            assimilate list --archive=-1
+            assimilate list ––archive=-1
 
-        Or you choose an archive based on a date and time.  Specify --after to
-        select the first archive younger than the given date or time, and --before
+        Or you choose an archive based on a date and time.  Specify ––after to
+        select the first archive younger than the given date or time, and ––before
         to use the first that is older.  A variety of date formats are supported.
 
-            assimilate list --before 2021/04/01
-            assimilate list --before 2021-04-01
-            assimilate list --before 2020-12-05T12:39
+            assimilate list ––before 2021/04/01
+            assimilate list ––before 2021-04-01
+            assimilate list ––before 2020-12-05T12:39
 
         You can also the date in relative terms using s, m, h, d, w, M, y to
         indicate seconds, minutes, hours, days, weeks, months, and years:
 
-            assimilate list --before 2w
+            assimilate list ––before 2w
 
         There are a variety of ways that you use to sort the output.  For
         example, sort by size, use:
@@ -2061,12 +2060,12 @@ class MountCommand(Command):
         If you do not specify an archive or date, the most recently created
         archive is mounted.
 
-        You can select individual archives to mount using the --archive,
-        --before, and --after command line options.  See the help message for
+        You can select individual archives to mount using the ––archive,
+        ––before, and ––after command line options.  See the help message for
         list command for details on how to select individual archives.
 
-        You can select groups archives to mount using the --first, --last,
-        --newer, --older, --newest, and --oldest options.  See the help message
+        You can select groups archives to mount using the ––first, ––last,
+        ––newer, ––older, ––newest, and ––oldest options.  See the help message
         for repo-list command for details on how to select multiple archives.
 
         You should use `assimilate umount` when you are done.
@@ -2242,7 +2241,7 @@ class RepoCreateCommand(Command):
 
         This must be done before you create your first archive.
 
-        The number of bytes specified to --reserve may employ SI or binary scale
+        The number of bytes specified to ––reserve may employ SI or binary scale
         factors and may include the units (ex. 1GB, 1MiB).  Reserved space is
         always rounded up to use full reservation blocks of 64 MiB.
         """
@@ -2312,23 +2311,23 @@ class RepoListCommand(Command):
         By default all archives will listed, however you can limit the
         number shown using various command line options.
 
-        Select the oldest N archives using --first=N.
-        Select the youngest N archives using --last=N.
+        Select the oldest N archives using ––first=N.
+        Select the youngest N archives using ––last=N.
 
-        Select the archives older than a given date or time using --older.
-        Select the archives younger than a given date or time using --newer.
+        Select the archives older than a given date or time using ––older.
+        Select the archives younger than a given date or time using ––newer.
         The date may be given using a variety of formats:
 
-            $ assimilate repo-list --before 2021-04-01
+            $ assimilate repo-list ––before 2021-04-01
 
         or given as a relative time:
 
-            $ assimilate repo-list --before 1w
+            $ assimilate repo-list ––before 1w
 
         Finally you can select archives that were created within a specified
-        time of the first (--newest) or last (--oldest) archive created:
+        time of the first (––newest) or last (––oldest) archive created:
 
-            $ assimilate repo-list --oldest 1y
+            $ assimilate repo-list ––oldest 1y
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -2383,7 +2382,7 @@ class RepoSpaceCommand(Command):
         forget to reserve space again, in case you run into that situation again
         at a later time.
 
-        The number of bytes specified to --reserve may employ Si or binary scale
+        The number of bytes specified to ––reserve may employ Si or binary scale
         factors and may include the units (ex. 1GB, 1MiB).  Reserved space is
         always rounded up to use full reservation blocks of 64 MiB.
         """
@@ -2448,10 +2447,10 @@ class RestoreCommand(Command):
         being the most recent.  If you do not you will use the most recent
         archive.
 
-            $ assimilate compare --archive continuum-2020-12-04T17:41:28
-            $ assimilate compare --archive 2
-            $ assimilate compare --before 2020-12-04
-            $ assimilate compare --before 1w
+            $ assimilate compare ––archive continuum-2020-12-04T17:41:28
+            $ assimilate compare ––archive 2
+            $ assimilate compare ––before 2020-12-04
+            $ assimilate compare ––before 1w
 
         See the help message for list command for more detail on how to select
         an archive.
@@ -2677,12 +2676,12 @@ class UndeleteCommand(Command):
         delete or prune commands.  However, undeleting archives is only possible
         before compacting.
 
-        You can select individual archives to undelete using the --archive,
-        --before, and --after command line options.  See the help message for
+        You can select individual archives to undelete using the ––archive,
+        ––before, and ––after command line options.  See the help message for
         list command for details on how to select individual archives.
 
-        You can select groups archives to undelete using the --first, --last,
-        --newer, --older, --newest, and --oldest options.  See the help message
+        You can select groups archives to undelete using the ––first, ––last,
+        ––newer, ––older, ––newest, and ––oldest options.  See the help message
         for repo-list command for details on how to select multiple archives.
 
         All archives that were selected and are marked for deletion will be

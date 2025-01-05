@@ -23,7 +23,7 @@ overdue.conf.nt.  It should be placed in the configuration directory, typically
 
     https://assimilate.readthedocs.io/en/stable/monitoring.html#overdue
 
-The message given by --message may contain the following keys in braces:
+The message given by ––message may contain the following keys in braces:
     description: replaced by the description field from the config file, a string.
     max_age: replaced by the max_age field from the config file, a quantity.
     mtime: replaced by modification time, a datetime object.
