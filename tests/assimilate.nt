@@ -245,7 +245,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
-                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -879,6 +878,27 @@ assimilate:
                             >     -e, --include-external  list all archives in repository, not just
                             >                             those associated with chosen configuration
                             >     -d, --deleted           only archives archives marked for deletion
+                            >
+                            > By default all archives will listed, however you can limit the
+                            > number shown using various command line options.
+                            >
+                            > Select the oldest N archives using --first=N.
+                            > Select the youngest N archives using --last=N.
+                            >
+                            > Select the archives older than a given date or time using --older.
+                            > Select the archives younger than a given date or time using --newer.
+                            > The date may be given using a variety of formats:
+                            >
+                            >     $ assimilate repo-list --before 2021-04-01
+                            >
+                            > or given as a relative time:
+                            >
+                            >     $ assimilate repo-list --before 1w
+                            >
+                            > Finally you can select archives that were created within a specified
+                            > time of the first (--newest) or last (--oldest) archive created:
+                            >
+                            >     $ assimilate repo-list --oldest 1y
 
             albino — repo-create {{{2:
                 run: assimilate repo-create
@@ -891,7 +911,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
-                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1615,7 +1634,27 @@ assimilate:
                             >     -e, --include-external  list all archives in repository, not just
                             >                             those associated with chosen configuration
                             >     -d, --deleted           only archives archives marked for deletion
-
+                            >
+                            > By default all archives will listed, however you can limit the
+                            > number shown using various command line options.
+                            >
+                            > Select the oldest N archives using --first=N.
+                            > Select the youngest N archives using --last=N.
+                            >
+                            > Select the archives older than a given date or time using --older.
+                            > Select the archives younger than a given date or time using --newer.
+                            > The date may be given using a variety of formats:
+                            >
+                            >     $ assimilate repo-list --before 2021-04-01
+                            >
+                            > or given as a relative time:
+                            >
+                            >     $ assimilate repo-list --before 1w
+                            >
+                            > Finally you can select archives that were created within a specified
+                            > time of the first (--newest) or last (--oldest) archive created:
+                            >
+                            >     $ assimilate repo-list --oldest 1y
 
             epicenter — repo-create {{{2:
                 run: assimilate repo-create
@@ -1626,7 +1665,6 @@ assimilate:
                             >     'BORG_PASSPHRASE': '❬redacted❭',
                             >     'BORG_DISPLAY_PASSPHRASE': 'no',
                             > ⟫
-                        excludes text: borg-space
                         excludes text: roadhouse pause govern parry
                         contains text:
                             > running:
@@ -2324,7 +2362,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test1 \
                             >         --make-parent-dirs \
                             >         --encryption=repokey-blake2-chacha20-poly1305
-                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -3200,7 +3237,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
-                        excludes text: borg-space
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -3648,6 +3684,31 @@ assimilate:
                             >         list \
                             >         --repo=/{run_dir}/REPO/test
 
+            recast — list -a -2 {{{2:
+                run: assimilate list --archive=-2 --recursive .config
+                checks:
+                    stdout:
+                        contains lines:
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+
+                    stderr:
+                        matches regex: archive: {aid3} {ar3} .*
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-list \
+                            >         --repo=/{run_dir}/REPO/test
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         list \
+                            >         --repo=/{run_dir}/REPO/test
+
             tombola — list -a 1 {{{2:
                 run: assimilate list -a 1
                 checks:
@@ -3836,7 +3897,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
-                        excludes text: borg-space
 
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -4795,5 +4855,272 @@ assimilate:
                         matches regex:
                             > aid:{aid1a}  {ar1a}  .*
                             > aid:{aid2a}  {ar2a}  .*
+
+    errors — test error handling {{{1:
+        initialization:
+            create:
+                ~/.config/assimilate/shared.conf.nt:
+                    contents:
+                        > composite configs:
+                        >     test: test1 test2
+                        > default mount point: ~/ASSIMILATE
+                        > must exist: ~/u
+
+                ~/.config/assimilate/test1.conf.nt:
+                    contents:
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/.config/assimilate/test2.conf.nt:
+                    contents:
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/REPO/:
+
+                ~/a:
+                    contents: aaa
+                    mtime: 2024-11-27
+
+                ~/b:
+                    contents: bbb
+                    mtime: 2024-11-26
+
+        tests:
+            reminisce — create {{{2:
+                run: assimilate create
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: you must specify a config.
+                            >     Choose from: test, test1, or test2.
+                    status: 2
+
+            destiny — create -ctest3 {{{2:
+                run: assimilate -ctest3 create
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: test3: unknown config.
+                            >     Choose from: test, test1, or test2.
+                    status: 2
+
+            pervert — create -ctest1 {{{2:
+                run: assimilate -ctest1 create
+                checks:
+                    stderr:
+                        matches regex:
+                            > assimilate error: must_exist, /{run_dir}/u:
+                            >     does not exist, perform setup and restart.
+                    status: 2
+
+            windpipe — create -ctest1 {{{2:
+                initialization:
+                    create:
+                        ~/u:
+                run: assimilate -ctest1 create
+                checks:
+                    stderr:
+                        matches regex:
+                            > assimilate error: create, test1:
+                            >     Repository .+ path='/{run_dir}/REPO/test1' does not exist.
+                    status: 2
+
+            carrier — repo-create {{{2:
+                run: assimilate repo-create
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: you must specify a config.
+                            >     Choose from: test, test1, or test2.
+                    status: 2
+
+            agent — repo-create -ctest {{{2:
+                run: assimilate -ctest repo-create
+                checks:
+                    stderr:
+                        matches text:
+                            > === test1 ===
+                            >
+                            > === test2 ===
+
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test1 \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
+
+                    ~/.local/share/assimilate/test2.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test2 \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
+
+            pharmacy — list {{{2:
+                run: assimilate -ctest list
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: no suitable archive found.
+                    status: 2
+
+            gauntlet — delete --before=1h --after=1h {{{2:
+                run: assimilate -ctest delete --before=1h --after=1h
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: test: command does not support composite configs.
+                    status: 2
+
+            pharmacy — delete --before=1h --after=1h {{{2:
+                run: assimilate -ctest1 delete --before=1h --after=1h
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: must not specify both --before and --after.
+                    status: 2
+
+            pronoun — delete --archive=nutz --after=1h {{{2:
+                run: assimilate -ctest1 delete --archive=nutz --after=1h
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: must not specify both --archive and --before or --after.
+                    status: 2
+
+            sliver — delete --before=1h --archive=nutz {{{2:
+                run: assimilate -ctest1 delete --before=1h --archive=nutz
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: must not specify both --archive and --before or --after.
+                    status: 2
+
+            censure — delete --before=1x {{{2:
+                run: assimilate -ctest1 delete --before=1x
+                checks:
+                    stderr:
+                        contains line: assimilate error: 1x: invalid date specification.
+                    status: 2
+
+            fleshy — delete --archive=100 {{{2:
+                run: assimilate -ctest1 delete --archive=100
+                checks:
+                    stderr:
+                        contains line: assimilate error: index out of range.
+                    status: 2
+
+            eastward — delete --newer=1h --older=1h {{{2:
+                run: assimilate -ctest1 delete --newer=1h --older=1h
+                checks:
+                    stderr:
+                        contains line: assimilate error: incompatible options: --older, --newer.
+                    status: 2
+
+            westward — delete --first=1 --last=1 {{{2:
+                run: assimilate -ctest1 delete --first=1 --last=1
+                checks:
+                    stderr:
+                        contains line: assimilate error: incompatible options: --first, --last.
+                    status: 2
+
+            paper — delete --first=nutz {{{2:
+                run: assimilate -ctest1 delete --first=nutz
+                checks:
+                    stderr:
+                        contains line: assimilate error: --first: expected positive integer, found ‘nutz’.
+                    status: 2
+
+            flower — delete --last=0 {{{2:
+                run: assimilate -ctest1 delete --last=0
+                checks:
+                    stderr:
+                        contains line: assimilate error: --last: expected positive integer, found ‘0’.
+                    status: 2
+
+            strain — create -ctest {{{2:
+                run: assimilate -ctest create
+                checks:
+                    stderr:
+                        matches text:
+                            > === test1 ===
+                            >
+                            > === test2 ===
+
+                    ~/.local/share/assimilate/test1.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test1
+
+                    ~/.local/share/assimilate/test2.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test
+
+            entrant — list /x {{{2:
+                run: assimilate -ctest list /x
+                checks:
+                    stderr:
+                        contains line: assimilate error: not contained in a source directory: /x.
+                    status: 2
+
+            ripper — nutz {{{2:
+                run: assimilate nutz
+                checks:
+                    stderr:
+                        contains line: assimilate error: nutz: unknown command.
+                    status: 2
+
+            errand — check --dry-run {{{2:
+                run: assimilate --dry-run --config=test check
+                checks:
+                    stderr:
+                        contains line: assimilate error: --dry-run is not available with check command.
+                    status: 2
+
+            upper — compact --dry-run {{{2:
+                run: assimilate --dry-run --config=test compact
+                checks:
+                    stderr:
+                        contains line: assimilate error: --dry-run is not available with compact command.
+                    status: 2
+
+            evocation — compare nutz {{{2:
+                run: assimilate --config=test1 compare nutz
+                checks:
+                    stderr:
+                        contains line: assimilate error: no diff command available.
+                    status: 2
+
+            handshake — compare nutz {{{2:
+                run: assimilate --config=test1 compare nutz
+                checks:
+                    stderr:
+                        contains line: assimilate error: no diff command available.
+                    status: 2
 
 #  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:

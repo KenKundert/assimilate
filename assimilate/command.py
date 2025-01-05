@@ -46,6 +46,7 @@ from inform import (
 )
 from quantiphy import Quantity, UnitConversion, QuantiPhyError
 from time import sleep
+from .assimilate import borg_commands_with_dryrun
 from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, RESERVED_SETTINGS
 from .overdue import overdue, OVERDUE_USAGE
 from .preferences import DEFAULT_COMMAND, PROGRAM_NAME
@@ -79,6 +80,25 @@ Quantity.set_prefs(ignore_sf=True, spacer='')
 
 def to_seconds(value, default_units='d'):
     return Quantity(value, default_units, scale='s')
+
+def to_date(time_spec, default_units='d'):
+        try:
+            target = arrow.get(time_spec, tzinfo='local')
+        except arrow.parser.ParserError as e:
+            try:
+                seconds = Quantity(time_spec, default_units, scale='s')
+                target = arrow.now().shift(seconds=-seconds)
+            except QuantiPhyError:
+                codicil = join(
+                    full_stop(e),
+                    'Alternatively, relative time formats are accepted:',
+                    'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
+                )
+                raise Error(
+                    "invalid date specification.",
+                    culprit=time_spec, codicil=codicil, wrap=True
+                )
+        return target
 
 # title() {{{2
 def title(text):
@@ -118,29 +138,14 @@ def find_archive(settings, options):
         raise Error('must not specify both --archive and --before or --after.')
 
     def desc_and_id(archive):
-        if not archive:
+        if not archive:  # pragma: no cover
             raise Error('no suitable archive found.')
         return f"aid:{archive['id']}", archive_desc(archive)
             # aid: prefix indicates that what follows is an archive id
 
     # find archive closest to time threshold
     if time_thresh:
-        try:
-            target = arrow.get(time_thresh, tzinfo='local')
-        except arrow.parser.ParserError as e:
-            try:
-                seconds = Quantity(time_thresh, scale='s')
-                target = arrow.now().shift(seconds=-seconds)
-            except QuantiPhyError:
-                codicil = join(
-                    full_stop(e),
-                    'Alternatively, relative time formats are accepted:',
-                    'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
-                )
-                raise Error(
-                    "invalid date specification.",
-                    culprit=time_thresh, codicil=codicil, wrap=True
-                )
+        target = to_date(time_thresh)
 
         # find oldest archive that is younger than specified target
         older_archive = None
@@ -174,13 +179,12 @@ def find_archive(settings, options):
         # assume identifier is an index and return id of corresponding archive
         try:
             index = int(identifier)
-            if abs(index) < 100:
-                archives = get_available_archives(settings)
-                try:
-                    archive = list(reversed(archives))[index]
-                    return desc_and_id(archive)
-                except IndexError:
-                    raise Error("index out of range.")
+            archives = get_available_archives(settings)
+            try:
+                archive = list(reversed(archives))[index]
+                return desc_and_id(archive)
+            except IndexError:
+                raise Error("index out of range.")
         except ValueError:
             pass
 
@@ -194,7 +198,10 @@ def find_archive(settings, options):
 # archive_filter_options() {{{2
 def archive_filter_options(settings, given_options, default):
     archive = "--archive" in given_options and given_options["--archive"]
-    if archive:
+    first_before = "--before" in given_options and given_options["--before"]
+    first_after = "--after" in given_options and given_options["--after"]
+    if archive or first_before or first_after:
+        # user specified that only a single archive is desired
         archive, description = find_archive(settings, given_options)
         return [f"--match-archives={archive}"]
 
@@ -205,8 +212,14 @@ def archive_filter_options(settings, given_options, default):
         value = given_options.get(opt)
         if value:
             seen.append(opt)
-            minutes = Quantity(value, 'd',scale='s').scale('m')
-            processed_options.append(f"{opt}={minutes.fixed()}")
+            if opt in ('--older', '--newer'):
+                target = to_date(value)
+                seconds = (arrow.now() - target).total_seconds()
+            else:
+                seconds = to_seconds(value)
+            minutes = round(seconds/60)
+            processed_options.append(f"{opt}={minutes}m")
+            # processed_options.append(f"{opt}={days}d")
     if len(seen) > 1:
         raise Error(f"incompatible options: {', '.join(seen)}.")
 
@@ -215,6 +228,12 @@ def archive_filter_options(settings, given_options, default):
     for opt in cardinality_opts:
         value = given_options.get(opt)
         if value:
+            try:
+                v = int(value)
+            except ValueError:
+                v = 0
+            if v <= 0:
+                raise Error(f'expected positive integer, found ‘{value}’.', culprit=opt)
             seen.append(opt)
             processed_options.append(f"{opt}={value}")
     if len(seen) > 1:
@@ -277,36 +296,33 @@ def get_archive_paths(paths, settings):
     paths_not_found = set(paths)
     resolved_paths = []
     settings.resolve_patterns([], skip_checks=True)
-    try:
-        for root_dir in settings.roots:
-            resolved_root_dir = (settings.working_dir / root_dir).resolve()
-            for name in paths:
-                path = to_path(name)
-                resolved_path = path.resolve()
-                try:
-                    # get relative path from root_dir to path after resolving
-                    # symbolic links in both root_dir and path
-                    path = resolved_path.relative_to(resolved_root_dir)
+    for root_dir in settings.roots:
+        resolved_root_dir = (settings.working_dir / root_dir).resolve()
+        for name in paths:
+            path = to_path(name)
+            resolved_path = path.resolve()
+            try:
+                # get relative path from root_dir to path after resolving
+                # symbolic links in both root_dir and path
+                path = resolved_path.relative_to(resolved_root_dir)
 
-                    # add original root_dir (with sym links) to relative path
-                    path = to_path(settings.working_dir, root_dir, path)
+                # add original root_dir (with sym links) to relative path
+                path = to_path(settings.working_dir, root_dir, path)
 
-                    # get relative path from working dir to computed path
-                    # this will be the path contained in borg archive
-                    path = path.relative_to(settings.working_dir)
+                # get relative path from working dir to computed path
+                # this will be the path contained in borg archive
+                path = path.relative_to(settings.working_dir)
 
-                    resolved_paths.append(path)
-                    if name in paths_not_found:
-                        paths_not_found.remove(name)
-                except ValueError:
-                    pass
-        if paths_not_found:
-            raise Error(
-                f"not contained in a source directory: {conjoin(paths_not_found)}."
-            )
-        return resolved_paths
-    except ValueError as e:
-        raise Error(e)
+                resolved_paths.append(path)
+                if name in paths_not_found:
+                    paths_not_found.remove(name)
+            except ValueError:
+                pass
+    if paths_not_found:
+        raise Error(
+            f"not contained in a source directory: {conjoin(paths_not_found)}."
+        )
+    return resolved_paths
 
 
 # get_archive_path() {{{2
@@ -384,6 +400,13 @@ class Command:
         # settings files have been read.  As such, the settings argument is None.
         # run_early() is used for commands that do not need settings and should
         # work even if the settings files do not exist or are not valid.
+
+        # first check that command supports --dry-run if it was specified
+        if 'dry-run' in options:
+            if name not in borg_commands_with_dryrun:
+                raise Error(f"--dry-run is not available with {name} command.")
+
+        # now execute run_early if available
         if hasattr(cls, "run_early"):
             narrate(f"running pre-command: {name}")
             return cls.run_early(name, args if args else [], settings, options)
@@ -527,9 +550,20 @@ class CheckCommand(Command):
                                         those associated with chosen configuration
             -r, --repair                attempt to repair any inconsistencies found
             -v, --verify-data           perform a full integrity verification (slow)
+            --archives-only             perform only archive checks
+            --repository-only           perform only repository checks
+            --find-lost-archives        look for orphaned archives (slow)
 
         The most recently created archive is checked if one is not specified
         unless --all is given, in which case all archives are checked.
+
+        You can select individual archives to check using the --archive, --before,
+        and --after command line options.  See the help message for list command
+        for details on how to select individual archives.
+
+        You can select groups archives to check using the --first, --last,
+        --newer, --older, --newest, and --oldest options.  See the help message
+        for repo-list command for details on how to select multiple archives.
 
         Be aware that the --repair option is considered a dangerous operation
         that might result in the complete loss of corrupt archives.  It is
@@ -547,27 +581,37 @@ class CheckCommand(Command):
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         check_all = cmdline["--all"]
-        include_external_archives = cmdline["--include-external"]
-        verify = ["--verify-data"] if cmdline["--verify-data"] else []
-        repair = ['--repair'] if cmdline['--repair'] else []
-        if repair:
-            if 'dry-run' in options:
-                raise Error("--dry-run is not available with check command.")
-            os.environ['BORG_CHECK_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
-
+        strip_archive_matcher = cmdline["--include-external"]
         # identify archive or archives to check
         default = 'all' if check_all else 'latest'
         borg_opts = archive_filter_options(settings, cmdline, default=default)
 
+        # determine borg arguments
+        args = []
+        if cmdline["--archives-only"]:
+            args.append("--archives-only")
+        if cmdline["--repository-only"]:
+            args.append("--repository-only")
+            # strip off archive specific options
+            strip_archive_matcher = True
+            borg_opts = []
+        elif cmdline["--verify-data"]:
+            args.append("--verify-data")
+        if cmdline["--find-lost-archives"]:
+            args.append("--find-lost-archives")
+        if cmdline["--repair"]:
+            args.append("--repair")
+            os.environ['BORG_CHECK_I_KNOW_WHAT_I_AM_DOING'] = 'YES'
+
         # run borg
         borg = settings.run_borg(
             cmd = "check",
-            args = verify + repair,
+            args = args,
             assimilate_opts = options,
             borg_opts = borg_opts,
-            strip_archive_matcher = include_external_archives,
+            strip_archive_matcher = strip_archive_matcher,
         )
-        if repair:
+        if cmdline["--repair"]:
             out = borg.stdout
                 # suppress borg's stderr during repairs
         else:
@@ -615,8 +659,6 @@ class CompactCommand(Command):
         borg_opts = []
         if cmdline["--progress"] or settings.show_progress:
             borg_opts.append("--progress")
-        if 'dry-run' in options:
-            raise Error("--dry-run is not available with compact command.")
 
         # run borg
         borg = settings.run_borg(
@@ -664,12 +706,15 @@ class CompareCommand(Command):
 
         You can specify the archive by name or by date or age or index, with 0
         being the most recent.  If you do not you will use the most recent
-        archive:
+        archive.
 
-            $ assimilate compare -a continuum-2020-12-04T17:41:28
-            $ assimilate compare -d 2020-12-04
-            $ assimilate compare -d 1w
-            $ assimilate compare -d 2
+            $ assimilate compare --archive continuum-2020-12-04T17:41:28
+            $ assimilate compare --archive 2
+            $ assimilate compare --before 2020-12-04
+            $ assimilate compare --before 1w
+
+        See the help message for list command for more detail on how to select
+        an archive.
 
         You can specify a path to a file or directory to compare, if you do not
         you will compare the files and directories of the current working
@@ -1059,6 +1104,14 @@ class DeleteCommand(Command):
 
         The delete command deletes the specified archives.  If no archive is
         specified, the latest is deleted.
+
+        You can select individual archives to delete using the --archive,
+        --before, and --after command line options.  See the help message for
+        list command for details on how to select individual archives.
+
+        You can select groups archives to delete using the --first, --last,
+        --newer, --older, --newest, and --oldest options.  See the help message
+        for repo-list command for details on how to select multiple archives.
 
         The disk space associated with deleted archives is not reclaimed until
         the compact command is run.  You can specify that a compaction is
@@ -1478,29 +1531,17 @@ class ExtractCommand(Command):
         overridden in a configuration file).  The paths may point to
         directories, in which case the entire directory is extracted.
 
-        By default, the most recent archive is used, however, if desired you can
-        explicitly specify a particular archive.  For example:
+        You can specify the archive by name or by date or age or index, with 0
+        being the most recent.  If you do not you will use the most recent
+        archive.
 
-            $ assimilate extract --archive continuum-2020-12-05T12:54:26 home/shaunte/bin
+            $ assimilate compare --archive continuum-2020-12-04T17:41:28
+            $ assimilate compare --archive 2
+            $ assimilate compare --before 2020-12-04
+            $ assimilate compare --before 1w
 
-        Alternatively you can specify a date or date and time.  If only the date
-        is given the time is taken to be midnight.  The oldest archive that is
-        younger than specified date and time is used.
-
-            $ assimilate extract --before 2021-04-01 home/shaunte/bin
-            $ assimilate extract --before 2021-04-01T15:30 home/shaunte/bin
-
-        Alternatively, you can specify the date and time in relative terms:
-
-            $ assimilate extract --before 3d  home/shaunte/bin
-
-        In this case 3d means 3 days.  You can use s, m, h, d, w, M, and y to
-        represent seconds, minutes, hours, days, weeks, months, and years.
-
-        You can also specify the date by index, with 0 being the most recent
-        archive, 1 being the next most recent, etc.
-
-            $ assimilate extract --archive 3  home/shaunte/bin
+        See the help message for list command for more detail on how to select
+        an archive.
 
         The extracted files are placed in the current working directory with
         the original hierarchy.  Thus, the above commands create the file:
@@ -1735,10 +1776,25 @@ class ListCommand(Command):
 
         You can specify a particular archive if you wish:
 
-            assimilate list --archive kundert-2018-12-05T12:54:26
+            assimilate list --archive=kundert-2018-12-05T12:54:26
 
-        Or you choose an archive based on a date and time.  The oldest archive
-        that is younger than specified date and time is used.
+        You can specify the archive by its id (found using repo-list):
+
+            assimilate list --archive={aid}:724e7444
+
+        Or you can specify the archive by index, with 0 being the most recent
+        archive, 1 being the next most recent, etc.
+
+            assimilate list --archive 14
+
+        Negative indices can be used (here you must use the full name of the
+        option and the equals sign, i.e.: --archive=-N):
+
+            assimilate list --archive=-1
+
+        Or you choose an archive based on a date and time.  Specify --after to
+        select the first archive younger than the given date or time, and --before
+        to use the first that is older.  A variety of date formats are supported.
 
             assimilate list --before 2021/04/01
             assimilate list --before 2021-04-01
@@ -1748,11 +1804,6 @@ class ListCommand(Command):
         indicate seconds, minutes, hours, days, weeks, months, and years:
 
             assimilate list --before 2w
-
-        Finally you can specify the date by index, with 0 being the most recent
-        archive, 1 being the next most recent, etc.
-
-            assimilate list --archive 14
 
         There are a variety of ways that you use to sort the output.  For
         example, sort by size, use:
@@ -1773,9 +1824,7 @@ class ListCommand(Command):
 
         # resolve the path relative to working directory
         if path:
-            path = str(get_archive_path(path, settings))
-        else:
-            path = ''
+            path = get_archive_path(path, settings)
 
         # predefined formats
         formats = dict(
@@ -1857,11 +1906,10 @@ class ListCommand(Command):
             archive,
         ]
         if path:
-            args.append(path)
+            args.append(str(settings.working_dir / path))
 
-        borg = settings.run_borg(
-            cmd="list", args=args, assimilate_opts=options,
-        )
+        borg = settings.run_borg(cmd="list", args=args, assimilate_opts=options)
+
         # convert from JSON-lines to JSON
         json_data = '[' + ','.join(borg.stdout.splitlines()) + ']'
         lines = json.loads(json_data)
@@ -1885,6 +1933,7 @@ class ListCommand(Command):
             healthy_color = Color("green", enable=Color.isTTY())
             broken_color = Color("red", enable=Color.isTTY())
         total_size = 0
+        path = str(path or '')
         for values in lines:
             # this loop can be quite slow. the biggest issue is arrow. parsing
             # time is slow. also output() can be slow, so use print() instead.
@@ -2012,23 +2061,13 @@ class MountCommand(Command):
         If you do not specify an archive or date, the most recently created
         archive is mounted.
 
-        Or you choose an archive based on a date and time.  The oldest archive
-        that is younger than specified date and time is used.
+        You can select individual archives to mount using the --archive,
+        --before, and --after command line options.  See the help message for
+        list command for details on how to select individual archives.
 
-            assimilate mount --before 2021-04-01 backups
-            assimilate mount --before 2021-04-01T18:30 backups
-
-        You can also specify the date in relative terms::
-
-            $ assimilate mount --before 6M backups
-
-        where s, m, h, d, w, M, and y represents seconds, minutes, hours, days,
-        weeks, months, and years.
-
-        Finally you can specify the date by index, with 0 being the most recent
-        archive, 1 being the next most recent, etc.
-
-            assimilate mount --date 14 backups
+        You can select groups archives to mount using the --first, --last,
+        --newer, --older, --newest, and --oldest options.  See the help message
+        for repo-list command for details on how to select multiple archives.
 
         You should use `assimilate umount` when you are done.
         """
@@ -2269,6 +2308,27 @@ class RepoListCommand(Command):
             -e, --include-external  list all archives in repository, not just
                                     those associated with chosen configuration
             -d, --deleted           only archives archives marked for deletion
+
+        By default all archives will listed, however you can limit the
+        number shown using various command line options.
+
+        Select the oldest N archives using --first=N.
+        Select the youngest N archives using --last=N.
+
+        Select the archives older than a given date or time using --older.
+        Select the archives younger than a given date or time using --newer.
+        The date may be given using a variety of formats:
+
+            $ assimilate repo-list --before 2021-04-01
+
+        or given as a relative time:
+
+            $ assimilate repo-list --before 1w
+
+        Finally you can select archives that were created within a specified
+        time of the first (--newest) or last (--oldest) archive created:
+
+            $ assimilate repo-list --oldest 1y
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -2384,28 +2444,17 @@ class RestoreCommand(Command):
         location of the files has not changed since the archive was created.
         The intent is to replace the files in place.
 
-        By default, the most recent archive is used, however, if desired you can
-        explicitly specify a particular archive.  For example:
+        You can specify the archive by name or by date or age or index, with 0
+        being the most recent.  If you do not you will use the most recent
+        archive.
 
-            $ assimilate restore --archive continuum-2020-12-05T12:54:26 resume.doc
+            $ assimilate compare --archive continuum-2020-12-04T17:41:28
+            $ assimilate compare --archive 2
+            $ assimilate compare --before 2020-12-04
+            $ assimilate compare --before 1w
 
-        Or you choose an archive based on a date and time.  The oldest archive
-        that is younger than specified date and time is used.
-
-            $ assimilate restore --before 2021-04-01 resume.doc
-            $ assimilate restore --before 2021-04-01T18:30 resume.doc
-
-        Or you can specify the date in relative terms:
-
-            $ assimilate restore --before 3d  resume.doc
-
-        In this case 3d means 3 days.  You can use s, m, h, d, w, M, and y to
-        represent seconds, minutes, hours, days, weeks, months, and years.
-
-        Finally you can specify the archive by index, with 0 being the most recent
-        archive, 1 being the next most recent, etc.
-
-            assimilate list --archive 14
+        See the help message for list command for more detail on how to select
+        an archive.
 
         This command is very similar to the extract command except that it is
         meant to be replace files while in place.  The extract command is
@@ -2627,6 +2676,14 @@ class UndeleteCommand(Command):
         You can apply the undelete command to any archives deleted with the
         delete or prune commands.  However, undeleting archives is only possible
         before compacting.
+
+        You can select individual archives to undelete using the --archive,
+        --before, and --after command line options.  See the help message for
+        list command for details on how to select individual archives.
+
+        You can select groups archives to undelete using the --first, --last,
+        --newer, --older, --newest, and --oldest options.  See the help message
+        for repo-list command for details on how to select multiple archives.
 
         All archives that were selected and are marked for deletion will be
         undeleted (they will no longer be marked for deletion).  If no archives

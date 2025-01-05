@@ -145,14 +145,14 @@ class ConfigQueue:
             if not name:
                 raise Error(
                     "you must specify a config.",
-                    codicil=f"Choose from: {conjoin(known_configs, ', or ')}"
+                    codicil=f"Choose from: {conjoin(sorted(known_configs), ', or ')}."
                 )
 
         # check that name is known
         if name not in known_configs:
             raise Error(
                 'unknown config.',
-                codicil=f"Choose from: {conjoin(known_configs, ', or ')}.",
+                codicil=f"Choose from: {conjoin(sorted(known_configs), ', or ')}.",
                 culprit=name
             )
 
@@ -162,7 +162,7 @@ class ConfigQueue:
             if unknown_configs:
                 raise Error(
                     f"unknown {plural(unknown_configs):config/s}:",
-                    f"{', '.join(unknown_configs)}.",
+                    f"{', '.join(sorted(unknown_configs))}.",
                     culprit=(name, "composite_configs")
                 )
             if name in sub_configs:
@@ -566,7 +566,7 @@ class Assimilate:
         """Convert setting to paths, without resolution."""
         return [
             self.to_path(s, resolve, name if must_exist else None)
-            for s in self.values(name)
+            for s in self.settings.get(name, ())
         ]
 
     # borg_options() {{{2
