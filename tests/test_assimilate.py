@@ -63,9 +63,11 @@ def de_dup(key, state):
 def normalize_key(key, parent_keys):
     num_parents = len(parent_keys)
     if num_parents == 1:
-        return key
+        name, _, desc = key.partition('—')
+        return name.strip()
     if num_parents == 3 and parent_keys[2] == 'tests':
-        return key
+        name, _, desc = key.partition('—')
+        return name.strip()
     if num_parents == 4 and parent_keys[3] == 'create':
         return key
     if num_parents == 5 and parent_keys[4] == 'checks':
@@ -80,8 +82,11 @@ add_loader('.nt', nt_loader)
 # SCHEMA {{{1
 # id_with_desc() {{{2
 def id_with_desc(arg):
+    # I think this is no longer necessary ad normalize_key() strips the
+    # description
     try:
-        return arg.split(maxsplit=1)[0]  # discard description
+        name, _, desc = arg.partition('—')
+        return name.strip()   # discard description
     except AttributeError:
         raise Invalid("expected identifier with an optional description")
 

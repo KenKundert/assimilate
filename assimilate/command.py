@@ -44,7 +44,7 @@ from inform import (
     truth,
     warn,
 )
-from quantiphy import Quantity, UnitConversion, QuantiPhyError
+from quantiphy import Quantity, QuantiPhyError
 from time import sleep
 from .assimilate import borg_commands_with_dryrun
 from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, RESERVED_SETTINGS
@@ -54,52 +54,17 @@ from .shlib import (
     Cmd, Run, cwd, lsd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
 )
 from .utilities import (
-    gethostname, output, pager, process_cmdline, read_latest, table, two_columns,
-    update_latest, when,
+    gethostname, output, pager, process_cmdline, read_latest, table, to_date,
+    to_days, to_seconds, two_columns, update_latest, when,
 )
 
 
-# Utilities {{{1
+# Globals {{{1
 hostname = gethostname()
 set_shlib_prefs(use_inform=True, log_cmd=True)
-
-# time conversions {{{2
-UnitConversion('s', 'sec second seconds')
-UnitConversion('s', 'm min minute minutes', 60)
-UnitConversion('s', 'h hr hour hours', 60*60)
-UnitConversion('s', 'd day days', 24*60*60)
-UnitConversion('s', 'w week weeks', 7*24*60*60)
-UnitConversion('s', 'M month months', 30*24*60*60)
-UnitConversion('s', 'y year years', 365*24*60*60)
-UnitConversion('d', 'm min minute minutes', 1/60/24)
-UnitConversion('d', 'h hr hour hours', 1/24)
-UnitConversion('d', 'w week weeks', 7)
-UnitConversion('d', 'M month months', 30)
-UnitConversion('d', 'y year years', 365)
 Quantity.set_prefs(ignore_sf=True, spacer='')
 
-def to_seconds(value, default_units='d'):
-    return Quantity(value, default_units, scale='s')
-
-def to_date(time_spec, default_units='d'):
-        try:
-            target = arrow.get(time_spec, tzinfo='local')
-        except arrow.parser.ParserError as e:
-            try:
-                seconds = Quantity(time_spec, default_units, scale='s')
-                target = arrow.now().shift(seconds=-seconds)
-            except QuantiPhyError:
-                codicil = join(
-                    full_stop(e),
-                    'Alternatively, relative time formats are accepted:',
-                    'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
-                )
-                raise Error(
-                    "invalid date specification.",
-                    culprit=time_spec, codicil=codicil, wrap=True
-                )
-        return target
-
+# Utilities {{{1
 # title() {{{2
 def title(text):
     return full_stop(title_case(text))
@@ -217,9 +182,8 @@ def archive_filter_options(settings, given_options, default):
                 seconds = (arrow.now() - target).total_seconds()
             else:
                 seconds = to_seconds(value)
-            minutes = round(seconds/60)
-            processed_options.append(f"{opt}={minutes}m")
-            # processed_options.append(f"{opt}={days}d")
+            days = round(seconds/60/60/24)
+            processed_options.append(f"{opt}={days}d")
     if len(seen) > 1:
         raise Error(f"incompatible options: {', '.join(seen)}.")
 
@@ -1322,8 +1286,7 @@ class DueCommand(Command):
                 return f"{config} {cmd} never run."
             elapsed = when(date)
             if cmdline["--message"]:
-                since_last_backup = arrow.now() - date
-                days = Quantity(since_last_backup.total_seconds(), 's', scale='d')
+                days = to_days(date)
                 replacements = dict(
                     since=days, elapsed=elapsed, config=config,
                     cmd=cmd, action=action
@@ -1400,8 +1363,7 @@ class DueCommand(Command):
 
         # Warn user if backup is overdue
         if since_backup_thresh and last_run['backup']:
-            since_last_backup = arrow.now() - last_run['backup']
-            seconds = since_last_backup.total_seconds()
+            seconds = to_seconds(last_run['backup'])
             try:
                 if seconds > to_seconds(since_backup_thresh):
                     deliver_message('backup')

@@ -3402,12 +3402,12 @@ assimilate:
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
-            larder — repo-list {{{2:
+            heron — repo-list {{{2:
                 run: assimilate repo-list
                 checks:
                     stdout:
                         matches regex:
-                            > 4   aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+) *
+                            > 4   aid:(?P<aid4>\w+)  (?P<ar4>[^ ]+)  .*
                             > 3   aid:(?P<aid3>\w+)  (?P<ar3>[^ ]+)  .*
                             > 2   aid:(?P<aid2>\w+)  (?P<ar2>[^ ]+)  .*
                             > 1   aid:(?P<aid1>\w+)  (?P<ar1>[^ ]+)  .*
@@ -3418,7 +3418,6 @@ assimilate:
                             > running:
                             >     borg \
                             >         repo-list \
-                            >         --oldest=1440m \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
@@ -3461,8 +3460,8 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
 
-            larder — repo-list --oldest=1d {{{2:
-                run: assimilate repo-list --oldest=1d
+            larder — repo-list --oldest=25h {{{2:
+                run: assimilate repo-list --oldest=25h
                 checks:
                     stdout:
                         matches regex:
@@ -3477,13 +3476,13 @@ assimilate:
                             > running:
                             >     borg \
                             >         repo-list \
-                            >         --oldest=1440m \
+                            >         --oldest=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
 
-            elevate — repo-list --newest=1d {{{2:
-                run: assimilate repo-list --newest=1d
+            elevate — repo-list --newest=0.9d {{{2:
+                run: assimilate repo-list --newest=0.9d
                 checks:
                     stdout:
                         matches regex:
@@ -3498,13 +3497,13 @@ assimilate:
                             > running:
                             >     borg \
                             >         repo-list \
-                            >         --newest=1440m \
+                            >         --newest=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
 
-            wrongdoer — repo-list --older=1d {{{2:
-                run: assimilate repo-list --older=1d
+            wrongdoer — repo-list --older=23h {{{2:
+                run: assimilate repo-list --older=23h
                 checks:
                     stdout:
                         matches regex:
@@ -3514,13 +3513,13 @@ assimilate:
                             > running:
                             >     borg \
                             >         repo-list \
-                            >         --older=1440m \
+                            >         --older=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
 
-            climb — repo-list --newer=1d {{{2:
-                run: assimilate repo-list --newer=1d
+            climb — repo-list --newer=1.1d {{{2:
+                run: assimilate repo-list --newer=1.1d
                 checks:
                     stdout:
                         matches regex:
@@ -3535,7 +3534,7 @@ assimilate:
                             > running:
                             >     borg \
                             >         repo-list \
-                            >         --newer=1440m \
+                            >         --newer=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --match-archives=sh:test
@@ -4104,7 +4103,8 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=sh:test \
+                            >         --verify-data
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains text:
@@ -4113,7 +4113,76 @@ assimilate:
                             >     >         check \
                             >     >         --last=1 \
                             >     >         --repo=/{run_dir}/REPO/test \
-                            >     >         --match-archives=sh:test
+                            >     >         --match-archives=sh:test \
+                            >     >         --verify-data
+
+
+            essay — check --archives-only  {{{2:
+                run: assimilate check --archives-only
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         --archives-only
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --match-archives=sh:test \
+                            >     >         --archives-only
+
+
+            thrifty — check --repository-only  {{{2:
+                run: assimilate check --repository-only
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --repository-only
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --repository-only
+
+
+            manse — check --find-lost-archives  {{{2:
+                run: assimilate check --find-lost-archives
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         check \
+                            >         --last=1 \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test \
+                            >         --find-lost-archives
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         check \
+                            >     >         --last=1 \
+                            >     >         --repo=/{run_dir}/REPO/test \
+                            >     >         --match-archives=sh:test \
+                            >     >         --find-lost-archives
 
 
             valency — compact --progress  {{{2:
@@ -4992,7 +5061,7 @@ assimilate:
                             > assimilate error: test: command does not support composite configs.
                     status: 2
 
-            pharmacy — delete --before=1h --after=1h {{{2:
+            sickroom — delete --before=1h --after=1h {{{2:
                 run: assimilate -ctest1 delete --before=1h --after=1h
                 checks:
                     stderr:

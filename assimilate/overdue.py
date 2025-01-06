@@ -79,7 +79,7 @@ from inform import (
     warn,
 )
 import nestedtext as nt
-from quantiphy import Quantity, UnitConversion
+from quantiphy import Quantity
 from voluptuous import Schema
 from .configs import (
     add_setting, add_parents_of_non_identifier_keys,
@@ -126,15 +126,6 @@ error_message = dedent(f"""
 """, strip_nl='b')
 
 # VALIDATORS {{{1
-# time conversions {{{2
-UnitConversion('s', 'sec second seconds')
-UnitConversion('s', 'm min minute minutes', 60)
-UnitConversion('s', 'h hr hour hours', 60*60)
-UnitConversion('s', 'd day days', 24*60*60)
-UnitConversion('s', 'w week weeks', 7*24*60*60)
-UnitConversion('s', 'M month months', 30*24*60*60)
-UnitConversion('s', 'y year years', 365*24*60*60)
-
 # as_seconds {{{2
 def as_seconds(arg, units=None):
     arg = as_string(arg)

@@ -25,9 +25,10 @@ import sys
 import nestedtext as nt
 from docopt import docopt, DocoptExit
 from inform import (
-    Error, conjoin, cull, error, full_stop, narrate, os_error, warn,
+    Error, conjoin, cull, error, full_stop, join, narrate, os_error, warn,
     output as output_raw, terminate
 )
+from quantiphy import Quantity, UnitConversion, QuantiPhyError
 from .shlib import Run, set_prefs as set_shlib_prefs
 set_shlib_prefs(use_inform=True, log_cmd=True)
 
@@ -286,3 +287,67 @@ def process_cmdline(*args, **kwargs):
     except DocoptExit as e:
         sys.stderr.write(str(e) + '\n')
         terminate(3)
+
+# time conversions {{{1
+UnitConversion('s', 'sec second seconds')
+UnitConversion('s', 'm min minute minutes', 60)
+UnitConversion('s', 'h hr hour hours', 60*60)
+UnitConversion('s', 'D d day days', 24*60*60)
+UnitConversion('s', 'W w week weeks', 7*24*60*60)
+UnitConversion('s', 'M month months', 30*24*60*60)
+UnitConversion('s', 'Y y year years', 365*24*60*60)
+UnitConversion('d', 'm min minute minutes', 1/60/24)
+UnitConversion('d', 'h hr hour hours', 1/24)
+UnitConversion('d', 'W w week weeks', 7)
+UnitConversion('d', 'M month months', 30)
+UnitConversion('d', 'Y y year years', 365)
+Quantity.set_prefs(ignore_sf=True, spacer='')
+
+# to_seconds() {{{2
+def to_seconds(time_spec, default_units='d'):
+    # The time_spec may be an absolute format (an arrow date format) or it may
+    # be a relative time format (Ny, NM, Nw, Nd, Nm, Ns).
+    # If an absolute format is given, then the return value is the number of
+    # seconds in from now to the given date (is positive if date is in past).
+    # A Quantity with units of 's' is returned.
+    try:
+        target = arrow.get(time_spec, tzinfo='local')
+        return Quantity((arrow.now() - target).total_seconds(), 's')
+    except arrow.parser.ParserError:
+        return Quantity(time_spec, default_units, scale='s')
+
+# to_days() {{{2
+def to_days(time_spec, default_units='s'):
+    # The time_spec may be an absolute format (an arrow date format) or it may
+    # be a relative time format (Ny, NM, Nw, Nd, Nm, Ns).
+    # If an absolute format is given, then the return value is the number of
+    # seconds in from now to the given date (is positive if date is in past).
+    # A Quantity with units of 's' is returned.
+    try:
+        target = arrow.get(time_spec, tzinfo='local')
+        return Quantity((arrow.now() - target).total_seconds(), 's', scale='d')
+    except arrow.parser.ParserError:
+        return Quantity(time_spec, default_units, scale='d')
+
+# to_date() {{{2
+def to_date(time_spec, default_units='d'):
+    # The time_spec may be an absolute format (an arrow date format) or it may
+    # be a relative time format (Ny, NM, Nw, Nd, Nm, Ns).
+    # An arrow datetime object is returned.
+    try:
+        return arrow.get(time_spec, tzinfo='local')
+    except arrow.parser.ParserError as e:
+        try:
+            seconds = Quantity(time_spec, default_units, scale='s')
+            return arrow.now().shift(seconds=-seconds)
+        except QuantiPhyError:
+            codicil = join(
+                full_stop(e),
+                'Alternatively, relative time formats are accepted:',
+                'Ns, Nm, Nh, Nd, Nw, NM, Ny.  Example 2w is 2 weeks.'
+            )
+            raise Error(
+                "invalid date specification.",
+                culprit=time_spec, codicil=codicil, wrap=True
+            )
+
