@@ -1,6 +1,9 @@
 Assimilate — Front-End to Borg Backup
 =====================================
 
+*Assimilate your files to the Borg Collective*
+
+
 |downloads| |build status| |coverage| |rtd status| |pypi version| |python version|
 
 :Author: Ken Kundert

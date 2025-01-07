@@ -4006,12 +4006,12 @@ assimilate:
                             > running:
                             >     borg \
                             >         create \
+                            >         --stats \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --exclude=.cache \
                             >         --exclude=.local \
                             >         --exclude=bu \
                             >         --exclude=REPO \
-                            >         --stats \
                             >         test \
                             >         .
 
@@ -4303,24 +4303,6 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --list \
-                            >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
-                            >         --match-archives=sh:test
-
-                        contains text:
-                            > running:
-                            >     borg \
-                            >         compact \
-                            >         --repo=/{run_dir}/REPO/test
-
-            polyp — prune --stats  {{{2:
-                run: assimilate prune --stats
-                checks:
-                    ~/.local/share/assimilate/test.log:
-                        contains text:
-                            > running:
-                            >     borg \
-                            >         prune \
                             >         --repo=/{run_dir}/REPO/test \
                             >         --keep-within=1d \
                             >         --match-archives=sh:test

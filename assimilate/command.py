@@ -184,6 +184,7 @@ def archive_filter_options(settings, given_options, default):
                 seconds = to_seconds(value)
             days = round(seconds/60/60/24)
             processed_options.append(f"{opt}={days}d")
+            # processed_options.append(f"{opt}={round(seconds)}S")
     if len(seen) > 1:
         raise Error(f"incompatible options: {', '.join(seen)}.")
 
@@ -886,7 +887,8 @@ class CreateCommand(Command):
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         borg_opts = []
-        show_stats = cmdline["--stats"] or settings.show_stats
+        if cmdline["--stats"] or settings.show_stats:
+            borg_opts.append("--stats")
         if cmdline["--list"]:
             borg_opts.append("--list")
         if cmdline["--progress"] or settings.show_progress:
@@ -926,10 +928,10 @@ class CreateCommand(Command):
                     try:
                         borg = settings.run_borg(
                             cmd = "create",
-                            borg_opts = borg_opts,
+                            borg_opts = borg_opts.copy(),
                             args = [settings.value('archive')] + src_dirs,
                             assimilate_opts = options,
-                            show_borg_output = show_stats,
+                            show_borg_output = "--stats" in borg_opts,
                             use_working_dir = True,
                         )
                         break
@@ -1005,8 +1007,7 @@ class CreateCommand(Command):
                 if settings.prune_after_create:
                     announce("Pruning repository ...")
                     prune = PruneCommand()
-                    args = ["--stats"] if cmdline["--stats"] else []
-                    prune_status = prune.run("prune", args, settings, options)
+                    prune_status = prune.run("prune", [], settings, options)
                     updated.append('prune')
                 else:
                     prune_status = 0
@@ -2113,7 +2114,6 @@ class PruneCommand(Command):
                                      those associated with chosen configuration
             -f, --fast               skip compacting
             -l, --list               show fate of each archive
-            -s, --stats              show Borg statistics
 
         The prune command deletes archives that are no longer needed as
         determined by the prune rules.  However, the disk space is not reclaimed
@@ -2133,8 +2133,6 @@ class PruneCommand(Command):
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline["--include-external"]
         borg_opts = []
-        #KSK if cmdline["--stats"] or settings.show_stats:
-        #KSK     borg_opts.append("--stats")
         if cmdline["--list"]:
             borg_opts.append("--list")
         fast = cmdline["--fast"]
@@ -2156,7 +2154,6 @@ class PruneCommand(Command):
             borg_opts = borg_opts,
             assimilate_opts = options,
             strip_archive_matcher = include_external_archives,
-            show_borg_output = "--stats" in borg_opts,
         )
         out = borg.stderr or borg.stdout
         if out:

@@ -56,7 +56,7 @@ When converted to an *Assimilate* config, it would look like this:
 
     repository: backups:/mnt/borg-backups/{host_name}-{user_name}-home
     archive: {config_name}-{{now}}
-    glob_archives: {config_name}-*
+    match archives: sh:{config_name}-*
     encryption: repokey
     passphrase: bedroom stage infirmary lessen
 
@@ -81,7 +81,7 @@ Here are a few things to notice about this specification:
     ␣ represents a space).
 
 2.  The string values are not quoted and special characters are not escaped.  
-    The values are taking verbatim, so if you include quote characters or back 
+    The values are taken verbatim, so if you include quote characters or back 
     slashes, they are included in the value literally.
 
 3.  Boolean values in *Assimilate* are given as *'yes* or *'no*.  In general, 
@@ -161,6 +161,9 @@ Here are a few things to notice about this specification:
 6. The setting name (the key in a key-value pair) can be given with or without 
    underscores.  So for example, ``default_mount_point`` can be specified as 
    ``default mount point``.
+
+7. Some setting names have changed.  For example, notice that ``glob_archives`` 
+   changed to ``match_archives``.
 
 
 Settings
