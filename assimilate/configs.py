@@ -697,13 +697,13 @@ def get_available_configs(keep_shared=False):
 
 # report_setting_error() {{{2
 keymaps = defaultdict(dict)
-def report_setting_error(keys, error):
+def report_setting_error(keys, error, codicil=None):
     paths = reversed(keymaps.keys())
     for path in paths:
         keymap = keymaps[path]
         loc = keymap.get(keys)
         if loc:
-            raise Error(error, culprit=(path,)+keys, codicil=loc.as_line())
+            raise Error(error, culprit=(path,)+keys, codicil=(codicil, loc.as_line()))
     raise AssertionError  # this should not happen with a user specified value
 
 

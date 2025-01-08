@@ -160,11 +160,12 @@ def get_local_data(description, config, path, max_age):
     if config:
         if not path:
             path = to_path(DATA_DIR)
-        latest = read_latest(path / f"{config}.latest.nt")
+        locked = (path /  f"{config}.lock").exists()
+        path = path / f"{config}.latest.nt"
+        latest = read_latest(path)
         mtime = latest.get('create last run')
         if not mtime:
             raise Error('create time is not available.', culprit=path)
-        locked = (path /  f"{config}.lock").exists()
     else:
         if not path:
            raise Error("‘sentinel_dir’ setting is required.", culprit=description)

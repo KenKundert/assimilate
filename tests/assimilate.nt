@@ -629,8 +629,6 @@ assimilate:
                             >             create_retries: number of times to retry a create if failures
                             >                             occur
                             >         create_retry_sleep: time to sleep between retries [s]
-                            >                cronhub_url: the cronhub.io URL for back-ups monitor
-                            >               cronhub_uuid: the cronhub.io UUID for back-ups monitor
                             >             default_config: default Assimilate configuration
                             >        default_list_format: the format that the list command should use if
                             >                             none is specified
@@ -643,10 +641,6 @@ assimilate:
                             >               exclude_from: file that contains exclude patterns
                             >                   excludes: list of glob strings of files or directories
                             >                             to skip
-                            >           healthchecks_url: the healthchecks.io URL for monitoring back
-                            >                             ups
-                            >          healthchecks_uuid: the healthchecks.io UUID for monitoring back
-                            >                             ups
                             >                   home_dir: users home directory (read only)
                             >                    include: include the contents of another file
                             >               list_formats: named format strings available to list command
@@ -654,6 +648,7 @@ assimilate:
                             >                    logging: logging options
                             >           manage_diffs_cmd: command to use to manage differences in files
                             >                             and directories
+                            >                 monitoring: services to notify upon backup
                             >                 must_exist: if set, each of these files or directories
                             >                             must exist or create will quit with an error
                             >            needs_ssh_agent: when set Assimilate complains if ssh_agent is

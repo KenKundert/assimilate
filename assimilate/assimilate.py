@@ -268,7 +268,7 @@ class Assimilate:
                 warn(f'unknown colorscheme: {self.colorscheme}.')
 
         # determine the do_not_expand list
-        do_not_expand = set()
+        do_not_expand = set(['monitoring', 'command_aliases', 'overdue'])
         for key, value in ASSIMILATE_SETTINGS.items():
             if value.get('do_not_expand'):
                 do_not_expand.add(key)

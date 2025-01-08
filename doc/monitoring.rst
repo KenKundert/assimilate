@@ -427,10 +427,137 @@ Various monitoring services are available on the web.  You can configure
 services allow you to monitor many of your routine tasks and assure they have 
 completed recently and successfully.
 
-There are many such services available and they are not difficult to add.  If 
-the service you prefer is not currently available, feel free to request it on 
-`Github <https://github.com/KenKundert/assimilate/issues>`_ or add it yourself 
-and issue a pull request.
+There are many such services available and they are not difficult to add.  There 
+is built-in support for a few common services.  For others you can use the 
+*custom* service.  It can handle most web-based services.  If the service you 
+prefer is not currently available and cannot be supported as a custom service, 
+feel free to request it on `Github 
+<https://github.com/KenKundert/assimilate/issues>`_ or add it yourself and issue 
+a pull request.
+
+.. _custom monitoring service:
+
+Custom
+~~~~~~
+
+You can configure *Assimilate* to send custom web-based messages to your 
+monitoring service when backing up.  You can configure four different types of 
+messages: *start*, *success*, *failure* and *finish*.  These messages are sent 
+as follows:
+
+start:
+    When the backup begins.
+
+success:
+    When the backup completes, but only if there were no errors.
+
+failure:
+    When the backup completes, but only if there were errors.
+
+finish:
+    When the backup completes.
+
+Generally you do not configure all of them as they are redundant.  Specifically, 
+you would configure *success* and *failure* together, or you would configure 
+*finish* in such a way as to indicate whether the backup succeeded.  For 
+example, here is how one might configure HealthCheck.io using the custom 
+service:
+
+.. code-block:: nestedtext
+
+    monitoring:
+        custom:
+            id: 51cb35d8-2975-110b-67a7-11b65d432027
+            url: https://hc-ping.com/{id}
+            start: {url}/start
+            success: {url}/0
+            failure:
+                url: {url}/fail
+                post:
+                    > CONFIG: {config}
+                    > EXIT STATUS: {status}
+                    > ERROR: {error}
+                    >
+                    > STDOUT:
+                    > {stdout}
+                    >
+                    > STDERR:
+                    > {stderr}
+
+In this example *start*, *success* and *failure* were configured. With each, you 
+can simply specify a URL, or you can specify key-value pairs that control the 
+message that is sent.  Furthermore, you can specify *id* and *url* up-front and 
+simply refer to them in when configuring your message.  For example, *start* is 
+specified as ``{url}/start``.  Here ``{url}`` is replaced by the value you 
+specified earlier for *url*.  Similarly, *success* is specified only by its URL, 
+``{url}/0``.  But, *fail* is given as a collection of key-value pairs.  Three 
+keys are allowed: *url*, *params*, and *post*.  *url* is required, but the other 
+two are optional.  *params* is a collection of key-value pairs.  These will be 
+passed in the URL as parameters.  Specify *params* only if your service requires 
+them.  *post* indicates that the *post* method is to be used, otherwise the 
+*get* method is used.  The value of post may be a string, or a collection of 
+key-value pairs.  You would specify both *params* and *post* to conform with the 
+requirements of your service.
+
+When constructing your messages you can insert placeholders that are replaced 
+before sending the message.  The available placeholders are:
+
+config:
+    The name of the config being backed up.
+
+status:
+    The exit status of the *Borg* process performing the backup.
+
+error:
+    A short message that describes error that occurred during the backup if 
+    appropriate.
+
+stdout:
+    The text sent to the standard output by the *Borg* process performing the 
+    backup.
+
+stderr:
+    The text sent to the standard error output by the *Borg* process performing 
+    the backup.
+
+id:
+    The value specified as *id*.
+
+url:
+    The value specified as *url*.
+
+success:
+    A Boolean `truth object <https://inform.readthedocs.io/en/stable/user.html#truth>`_
+    that evaluates to *yes* if *Borg* returned with an exit status of 0 or 1, 
+    which implies that the command completed as expected, though there might 
+    have been issues with individual files or directories.  If *Borg* returns 
+    with an exit status of 2 or greater, *success* evaluates to *no*.  However, 
+    you can specify different values by specifying a format string.  For 
+    example, the above example specifies both *success* and *failure*, but this 
+    could be collapsed to using only *finish* by using *success* to modify the 
+    URL used to communicate the completion message.  In this example, the URL is 
+    specified as ``{url}/{success:0/fail}``.  Here ``{success:0/fail}`` 
+    evaluates to ``0`` if *Borg* succeeds and ``fail`` otherwise.
+
+.. code-block:: nestedtext
+
+    monitoring:
+        custom:
+            id: 51cb35d8-2975-110b-67a7-11b65d432027
+            url: https://hc-ping.com/{id}
+            start: {url}/start
+            finish:
+                url: {url}/{success:0/fail}
+                post:
+                    > CONFIG: {config}
+                    > EXIT STATUS: {status}
+                    > ERROR: {error}
+                    >
+                    > STDOUT:
+                    > {stdout}
+                    >
+                    > STDERR:
+                    > {stderr}
 
 .. _cronhub:
 
@@ -442,9 +569,11 @@ health check for your *Assimilate* configuration, you will be given a UUID (a 32
 digit hexadecimal number partitioned into 5 parts by dashes).  Add that to the 
 following setting in your configuration file:
 
-.. code-block:: python
+.. code-block:: nestedtext
 
-    cronhub_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
+    monitoring:
+        cronhub.io:
+            uuid: 51cb35d8-2975-110b-67a7-11b65d432027
 
 If given, this setting should be specified on an individual configuration.  It 
 causes a report to be sent to *CronHub* each time an archive is created.  
@@ -464,9 +593,11 @@ the health check for your *Assimilate* configuration, you will be given a UUID
 (a 32 digit hexadecimal number partitioned into 5 parts by dashes).  Add that to 
 the following setting in your configuration file:
 
-.. code-block:: python
+.. code-block:: nestedtext
 
-    healthchecks_uuid = '51cb35d8-2975-110b-67a7-11b65d432027'
+    monitoring:
+        healthchecks.io:
+            uuid: 51cb35d8-2975-110b-67a7-11b65d432027
 
 If given, this setting should be specified on an individual configuration.  It 
 causes a report to be sent to *HealthChecks* each time an archive is created.  

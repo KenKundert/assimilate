@@ -18,7 +18,7 @@
 
 
 # Imports {{{1
-from inform import Error, full_stop, is_str, log, os_error
+from inform import Error, conjoin, full_stop, is_str, log, os_error, truth
 from .configs import add_setting, as_string, as_dict, report_setting_error
 from voluptuous import Any, Invalid, Schema
 import requests
@@ -121,12 +121,12 @@ class Custom(Hooks):
 
     def __init__(self, assimilate_settings):
         settings = self.get_settings(assimilate_settings)
-        placeholders = {}
+        placeholders = dict(config=assimilate_settings.config_name)
         if 'id' in settings:
-            placeholders['id'] = settings['id']
+            placeholders['id'] = settings['id'].strip()
         try:
             if 'url' in settings:
-                placeholders['url'] = settings['url'].format(**placeholders)
+                placeholders['url'] = settings['url'].format(**placeholders).strip()
         except TypeError as e:
             self.invalid_key('url', e)
         self.placeholders = placeholders
@@ -143,29 +143,36 @@ class Custom(Hooks):
         error = 'unknown key: ‘{key}’'
         self.report_error(keys, error)
 
-    def report_error(self, keys, error):
+    def report_error(self, keys, error, codicil=None):
         if is_str(keys):
             keys = (keys,)
         keys = (Hooks.NAME, self.NAME) + keys
-        report_setting_error(keys, error)
+        report_setting_error(keys, error, codicil)
 
     def expand_value(self, keys, placeholders):
         value = self.settings
         for key in keys:
+            if key not in value:
+                return
             value = value[key]
 
-        def expand_str(value):
+        def expand_str(keys, value):
             try:
                 return value.format(**placeholders)
             except TypeError as e:
-                self.invalid_key(e, keys)
+                self.invalid_key(keys, e)
+            except KeyError as e:
+                self.report_error(
+                    keys, f"unknown key: {e.args[0]}",
+                    f"Choose from {conjoin(placeholders.keys(), conj=' or ')}."
+                )
 
         if is_str(value):
-            return expand_str(value)
+            return expand_str(keys, value)
         else:
             data = {}
-            for k, v in values.items():
-                data[k] = expand_str(keys + (k,), placeholders)
+            for k, v in value.items():
+                data[k] = expand_str(keys + (k,), v)
             return data
 
     def report(self, name, placeholders):
@@ -197,7 +204,7 @@ class Custom(Hooks):
         except Invalid:
             self.report_error((), 'invalid url.')
 
-        log(f'signaling {name} of backups to {self.NAME}: {url}.')
+        log(f'signaling {name} of backups to {self.NAME}: {url} via {method}.')
         try:
             if method == 'get':
                 requests.get(url, params=params)
@@ -216,16 +223,28 @@ class Custom(Hooks):
             names = ['success', 'finish']
 
         placeholders = self.placeholders.copy()
+        placeholders['error'] = ''
+        placeholders['stderr'] = ''
+        placeholders['stdout'] = ''
         if exception:
             if isinstance(exception, OSError):
                 placeholders['error'] = os_error(exception)
-                placeholders['exit_status'] = "2"
+                placeholders['status'] = "2"
+            elif isinstance(exception, KeyboardInterrupt):
+                placeholders['error'] = "Killed by user."
+                placeholders['status'] = "2"
             else:
                 placeholders['error'] = str(exception)
-                placeholders['exit_status'] = str(getattr(exception, 'status', 2))
+                placeholders['status'] = str(getattr(exception, 'status', 2))
                 placeholders['stderr'] = getattr(exception, 'stderr', '')
+                placeholders['stdout'] = getattr(exception, 'stdout', '')
+        elif self.borg:
+            placeholders['status'] = str(self.borg.status)
+            placeholders['stderr'] = self.borg.stderr
+            placeholders['stdout'] = self.borg.stdout
         else:
-            placeholders['exit_status'] = '0'
+            placeholders['status'] = '0'
+        placeholders['success'] = truth(placeholders['status'] in '01')
 
         for name in names:
             self.report(name, placeholders)

@@ -1072,6 +1072,16 @@ a large number of log entries are kept.  It is recommended that you specify
 a reasonable value for *max_entries*.
 
 
+.. _monitoring setting:
+
+monitoring
+~~~~~~~~~~
+
+*monitoring* is a dictionary setting that configures status reporting to 
+monitoring services.  Detailed information about this setting can be found in 
+:ref:`monitoring <monitoring_services>`.
+
+
 .. _must_exist:
 
 must_exist
