@@ -109,9 +109,9 @@ def main():
             if cmdline["--narrate"]:
                 inform.narrate = True
 
-            shared_settings = read_settings('shared')
-
+            # read shared settings
             Hooks.provision_hooks()
+            shared_settings = read_settings('shared')
 
             # find the command
             cmd, cmd_name, alias_args = Command.find(command, shared_settings)

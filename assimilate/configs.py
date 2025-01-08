@@ -21,8 +21,9 @@
 from .preferences import CONFIG_DIR
 from .shlib import lsf, to_path, chmod, getmod
 from .utilities import report_voluptuous_errors
+from collections import defaultdict
 from inform import (
-    codicil, conjoin, is_str, join, narrate, warn, terminate, truth
+    Error, codicil, conjoin, is_str, join, narrate, warn, terminate, truth
 )
 from quantiphy import Quantity, InvalidNumber
 from voluptuous import Schema, Invalid, MultipleInvalid, Extra
@@ -694,11 +695,23 @@ def get_available_configs(keep_shared=False):
         return available_configs
     return {k:v for k, v in available_configs.items() if k != 'shared'}
 
+# report_setting_error() {{{2
+keymaps = defaultdict(dict)
+def report_setting_error(keys, error):
+    paths = reversed(keymaps.keys())
+    for path in paths:
+        keymap = keymaps[path]
+        loc = keymap.get(keys)
+        if loc:
+            raise Error(error, culprit=(path,)+keys, codicil=loc.as_line())
+    raise AssertionError  # this should not happen with a user specified value
+
+
 # read_config() {{{2
 def read_config(path, validate_settings):
     # read a file and recursively process includes
     try:
-        keymap = {}
+        keymap = keymaps[str(path)]
         settings = nt.load(
             path, top=dict, keymap=keymap, normalize_key=normalize_key
         )

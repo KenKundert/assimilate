@@ -18,17 +18,46 @@
 
 
 # Imports {{{1
-from inform import Error, full_stop, log, os_error
-from .configs import add_setting, as_string
+from inform import Error, full_stop, is_str, log, os_error
+from .configs import add_setting, as_string, as_dict, report_setting_error
+from voluptuous import Any, Invalid, Schema
 import requests
+
+# Schema {{{1
+# as_url() {{{2
+def as_url(arg):
+    as_string(arg)
+    from urllib.parse import urlparse
+    url = urlparse(arg)
+    if url.scheme not in ['http', 'https'] or not url.hostname:
+        raise Invalid('invalid url.')
+    return arg
+
+# as_action() {{{2
+as_action = Any(
+    as_string,
+    dict(url=as_string, params=as_dict, post=Any(as_string, as_dict))
+)
+
+# schema {{{2
+schema = {}
 
 # Hooks base class {{{1
 class Hooks:
+    NAME = "monitoring"
+
     @classmethod
     def provision_hooks(cls):
+        schema = {}
+
         for subclass in cls.__subclasses__():
-            for k, v in subclass.ASSIMILATE_SETTINGS.items():
-                add_setting(k, desc=v, validator=as_string)
+            schema[subclass.NAME] = subclass.VALIDATOR
+
+        add_setting(
+            name = cls.NAME,
+            desc = "services to notify upon backup",
+            validator = Schema(schema)
+        )
 
     def __init__(self, settings):
         self.active_hooks = []
@@ -36,6 +65,12 @@ class Hooks:
             c = subclass(settings)
             if c.is_active():
                 self.active_hooks.append(c)
+
+    def get_settings(self, assimilate_settings):
+        monitoring = assimilate_settings.monitoring
+        if monitoring:
+            return monitoring.get(self.NAME, {})
+        return {}
 
     def report_results(self, borg):
         for hook in self.active_hooks:
@@ -49,9 +84,6 @@ class Hooks:
     def __exit__(self, exc_type, exc_value, exc_traceback):
         for hook in self.active_hooks:
             hook.signal_end(exc_value)
-
-    def is_active(self):
-        return bool(self.uuid)
 
     def signal_start(self):
         url = self.START_URL.format(url=self.url, uuid=self.uuid)
@@ -75,21 +107,146 @@ class Hooks:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
 
+# Custom class {{{1
+class Custom(Hooks):
+    NAME = 'custom'
+    VALIDATOR = dict(
+        id = as_string,
+        url = as_url,
+        start = as_action,
+        success = as_action,
+        failure = as_action,
+        finish = as_action
+    )
+
+    def __init__(self, assimilate_settings):
+        settings = self.get_settings(assimilate_settings)
+        placeholders = {}
+        if 'id' in settings:
+            placeholders['id'] = settings['id']
+        try:
+            if 'url' in settings:
+                placeholders['url'] = settings['url'].format(**placeholders)
+        except TypeError as e:
+            self.invalid_key('url', e)
+        self.placeholders = placeholders
+        self.settings = settings
+        self.borg = None
+
+    def is_active(self):
+        return bool(self.settings)
+
+    def invalid_key(self, keys, e):
+        # unfortunately TypeErrors must be de-parsed to determine the key
+        _, _, key = str(e).partition("'")
+        key = key=key[:-1]
+        error = 'unknown key: ‘{key}’'
+        self.report_error(keys, error)
+
+    def report_error(self, keys, error):
+        if is_str(keys):
+            keys = (keys,)
+        keys = (Hooks.NAME, self.NAME) + keys
+        report_setting_error(keys, error)
+
+    def expand_value(self, keys, placeholders):
+        value = self.settings
+        for key in keys:
+            value = value[key]
+
+        def expand_str(value):
+            try:
+                return value.format(**placeholders)
+            except TypeError as e:
+                self.invalid_key(e, keys)
+
+        if is_str(value):
+            return expand_str(value)
+        else:
+            data = {}
+            for k, v in values.items():
+                data[k] = expand_str(keys + (k,), placeholders)
+            return data
+
+    def report(self, name, placeholders):
+        if not self.settings:
+            return
+
+        reporter = self.settings.get(name)
+        if not reporter:
+            return
+
+        # process reporter
+        method = 'get'
+        if is_str(reporter):
+            url = self.expand_value((name,), placeholders)
+            params = {}
+        else:
+            url = self.expand_value((name, 'url'), placeholders)
+            params = self.expand_value((name, 'params'), placeholders)
+            if 'post' in reporter:
+                method = 'post'
+                data = self.expand_value(
+                    (name, 'post'), placeholders
+                )
+
+        if not url:
+            self.report_error(name, 'missing url.')
+        try:
+            as_url(url)
+        except Invalid:
+            self.report_error((), 'invalid url.')
+
+        log(f'signaling {name} of backups to {self.NAME}: {url}.')
+        try:
+            if method == 'get':
+                requests.get(url, params=params)
+            else:
+                requests.post(url, params=params, data=data)
+        except requests.exceptions.RequestException as e:
+            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
+
+    def signal_start(self):
+        self.report('start', self.placeholders)
+
+    def signal_end(self, exception):
+        if exception:
+            names = ['failure', 'finish']
+        else:
+            names = ['success', 'finish']
+
+        placeholders = self.placeholders.copy()
+        if exception:
+            if isinstance(exception, OSError):
+                placeholders['error'] = os_error(exception)
+                placeholders['exit_status'] = "2"
+            else:
+                placeholders['error'] = str(exception)
+                placeholders['exit_status'] = str(getattr(exception, 'status', 2))
+                placeholders['stderr'] = getattr(exception, 'stderr', '')
+        else:
+            placeholders['exit_status'] = '0'
+
+        for name in names:
+            self.report(name, placeholders)
+
+
 # HealthChecks class {{{1
 class HealthChecks(Hooks):
     NAME = 'healthchecks.io'
-    ASSIMILATE_SETTINGS = dict(
-        healthchecks_url = 'the healthchecks.io URL for monitoring back ups',
-        healthchecks_uuid = 'the healthchecks.io UUID for monitoring back ups',
-    )
+    VALIDATOR = dict(url=as_url, uuid=as_string)
     URL = 'https://hc-ping.com'
 
-    def __init__(self, settings):
-        self.uuid = settings.healthchecks_uuid
-        self.url = settings.healthchecks_url
+    def __init__(self, assimilate_settings):
+        settings = self.get_settings(assimilate_settings)
+        self.uuid = settings.get('uuid')
+        self.url = settings.get('url')
         if not self.url:
             self.url = self.URL
         self.borg = None
+
+    def is_active(self):
+        return bool(self.uuid)
 
     def signal_start(self):
         url = f'{self.url}/{self.uuid}/start'
@@ -135,17 +292,18 @@ class HealthChecks(Hooks):
 # CronHub class {{{1
 class CronHub(Hooks):
     NAME = 'cronhub.io'
-    ASSIMILATE_SETTINGS = dict(
-        cronhub_uuid = 'the cronhub.io UUID for back-ups monitor',
-        cronhub_url = 'the cronhub.io URL for back-ups monitor',
-    )
+    VALIDATOR = dict(url=as_url, uuid=as_string)
     START_URL = '{url}/start/{uuid}'
     SUCCESS_URL = '{url}/finish/{uuid}'
     FAIL_URL = '{url}/fail/{uuid}'
     URL = 'https://cronhub.io'
 
-    def __init__(self, settings):
-        self.uuid = settings.cronhub_uuid
-        self.url = settings.cronhub_url
+    def __init__(self, assimilate_settings):
+        settings = self.get_settings(assimilate_settings)
+        self.uuid = settings.get('uuid')
+        self.url = settings.get('url')
         if not self.url:
             self.url = self.URL
+
+    def is_active(self):
+        return bool(self.uuid)
