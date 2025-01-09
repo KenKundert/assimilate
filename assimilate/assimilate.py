@@ -54,6 +54,7 @@ from .configs import (
     get_available_configs,
     get_config_dir,
     read_settings,
+    report_setting_error
 )
 from .hooks import Hooks
 from .patterns import (
@@ -160,16 +161,13 @@ class ConfigQueue:
             sub_configs = composite_configs[name].split()
             unknown_configs = set(sub_configs) - known_configs
             if unknown_configs:
-                raise Error(
+                report_setting_error(
+                    "composite_configs",
                     f"unknown {plural(unknown_configs):config/s}:",
                     f"{', '.join(sorted(unknown_configs))}.",
-                    culprit=(name, "composite_configs")
                 )
             if name in sub_configs:
-                raise Error(
-                    "recursion is not allowed.",
-                    culprit=(name, "composite_configs")
-                )
+                report_setting_error("composite_configs", "recursion is not allowed.")
         else:
             sub_configs = [name]
 
@@ -366,9 +364,9 @@ class Assimilate:
 
         self.working_dir = to_path(self.settings.get("working_dir", "/"))
         if not self.working_dir.exists():
-            raise Error(f"{self.working_dir!s} not found.", culprit="working_dir")
+            report_setting_error("working_dir", f"{self.working_dir!s} not found.")
         if not self.working_dir.is_absolute():
-            raise Error("must be an absolute path.", culprit="working_dir")
+            report_setting_error("working_dir", "must be an absolute path.")
 
     # handle errors {{{2
     def fail(self, *msg, cmd='❬unknown❭'):

@@ -569,6 +569,18 @@ BORG_SETTINGS = dict(
         desc = "number of monthly archives to keep",
         validator = as_integer,
     ),
+    keep_3monthly = dict(
+        cmds = ["prune"],
+        arg = "NUM",
+        desc = "number of 3 month quarter archives to keep",
+        validator = as_integer,
+    ),
+    keep_13weekly = dict(
+        cmds = ["prune"],
+        arg = "NUM",
+        desc = "number of 13 week quarter archives to keep",
+        validator = as_integer,
+    ),
     keep_yearly = dict(
         cmds = ["prune"],
         arg = "NUM",
@@ -697,14 +709,28 @@ def get_available_configs(keep_shared=False):
 
 # report_setting_error() {{{2
 keymaps = defaultdict(dict)
-def report_setting_error(keys, error, codicil=None):
-    paths = reversed(keymaps.keys())
-    for path in paths:
+def report_setting_error(keys, *args, **kwargs):
+    if is_str(keys):
+        keys = tuple(keys.split())
+    if 'codicil' in kwargs:
+        codicil = kwargs.pop('codicil')
+        if is_str(codicil):
+            codicil = tuple(codicil.split())
+    else:
+        codicil = ()
+
+    for path in reversed(keymaps.keys()):
         keymap = keymaps[path]
         loc = keymap.get(keys)
         if loc:
-            raise Error(error, culprit=(path,)+keys, codicil=(codicil, loc.as_line()))
-    raise AssertionError  # this should not happen with a user specified value
+            culprit = (path,) + keys
+            raise Error(
+                *args,
+                culprit=(path,)+keys,
+                codicil=codicil + (loc.as_line(),),
+                **kwargs
+            )
+    raise Error(*args, culprit=keys, codicil=codicil **kwargs)
 
 
 # read_config() {{{2

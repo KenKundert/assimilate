@@ -6,7 +6,7 @@ Releases
 *Assimilate* is suitable for use with *BorgBackup* version 2.0 or later.  For 
 earlier versions of *Borg* you should use Emborg_.
 
-.. important:
+.. important::
 
     *Assimilate* is designed to work with *Borg Backup v2.0*.  *Borg 2.0* is 
     currently in beta release, so neither *Borg* nor *Assimilate* should be used 
@@ -23,22 +23,16 @@ earlier versions of *Borg* you should use Emborg_.
     2. Normally *Assimilate* saves the size of the repository to the *latest.nt* 
        file.  However the repository size is not yet available in *Borg 2*.
 
+    3. Currently the resolution of ``--newer``, ``--older``, ``--newest``, 
+       ``--oldest`` is constrained to one day by *Borg*. That should be fixed in 
+       the next release.
+
 
 Latest development release
 --------------------------
 | Version: 0.0a0
 | Released: 2024-12-08
 
-0.0.0 (2025-01-01)
+0.0.0 (2025-??-??)
 ------------------
 - Initial release
-
-
-Known Issues
-------------
-
-- The :ref:`repo-create command <repo-create>` does not create parent directory 
-  for repository.
-
-- The size of the repository is not currently being saved in the 
-  *❬config❭.latest.nt* file.

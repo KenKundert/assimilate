@@ -484,10 +484,10 @@ assimilate:
                 checks:
                     stderr:
                         matches text:
-                            > assimilate error: No prune settings available.
+                            > assimilate error: no prune settings available.
                             >     At least one of keep_within, keep_last, keep_minutely, keep_hourly,
-                            >     keep_daily, keep_weekly, keep_monthly, or keep_yearly must be
-                            >     specified.
+                            >     keep_daily, keep_weekly, keep_monthly, keep_3monthly, keep_13weekly,
+                            >     or keep_yearly must be specified.
                     status: 2
 
             felony — compact {{{2:
@@ -698,6 +698,8 @@ assimilate:
                             >                             containing a filesystem object with the given
                             >                             NAME
                             >             exclude_nodump: exclude files flagged NODUMP
+                            >              keep_13weekly: number of 13 week quarter archives to keep
+                            >              keep_3monthly: number of 3 month quarter archives to keep
                             >                 keep_daily: number of daily archives to keep
                             >                keep_hourly: number of hourly archives to keep
                             >                  keep_last: number of the most recent archives to keep
@@ -4971,7 +4973,7 @@ assimilate:
                     stderr:
                         matches regex:
                             > assimilate error: must_exist, /{run_dir}/u:
-                            >     does not exist, perform setup and restart.
+                            >     does not exist; perform setup and restart.
                     status: 2
 
             windpipe — create -ctest1 {{{2:

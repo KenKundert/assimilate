@@ -64,6 +64,10 @@ hostname = gethostname()
 set_shlib_prefs(use_inform=True, log_cmd=True)
 Quantity.set_prefs(ignore_sf=True, spacer='')
 
+prune_intervals = """
+    within last minutely hourly daily weekly monthly 3monthly 13weekly yearly
+""".split()
+
 # Utilities {{{1
 # title() {{{2
 def title(text):
@@ -902,7 +906,7 @@ class CreateCommand(Command):
         for path in must_exist:
             if not path.exists():
                 raise Error(
-                    "does not exist, perform setup and restart.",
+                    "does not exist; perform setup and restart.",
                     culprit = ("must_exist", path),
                 )
 
@@ -1346,8 +1350,7 @@ class DueCommand(Command):
             squeeze_cmd = 'compact'
 
         # disable squeeze check if there are no prune settings
-        intervals = "within last minutely hourly daily weekly monthly yearly"
-        prune_settings = [("keep_" + s) for s in intervals.split()]
+        prune_settings = [("keep_" + s) for s in prune_intervals]
         if not any(settings.value(s) for s in prune_settings):
             last_run['squeeze'] = None
 
@@ -2138,12 +2141,11 @@ class PruneCommand(Command):
         fast = cmdline["--fast"]
 
         # checking the settings
-        intervals = "within last minutely hourly daily weekly monthly yearly"
-        prune_settings = [("keep_" + s) for s in intervals.split()]
+        prune_settings = [("keep_" + s) for s in prune_intervals]
         if not any(settings.value(s) for s in prune_settings):
             prune_settings = conjoin(prune_settings, ", or ")
             raise Error(
-                "No prune settings available.",
+                "no prune settings available.",
                 codicil = f"At least one of {prune_settings} must be specified.",
                 wrap = True,
             )
