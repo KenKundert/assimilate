@@ -1258,7 +1258,7 @@ class DueCommand(Command):
             root squeeze completed 4.6 days ago.
             root check completed 12 days ago.
 
-            > assimilate due -b1 -m "It has been {since:.1pd} days since the last {action}."
+            > assimilate due -b1 -m "It has been {since:.1pdays} since the last {action}."
             It has been 1.8 days since the last backup.
 
             > assimilate due -s10 -m "It has been {elapsed} since the last {cmd} of {config}."
@@ -1297,7 +1297,8 @@ class DueCommand(Command):
                     cmd=cmd, action=action
                 )
                 try:
-                    return cmdline["--message"].format(**replacements)
+                    with Quantity.prefs(spacer=" "):
+                        return cmdline["--message"].format(**replacements)
                 except KeyError as e:
                     raise Error(
                         f"‘{e.args[0]}’ is an unknown key.",
