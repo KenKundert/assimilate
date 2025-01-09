@@ -730,7 +730,7 @@ def report_setting_error(keys, *args, **kwargs):
                 codicil=codicil + (loc.as_line(),),
                 **kwargs
             )
-    raise Error(*args, culprit=keys, codicil=codicil **kwargs)
+    raise Error(*args, culprit=culprit, codicil=codicil **kwargs)
 
 
 # read_config() {{{2
