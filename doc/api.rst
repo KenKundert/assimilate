@@ -12,18 +12,21 @@ separately:
 
 .. code-block:: python
 
-    from assimilate import Assimilate
+    from assimilate import Assimilate, AssimilateError
     from pathlib import Path
 
-    destination = Path('keys')
+    destination = Path('key')
 
-    with Assimilate('home') as assimilate:
-        borg = assimilate.run_borg(
-            cmd = 'key export',
-            args = [assimilate.destination(), destination / '.config/borg.repokey']
-        )
-        if borg.stdout:
-            print(borg.stdout.rstrip())
+    try:
+        with Assimilate('home') as assimilate:
+            borg = assimilate.run_borg(
+                cmd = 'key export',
+                args = [destination]
+            )
+            if borg.stdout:
+                print(borg.stdout.strip())
+    except AssimilateError as e:
+        e.report()
 
 *Assimilate* takes the config name as an argument, if not given the default 
 config is used.  You can also pass list of *Assimilate* options and the path to 
@@ -48,14 +51,6 @@ The path to the repository.
 **version**
 
 The *Assimilate* version number as a 3-tuple (major, minor, patch).
-
-
-**destination(archive)**
-
-Returns the full path to the archive. If Archive is False or None, then the path 
-to the repository it returned. If Archive is True, then the default archive name 
-as taken from settings file is used. This is only appropriate when creating new 
-repositories.
 
 
 **run_borg(cmd, args, borg_opts, assimilate_opts)**

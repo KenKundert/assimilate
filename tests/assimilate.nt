@@ -1542,6 +1542,27 @@ assimilate:
                     contents: bbb
                     mtime: 2024-11-26
 
+                extract-key:
+                    contents:
+                        > #!/usr/bin/env python3
+                        >
+                        > from assimilate import Assimilate, AssimilateError
+                        > from pathlib import Path
+                        >
+                        > destination = Path('repokey')
+                        >
+                        > try:
+                        >     with Assimilate('test') as assimilate:
+                        >         borg = assimilate.run_borg(
+                        >             cmd = 'key export',
+                        >             args = (destination,),
+                        >         )
+                        >         if borg.stdout:
+                        >             print(borg.stdout.strip())
+                        > except AssimilateError as e:
+                        >     e.report()
+                    mode: 0o777
+
         tests:
             compel — version {{{2:
                 run: assimilate version
@@ -2277,6 +2298,13 @@ assimilate:
                     stdout:
                         matches regex:
                             > {aid0}  .*  {ar0}  .*
+
+            dusty — api {{{2:
+                run: ./extract-key
+                checks:
+                    repokey:
+                        matches regex:
+                            > BORG_KEY .*
 
     daemon — composite config that uses patterns and implicit archive {{{1:
         initialization:

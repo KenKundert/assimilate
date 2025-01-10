@@ -53,4 +53,5 @@ ignore = []
 
 [tool.ruff.lint.per-file-ignores]
 "assimilate/__init__.py" = ["F401"]
+"assimilate/assimilate.py" = ["F401"]
 "assimilate/utilities.py" = ["F401"]

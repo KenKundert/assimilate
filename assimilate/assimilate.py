@@ -80,6 +80,9 @@ from .preferences import (
     PROGRAM_NAME,
     SHARED_SETTINGS_FILE,
 )
+from . import overdue
+    # unused here, but needed so that overdue extensions to settings file are
+    # added before the files are read
 from .shlib import (
     Run, cd, cwd, render_command, to_path,
     set_prefs as set_shlib_prefs
@@ -234,7 +237,7 @@ class Assimilate:
             self.assimilate_opts = {"no-log": True}
                 # no-log as True is suitable for API default
         if config:
-            if assimilate_opts.get("config"):
+            if assimilate_opts and assimilate_opts.get("config"):
                 assert config == assimilate_opts.get("config")
         else:
             if assimilate_opts.get("config"):
@@ -242,6 +245,7 @@ class Assimilate:
 
         # read shared setting if not already available
         if shared_settings is None:
+            Hooks.provision_hooks()
             shared_settings = read_settings('shared')
         self.run_name = kwargs.pop('run_name', None)
 
@@ -331,8 +335,7 @@ class Assimilate:
         self.settings["config_name"] = config
 
         # add command name to settings so it can be used in expansions
-        if 'cmd_name' in kwargs:
-            self.settings['cmd_name'] = kwargs['cmd_name']
+        self.settings['cmd_name'] = kwargs.get('cmd_name', '')
 
 
     # check() {{{2

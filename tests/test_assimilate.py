@@ -496,7 +496,7 @@ def file_ops(operations):
 
                 mode = attributes.get("mode", None)
                 if mode:
-                    path.chmod(mode)
+                    path.chmod(int(mode, base=0))
 
                 mtime = attributes.get("mtime", None)
                 if mtime:
