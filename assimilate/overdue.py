@@ -129,7 +129,7 @@ error_message = dedent(f"""
 # as_seconds {{{2
 def as_seconds(arg, units=None):
     arg = as_string(arg)
-    return Quantity(arg, units or 'h').scale('s')
+    return Quantity(arg, units or 'h').scale('seconds')
 
 # SCHEMA {{{1
 validate_settings = Schema(
@@ -179,7 +179,7 @@ def get_local_data(description, config, path, max_age):
         locked = path.parent.glob('lock.*')
 
     delta = now - mtime
-    age = Quantity(24 * 60 * 60 * delta.days + delta.seconds, 's')
+    age = Quantity(24 * 60 * 60 * delta.days + delta.seconds, 'seconds')
     overdue = truth(age > max_age)
     locked = truth(locked)
     yield dict(

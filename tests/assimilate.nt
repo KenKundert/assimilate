@@ -4233,23 +4233,23 @@ assimilate:
                 run: assimilate due --since-backup 0  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since⟫ ⟪elapsed⟫'
                 checks:
                     stdout:
-                        matches regex: ^test: backup backup 0d .*
+                        matches regex: ^test: backup backup 0 days .*
 
                     status: 1
 
             agony — due --since-check ❬since❭ --message ❬msg❭ {{{2:
-                run: assimilate due --since-check 0h  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since:0.1ph⟫ ⟪elapsed⟫'
+                run: assimilate due --since-check 0h  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since:0.1phours⟫ ⟪elapsed⟫'
                 checks:
                     stdout:
-                        matches regex: ^test: check check 0h .*
+                        matches regex: ^test: check check 0 hours .*
 
                     status: 1
 
             resume — due --since-squeeze ❬since❭ --message ❬msg❭ {{{2:
-                run: assimilate due --since-squeeze 0Y  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since:0.0ps⟫ ⟪elapsed⟫'
+                run: assimilate due --since-squeeze 0Y  --message '⟪config⟫: ⟪cmd⟫ ⟪action⟫ ⟪since:0.0pseconds⟫ ⟪elapsed⟫'
                 checks:
                     stdout:
-                        matches regex: ^test: prune squeeze \d+s .*
+                        matches regex: ^test: prune squeeze \d+ seconds .*
 
                     status: 1
 
@@ -4341,7 +4341,7 @@ assimilate:
                     stderr:
                         matches regex:
                             > test
-                            > 100800 s
+                            > 100800 seconds
                             > .*
                             > .*
                             > .*
@@ -4358,7 +4358,7 @@ assimilate:
                             >     path: /{run_dir}/.local/share/assimilate/test.latest.nt
                             >     mtime: .*
                             >     age: .*
-                            >     max_age: 100800 s
+                            >     max_age: 100800 seconds
                             >     overdue: no
                             >     locked: no
                             >     updated: .*

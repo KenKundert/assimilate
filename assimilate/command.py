@@ -55,7 +55,7 @@ from .shlib import (
 )
 from .utilities import (
     gethostname, output, pager, process_cmdline, read_latest, table, to_date,
-    to_days, to_seconds, two_columns, update_latest, when,
+    to_days, to_seconds, two_columns, update_latest, when, UnknownConversion
 )
 
 
@@ -1299,9 +1299,11 @@ class DueCommand(Command):
                 try:
                     with Quantity.prefs(spacer=" "):
                         return cmdline["--message"].format(**replacements)
+                except UnknownConversion as e:
+                    raise Error(e, culprit = "--message")
                 except KeyError as e:
                     raise Error(
-                        f"‘{e.args[0]}’ is an unknown key.",
+                        f"‘{e!s}’ is an unknown key.",
                         culprit = "--message",
                         codicil = f"Choose from: {conjoin(replacements.keys())}."
                     )

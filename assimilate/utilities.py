@@ -28,7 +28,7 @@ from inform import (
     Error, conjoin, cull, error, full_stop, join, narrate, os_error, warn,
     output as output_raw, terminate
 )
-from quantiphy import Quantity, UnitConversion, QuantiPhyError
+from quantiphy import Quantity, UnitConversion, QuantiPhyError, UnknownConversion
 from .shlib import Run, set_prefs as set_shlib_prefs
 set_shlib_prefs(use_inform=True, log_cmd=True)
 
@@ -289,18 +289,20 @@ def process_cmdline(*args, **kwargs):
         terminate(3)
 
 # time conversions {{{1
-UnitConversion('s', 'sec second seconds')
-UnitConversion('s', 'm min minute minutes', 60)
-UnitConversion('s', 'h hr hour hours', 60*60)
-UnitConversion('s', 'D d day days', 24*60*60)
-UnitConversion('s', 'W w week weeks', 7*24*60*60)
-UnitConversion('s', 'M month months', 30*24*60*60)
-UnitConversion('s', 'Y y year years', 365*24*60*60)
-UnitConversion('d', 'm min minute minutes', 1/60/24)
-UnitConversion('d', 'h hr hour hours', 1/24)
-UnitConversion('d', 'W w week weeks', 7)
-UnitConversion('d', 'M month months', 30)
-UnitConversion('d', 'Y y year years', 365)
+UnitConversion('seconds', 's sec second')
+UnitConversion('seconds', 'm min minute minutes', 60)
+UnitConversion('seconds', 'h hr hour hours', 60*60)
+UnitConversion('seconds', 'D d day days', 24*60*60)
+UnitConversion('seconds', 'W w week weeks', 7*24*60*60)
+UnitConversion('seconds', 'M month months', 30*24*60*60)
+UnitConversion('seconds', 'Y y year years', 365*24*60*60)
+UnitConversion('days', 's sec second seconds', 1/60/60/24)
+UnitConversion('days', 'm min minute minutes', 1/60/24)
+UnitConversion('days', 'h hr hour hours', 1/24)
+UnitConversion('days', 'D d day', 1)
+UnitConversion('days', 'W w week weeks', 7)
+UnitConversion('days', 'M month months', 30)
+UnitConversion('days', 'Y y year years', 365)
 Quantity.set_prefs(ignore_sf=True, spacer='')
 
 # to_seconds() {{{2
@@ -309,25 +311,25 @@ def to_seconds(time_spec, default_units='d'):
     # be a relative time format (Ny, NM, Nw, Nd, Nm, Ns).
     # If an absolute format is given, then the return value is the number of
     # seconds in from now to the given date (is positive if date is in past).
-    # A Quantity with units of 's' is returned.
+    # A Quantity with units of 'seconds' is returned.
     try:
         target = arrow.get(time_spec, tzinfo='local')
-        return Quantity((arrow.now() - target).total_seconds(), 's')
+        return Quantity((arrow.now() - target).total_seconds(), 'seconds')
     except arrow.parser.ParserError:
-        return Quantity(time_spec, default_units, scale='s')
+        return Quantity(time_spec, default_units, scale='seconds')
 
 # to_days() {{{2
-def to_days(time_spec, default_units='s'):
+def to_days(time_spec, default_units='seconds'):
     # The time_spec may be an absolute format (an arrow date format) or it may
     # be a relative time format (Ny, NM, Nw, Nd, Nm, Ns).
     # If an absolute format is given, then the return value is the number of
     # seconds in from now to the given date (is positive if date is in past).
-    # A Quantity with units of 's' is returned.
+    # A Quantity with units of 'days' is returned.
     try:
         target = arrow.get(time_spec, tzinfo='local')
-        return Quantity((arrow.now() - target).total_seconds(), 's', scale='d')
+        return Quantity((arrow.now() - target).total_seconds(), 'seconds', scale='days')
     except arrow.parser.ParserError:
-        return Quantity(time_spec, default_units, scale='d')
+        return Quantity(time_spec, default_units, scale='days')
 
 # to_date() {{{2
 def to_date(time_spec, default_units='d'):
@@ -338,7 +340,7 @@ def to_date(time_spec, default_units='d'):
         return arrow.get(time_spec, tzinfo='local')
     except arrow.parser.ParserError as e:
         try:
-            seconds = Quantity(time_spec, default_units, scale='s')
+            seconds = Quantity(time_spec, default_units, scale='seconds')
             return arrow.now().shift(seconds=-seconds)
         except QuantiPhyError:
             codicil = join(
