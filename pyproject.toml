@@ -52,4 +52,5 @@ select = ["F"]
 ignore = []
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
+"assimilate/__init__.py" = ["F401"]
+"assimilate/utilities.py" = ["F401"]
