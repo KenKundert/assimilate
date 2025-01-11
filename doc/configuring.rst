@@ -106,8 +106,14 @@ It might look like the following:
         create: backup
         repo-list:
             - archives
+            - a
             - recent --last=20
-        list: paths
+        list:
+            - l
+            - ln -N
+            - ls -S
+            - ld -D
+        overdue: od
         umount: unmount
 
     logging:
@@ -632,6 +638,62 @@ the tints of those colors to make them more visible and attractive.
 *colorscheme* should be set to "none", "light", or "dark".  With "none" the text 
 is not colored.  In general it is best to use the "light" colorscheme on dark 
 backgrounds and the "dark" colorscheme on light backgrounds.
+
+
+command aliases
+~~~~~~~~~~~~~~~
+
+This collection of settings allows you to choose the names and options you use 
+for the various commands available in *Assimilate*.  It takes the following 
+form:
+
+.. code-block:: nestedtext
+
+    command aliases:
+        create: backup
+        repo-list:
+            - archives
+            - a
+            - recent --last=20
+        list:
+            - l
+            - ln -N
+            - ls -S
+            - ld -D
+        overdue: od
+        umount: unmount
+
+The *command_aliases* setting takes a collection of key-value pairs, where the 
+key is the name of the *Assimilate* command you wish to personalize.  The value 
+is a list of aliases for that command. Each list item includes the desired name 
+and desired command line options.  If there is only one item in the list, it can 
+be given on the same line as the key.  So for example:
+
+.. code-block:: nestedtext
+
+    command aliases:
+        create: backup
+
+This simply adds an alternative name for the *create* command.  You might do 
+this to allow yourself to use a name that is more comfortable for you, as with 
+*backup* or *archives*, or to make a command you use often easier to type, as 
+with *l* or *od*.
+
+You can customize the behavior of the command when invoked with an alias by 
+adding command line arguments.  For example:
+
+.. code-block:: nestedtext
+
+    command aliases:
+        list:
+            - l
+            - ln -N
+            - ls -S
+            - ld -D
+
+Besides creating a simple alias for the *list* command, this also creates three 
+new versions: *ln* sorts the listed files by name, *ls* sorts them by size, and 
+*ld* sorts them by date.
 
 
 .. _compact_after_delete:

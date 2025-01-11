@@ -2270,7 +2270,7 @@ class RepoListCommand(Command):
                                     oldest+range
             -e, --include-external  list all archives in repository, not just
                                     those associated with chosen configuration
-            -d, --deleted           only archives archives marked for deletion
+            -d, --deleted           only consider archives marked for deletion
 
         By default all archives will listed, however you can limit the
         number shown using various command line options.
