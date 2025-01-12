@@ -674,21 +674,20 @@ def build_validator():
 
 
 # CODE {{{1
-# get_config_dir() {{{2
+# set_config_dir() {{{2
 config_dir = to_path(CONFIG_DIR)
-def get_config_dir():
-    return config_dir
-
 def set_config_dir(dir):
     global config_dir
     if dir:
         config_dir = to_path(dir)
+    return config_dir
+
 
 # get_available_configs() {{{2
 available_configs = {}
 def get_available_configs(keep_shared=False):
     if not available_configs:
-        config_files = lsf(get_config_dir(), select="*.conf.nt")
+        config_files = lsf(config_dir, select="*.conf.nt")
         configs = {p.name[:-8]: p for p in config_files}
 
         # warn about non-compliant config names

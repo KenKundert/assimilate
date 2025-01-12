@@ -52,7 +52,7 @@ from .configs import (
     BORG_SETTINGS,
     convert_name_to_option,
     get_available_configs,
-    get_config_dir,
+    set_config_dir,
     read_settings,
     report_setting_error
 )
@@ -228,9 +228,18 @@ class Assimilate:
         A list of Assimilate options chosen from “verbose”, “narrate”,
         “dry-run”, “no-log”, “config” (config may either be given directly or in
         assimilate_opts, whichever is most convenient.
+    config_dir (path)
+        A path to the directory that contains the configuration files.  This
+        allows you to override the normal configuration directory, which is
+        typically ~/.config/assimilate.
     """
     # Constructor {{{2
-    def __init__(self, config=None, assimilate_opts=None, shared_settings=None, **kwargs):
+    def __init__(
+        self, config=None, assimilate_opts=None, config_dir=None,
+        shared_settings=None, **kwargs
+    ):
+        self.config_dir = set_config_dir(config_dir)
+
         # assimilate options
         self.assimilate_opts = assimilate_opts
         if assimilate_opts is None:
@@ -252,7 +261,6 @@ class Assimilate:
         # reset the logfile so anything logged after this is placed in the
         # logfile for this config
         get_informer().set_logfile(LoggingCache())
-        self.config_dir = get_config_dir()
         self.read_config(config, shared_settings, **kwargs)
         self.check()
         set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)

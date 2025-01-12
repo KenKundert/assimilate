@@ -125,7 +125,7 @@ def main():
             queue = ConfigQueue(cmd)
             while queue:
                 with Assimilate(
-                    cmdline["--config"], options, shared_settings,
+                    cmdline["--config"], options, shared_settings=shared_settings,
                     queue=queue, cmd_name=cmd_name, run_name=cmdline["--name"]
                 ) as settings:
                     try:

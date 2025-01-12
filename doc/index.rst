@@ -427,7 +427,6 @@ Contents
    monitoring
    accessories
    examples
-   api
    releases
 
 * :ref:`genindex`
