@@ -349,11 +349,11 @@ There are more commands, but the above are the most commonly used.
 Status
 ------
 
-The <overdue> command can be run in a cron script on either the client or the 
-server machine.  It notifies you if your back-ups have not completed 
-successfully in a specified period of time.  In addition, *Assimilate* can be 
-configured to update monitoring services such as HealthChecks.io_ with the 
-status of the backups.
+The :ref:`overdue <overdue>` command can be run in a cron script on either the 
+client or the server machine.  It notifies you if your back-ups have not 
+completed successfully in a specified period of time.  In addition, *Assimilate* 
+can be configured to update monitoring services such as HealthChecks.io_ with 
+the status of the backups.
 
 
 Borg

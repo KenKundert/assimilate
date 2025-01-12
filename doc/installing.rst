@@ -243,58 +243,6 @@ Once it has run, you can pull a file from the latest snapshot using:
     $ assimilate -c snapshots restore passwords.gpg
 
 
-Overdue Backups
-^^^^^^^^^^^^^^^
-
-*Assimilate* allows you to easily determine when your files were last backed up 
-using:
-
-.. code-block:: bash
-
-    $ assimilate due
-
-However, you must remember to run this command. *Assimilate* also provides 
-:ref:`assimilate-overdue <assimilate_overdue>` to provide automated reminders.  
-You configure *assimilate-overdue* using a configuration file: 
-~/.config/assimilate/overdue.conf.  For example:
-
-.. code-block:: python
-
-    default_maintainer = 'me@mydomain.com'
-    dumper = 'me@mydomain.com'
-    default_max_age = 36 # hours
-    root = '~/.local/share/assimilate'
-    repositories = [
-        dict(host='laptop (snapshots)', path='snapshots.lastbackup', max_age=0.2),
-        dict(host='laptop (backups)', path='backups.lastbackup'),
-    ]
-
-Then you would configure *cron* to run *assimilate-overdue* using something like:
-
-.. code-block:: text
-
-    00 * * * * ~/.local/bin/assimilate-overdue --quiet --mail
-
-This runs *assimilate-overdue* every hour on the hour, and it reports any delinquent 
-backups by sending mail to the appropriate maintainer (the message is sent from 
-the *dumper*).  You can specify any number of repositories to check, and for 
-each repository you can specify *host* (a descriptive name), *path* (the path to 
-the repository from the *root* directory, a *max_age* in hours, and 
-a *maintainer*. You can also specify defaults for the *maintainer* and 
-*max_age*.  When run, it checks the age of each repository and sends email to 
-the appropriate maintainer if it exceeds the maximum allowed age.
-
-In this example the actual repository is not checked directly, rather the 
-*lastbackup* file is checked.  This is a file that is updated by *Assimilate* after 
-every back up. This file is found in the *Assimilate* output directory. Every time 
-*Assimilate* runs it creates a log file that can also be found in this directory.  
-That logfile can be viewed directly, or you can view it using the *log* command:
-
-.. code-block:: bash
-
-    $ assimilate log
-
-
 Configuring Assimilate to Backup an Entire Machine
 --------------------------------------------------
 
