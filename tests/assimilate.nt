@@ -5199,4 +5199,42 @@ assimilate:
                         contains line: assimilate error: no diff command available.
                     status: 2
 
+    snarl — missing shared configuration file {{{1:
+        initialization:
+            create:
+                ~/.config/assimilate/test.conf.nt:
+                    contents:
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
+
+                ~/REPO/:
+
+                ~/a:
+                    contents: aaa
+                    mtime: 2024-11-27
+
+                ~/b:
+                    contents: bbb
+                    mtime: 2024-11-26
+
+        tests:
+            spinner — repo-create {{{2:
+                run: assimilate -c test repo-create
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         repo-create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --make-parent-dirs \
+                            >         --encryption=none
+
 #  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:

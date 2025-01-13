@@ -36,7 +36,7 @@ Finally, you can install it using `pip
 
 .. code-block:: bash
 
-    $ pip install borgbackup
+    $ pip install borgbackup==2.0.0b14
 
 Download and install *Assimilate* as follows (requires Python3.6 or better):
 
@@ -93,50 +93,48 @@ files.
 Shared Settings
 ^^^^^^^^^^^^^^^
 
-The first file is the shared configuration file:
+The first file is the shared configuration file: 
+``~/.config/assimilate/shared.conf.nt``:
 
-.. code-block:: python
+.. code-block:: nestedtext
 
-    configurations = 'backups snapshots'
-    default_configuration = 'backups'
+    default config: backups
 
-This is basically the minimum you can give. Your two configurations are listed 
-in *configurations*. It could be a list of strings, but you can also give 
-a single string, in which case the string is split on white space. Then you 
-specify your default configuration. In this example *backups* is to be run 
-interactively and *snapshots* is to be run on a schedule by *cron*, so the 
-default is set to *backups* to make it easier to run interactively.
+The shared settings are shared between all configs.  In most cases particular 
+settings can either be given in the shared settings file or in the settings file 
+for a particular configuration.  But some, including *default_config* must be 
+given in the shared settings file.
 
 
 Configuration for a Remote Repository: *backups*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The second file is the configuration file for *backups*:
+The second file is the configuration file for *backups*: 
+``~/.config/assimilate/backups.conf.nt``:
 
-.. code-block:: python
+.. code-block:: nestedtext
 
-    repository = 'backups:archives'
-    prefix = '{host_name}-'
-    encryption = 'keyfile'
-    passphrase = 'crone excess mandate bedpost'
+    repository: backups:archives
+    prefix: {host_name}-
+    encryption: keyfile-blake2-chacha20-poly1305
+    passphrase: crone excess mandate bedpost
 
-    src_dirs = '~'
-    excludes = '''
-        ~/.cache
-        **/*~
-        **/.git
-        **/__pycache__
-        **/.*.swp
-    '''
-    exclude_if_present = '.nobackup'
+    src_dirs: ~
+    excludes:
+        - ~/.cache
+        - **/*~
+        - **/.git
+        - **/__pycache__
+        - **/.*.swp
+    exclude_if_present: .nobackup
 
-    check_after_create = 'latest'
-    prune_after_create = True
-    compact_after_delete = True
-    keep_daily = 7
-    keep_weekly = 4
-    keep_monthly = 12
-    keep_yearly = 2
+    check_after_create: 'latest
+    prune_after_create: 'yes
+    compact_after_delete: 'yes
+    keep_daily: 7
+    keep_weekly: 4
+    keep_monthly: 12
+    keep_yearly: 2
 
 This configuration assumes that you have a *backups* entry in your SSH config 
 file that contains the appropriate user name, host name, port number, and such 
@@ -199,24 +197,24 @@ Configuration for a Local Repository: *snapshots*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The third file is the configuration file for *snapshots*:
+``~/.config/assimilate/snapshots.conf.nt``:
 
-.. code-block:: python
+.. code-block:: nestedtext
 
-    repository = '/mnt/snapshots/{user_name}'
-    prefix = '{config_name}-'
-    encryption = 'none'
+    repository: /mnt/snapshots/{user_name}
+    prefix: {config_name}-
+    encryption: none
 
-    src_dirs = '~'
-    excludes = '''
-        ~/.cache
-        **/*~
-        **/.git
-        **/__pycache__
-        **/.*.swp
-    '''
-    prune_after_create = True
-    compact_after_delete = True
-    keep_within = '1d'
+    src_dirs: ~
+    excludes:
+        - ~/.cache
+        - **/*~
+        - **/.git
+        - **/__pycache__
+        - **/.*.swp
+    prune_after_create: 'yes
+    compact_after_delete: 'yes
+    keep_within: 1d
 
 In this case the repository is on the local machine and it is not encrypted. It 
 again backs up your home directory, but for this configuration the archives are 
@@ -258,41 +256,35 @@ To start, run *assimilate* as root to create the initial configuration files:
     # assimilate
 
 This creates the /root/.config/assimilate directory in the root account and 
-populates it with three files: *settings*, *root*, *home*. You can delete *home* 
-and remove the reference to it in *settings*, leaving only:
+populates it with three files: *shared.conf.nt*, *root.conf.nt*, *home.conf.nt*.  
+You can delete *home.conf.nt*.  And since there will only be one config, you can 
+also delete *shared.conf.nt*.  Instead, all the settings can be placed in 
+*root.conf.nt*:
 
-.. code-block:: python
+.. code-block:: nestedtext
 
-    configurations = 'root'
-    default_configuration = 'root'
+    repository: backups:backups/{host_name}
+    archive: {config_name}-{{now}}
+    passphrase: 'western teaser landfall spearhead'
+    encryption: 'repokey-blake2-chacha20-poly1305'
 
-This assumes that most of the settings will be placed in *root*:
+    src_dirs: /
+    excludes:
+        - /dev
+        - /home/*/.cache
+        - /proc
+        - /root/.cache
+        - /run
+        - /sys
+        - /tmp
+        - /var
 
-.. code-block:: python
-
-    repository = 'backups:backups/{host_name}'
-    prefix = '{config_name}-'
-    passphrase = 'western teaser landfall spearhead'
-    encryption = 'repokey'
-
-    src_dirs = '/'
-    excludes = '''
-        /dev
-        /home/*/.cache
-        /proc
-        /root/.cache
-        /run
-        /sys
-        /tmp
-        /var
-    '''
-
-    check_after_create = 'latest'
-    compact_after_delete = True
-    prune_after_create = True
-    keep_daily = 7
-    keep_weekly = 4
-    keep_monthly = 12
+    check_after_create: 'latest
+    compact_after_delete: 'yes
+    prune_after_create: 'yes
+    keep_daily: 7
+    keep_weekly: 4
+    keep_monthly: 12
 
 Again, this is a rather minimal example. In this case, *repokey* is used as the 
 encryption method, which is only suitable if the repository is on a server you 
