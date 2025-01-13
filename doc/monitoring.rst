@@ -77,10 +77,13 @@ Overdue
 -------
 
 *Assimilate* provides the *overdue* command that can be used to determine which 
-of your repositories are overdue for backup.  It can report on many configs, not 
-just the active config.  This is useful if you are supporting many repositories 
-as it can use ssh to query remote backups.  It uses the :ref:`overdue setting` 
-setting to specify the desired configs.
+of your repositories are overdue for backup.  Unlike the :ref:`due command 
+<due>`, it is not limited to reporting on the active config and can even report 
+on remote configs via *ssh*.  As such, *overdue* is generally used to present 
+a summary of all of your backups.
+
+It uses the :ref:`overdue setting <overdue setting>` to specify the desired 
+configs, which is a composite setting that consists of:
 
 | *max_age* (how old a repository must be to constitute failure)
 | *sentinel_root* (default directory for sentinel files)

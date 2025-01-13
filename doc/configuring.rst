@@ -171,6 +171,10 @@ you gain access to *Borg* placeholders. *archive* shows an example of that.
 Interpolation is not performed on any setting whose name is given in 
 :ref:`do_not_expand`.
 
+If desired, you can create your own placeholders.  Simply add a named value to 
+an appropriate configuration file.  *Assimilate* will not recognize it and so 
+will ignore it, but the value is available to be used as a placeholder.
+
 
 .. _paths:
 
