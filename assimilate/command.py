@@ -1960,7 +1960,7 @@ class ListCommand(Command):
 
         if total_size:
             total_size = Quantity(total_size, 'B')
-            print(f"Total size = {total_size:0.2s}.")
+            print(f"Total size = {total_size:0.2b}")
 
         return borg.status
 

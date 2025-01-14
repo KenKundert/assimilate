@@ -3572,14 +3572,14 @@ assimilate:
                             > archive: {aid4} test .*
 
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3606,14 +3606,14 @@ assimilate:
                             > archive: {aid0} test .*
 
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -3932,18 +3932,18 @@ assimilate:
                 run: assimilate create --list
                 checks:
                     stderr:
-                        matches text:
-                            > - bu
-                            > A .config/assimilate/shared.conf.nt
-                            > A .config/assimilate/test.conf.nt
-                            > d .config/assimilate
-                            > d .config
-                            > - REPO
-                            > A a
-                            > A b
-                            > - .local
-                            > - .cache
-                            > d .
+                        contains lines:
+                            - - bu
+                            - A .config/assimilate/shared.conf.nt
+                            - A .config/assimilate/test.conf.nt
+                            - d .config/assimilate
+                            - d .config
+                            - - REPO
+                            - A a
+                            - A b
+                            - - .local
+                            - - .cache
+                            - d .
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -4082,14 +4082,14 @@ assimilate:
                 run: assimilate list
                 checks:
                     stdout:
-                        matches text:
-                            > ./
-                            > .config/
-                            > .config/assimilate/
-                            > .config/assimilate/shared.conf.nt
-                            > .config/assimilate/test.conf.nt
-                            > a
-                            > b
+                        contains lines:
+                            - ./
+                            - .config/
+                            - .config/assimilate/
+                            - .config/assimilate/shared.conf.nt
+                            - .config/assimilate/test.conf.nt
+                            - a
+                            - b
 
                     stderr:
                         matches regex:
@@ -4495,15 +4495,15 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
-                            > {run_dir}/c
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
+                            - {run_dir}/c
 
             villager — list --short {{{2:
                 run: assimilate list --short
@@ -4512,15 +4512,15 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches text:
-                            > {run_dir}/
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
-                            > {run_dir}/a
-                            > {run_dir}/b
-                            > {run_dir}/c
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
+                            - {run_dir}/a
+                            - {run_dir}/b
+                            - {run_dir}/c
 
             drowse — list --long {{{2:
                 run: assimilate list --long
@@ -4529,16 +4529,16 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches regex:
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config
-                            > drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate
-                            > -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/shared.conf.nt
-                            > -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/.config/assimilate/test.conf.nt
-                            > -rw------- .+ 3999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
-                            > -rw------- .+ 399999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
-                            > -rw------- .+ 39999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/c
-                            > Total size = 444148B.
+                        matches regexes:
+                            - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}
+                            - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config
+                            - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate
+                            - -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/shared.conf.nt
+                            - -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/test.conf.nt
+                            - -rw------- .+ 3999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
+                            - -rw------- .+ 399999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
+                            - -rw------- .+ 39999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/c
+                            - Total size = 434KiB
 
             surpass — list --name {{{2:
                 run: assimilate list --name
@@ -4607,7 +4607,7 @@ assimilate:
                             > 3.91KiB {run_dir}/a
                             > 39.1KiB {run_dir}/c
                             >  391KiB {run_dir}/b
-                            > Total size = 444148B.
+                            > Total size = 434KiB
 
             relegate — list --sort-by-size --reverse-sort {{{2:
                 run: assimilate list --sort-by-size --reverse-sort
@@ -4625,7 +4625,7 @@ assimilate:
                             >      0B {run_dir}/.config/assimilate/
                             >      0B {run_dir}/.config/
                             >      0B {run_dir}/
-                            > Total size = 444148B.
+                            > Total size = 434KiB
 
             coquette — list --sort-by-owner {{{2:
                 run: assimilate list --sort-by-owner
@@ -4678,7 +4678,7 @@ assimilate:
                             > {run_dir}/a
                             > {run_dir}/c
                             > {run_dir}/b
-                            > Total size = 444148B.
+                            > Total size = 434KiB
 
             coyote — list --format {{{2:
                 run: assimilate list --format size
@@ -4687,16 +4687,16 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches text:
-                            >        0 {run_dir}/
-                            >        0 {run_dir}/.config/
-                            >        0 {run_dir}/.config/assimilate/
-                            >       37 {run_dir}/.config/assimilate/shared.conf.nt
-                            >      114 {run_dir}/.config/assimilate/test.conf.nt
-                            >     3999 {run_dir}/a
-                            >   399999 {run_dir}/b
-                            >    39999 {run_dir}/c
-                            > Total size = 444148B.
+                        contains lines:
+                            -        0 {run_dir}/
+                            -        0 {run_dir}/.config/
+                            -        0 {run_dir}/.config/assimilate/
+                            -       37 {run_dir}/.config/assimilate/shared.conf.nt
+                            -      114 {run_dir}/.config/assimilate/test.conf.nt
+                            -     3999 {run_dir}/a
+                            -   399999 {run_dir}/b
+                            -    39999 {run_dir}/c
+                            - Total size = 434KiB
 
             sphere — list ❬path❭ {{{2:
                 run: assimilate list .config
@@ -4706,9 +4706,9 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches text:
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
+                        contains lines:
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
 
             yacht — list ❬path❭ {{{2:
                 run: assimilate list --recursive .config
@@ -4718,11 +4718,11 @@ assimilate:
                         matches regex: archive: .*
 
                     stdout:
-                        matches text:
-                            > {run_dir}/.config/
-                            > {run_dir}/.config/assimilate/
-                            > {run_dir}/.config/assimilate/shared.conf.nt
-                            > {run_dir}/.config/assimilate/test.conf.nt
+                        contains lines:
+                            - {run_dir}/.config/
+                            - {run_dir}/.config/assimilate/
+                            - {run_dir}/.config/assimilate/shared.conf.nt
+                            - {run_dir}/.config/assimilate/test.conf.nt
 
             shoulder — list --show-formats {{{2:
                 run: assimilate list --show-formats

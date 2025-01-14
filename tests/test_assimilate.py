@@ -249,6 +249,18 @@ class Checker:
             if match:
                 self.matches.update(match.groupdict())
             assert match, self.fail_message(match_type, expected)
+        elif match_type == 'matches_regexes':
+            unused_regexes = set(expected)
+            for line in self.lines:
+                found_match = False
+                for regex in unused_regexes:
+                    match = re.search(regex, line)
+                    if match:
+                        self.matches.update(match.groupdict())
+                        unused_regexes.remove(regex)
+                        found_match = True
+                        break
+                assert found_match, self.fail_message(match_type, line, 'could not find match')
         elif match_type == 'excludes_line':
             assert expected not in self.lines, self.fail_message(match_type, expected)
         elif match_type == 'excludes_text':
@@ -262,7 +274,7 @@ class Checker:
 
         if match and not issue:
             action, object, *_ = match.split('_')
-            if object not in ['line', 'text', 'regex', 'lines']:
+            if object not in ['line', 'text', 'regex', 'lines', 'regexes']:
                 raise AssertionError(f"{self.name}: {match}: unknown object of check.")
             if action not in ['matches', 'contains', 'excludes']:
                 raise AssertionError(f"{self.name}: {match}: unknown action of check.")
