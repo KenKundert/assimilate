@@ -121,6 +121,10 @@ assimilate:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > encryption: none
+                        >
+                        > # user defined placeholders
+                        > nutz: peanuts
+                        > squirrels love: {{nutz}}
 
                 ~/REPO/:
 
@@ -587,6 +591,7 @@ assimilate:
                             >                             editor: vim
                             >             match_archives: - sh:⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-\*
                             >            ❬when resolved❭: - sh:{hostname}-{username}-test-\*
+                            >                       nutz: peanuts
                             >                   patterns: - R ~
                             >                             - - ~/\.cache
                             >                             - - ~/\.local
@@ -594,6 +599,8 @@ assimilate:
                             >                             - - ~/REPO
                             >                 repository: ~/REPO/⟪config_name⟫
                             >            ❬when resolved❭: ~/REPO/test
+                            >             squirrels_love: ⟪nutz⟫
+                            >            ❬when resolved❭: peanuts
 
             druggist — setting archive {{{2:
                 run: assimilate setting archive
@@ -1519,12 +1526,16 @@ assimilate:
                         > command aliases:
                         >     repo-list:
                         >         - recent --last=20
+                    mode: 0o777
 
                 ~/.config/assimilate/test.conf.nt:
                     contents:
                         > repository: ~/REPO/⟪config_name⟫
                         > archive: ⟪config_name⟫
-                        > match archives: id:⟪config_name⟫
+                        > match archives:
+                        >     - id:⟪config_name⟫
+                        >     - user:{username}
+                        >     - host:{hostname}
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -1567,6 +1578,11 @@ assimilate:
             compel — version {{{2:
                 run: assimilate version
                 checks:
+                    stderr:
+                        matches text:
+                            > assimilate warning: /{run_dir}/.config/assimilate/shared.conf.nt:
+                            >     file permissions are too loose.
+                            >     Mode changed to 700.
                     stdout:
                         matches regex: assimilate version: \d+\.\d+(\.\d+)?(\.?\w+\d+)?  \(\d\d\d\d-\d\d-\d\d\) \[Python \d\.\d+\.\d+\]\.
 
@@ -1741,7 +1757,9 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
                         contains text:
                             > running:
                             >     borg \
@@ -1751,7 +1769,9 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
                         contains text:
                             > running:
                             >     borg \
@@ -1804,7 +1824,9 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
                         contains text:
                             > running:
                             >     borg \
@@ -1814,7 +1836,9 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
                         contains text:
                             > running:
                             >     borg \
@@ -1850,7 +1874,9 @@ assimilate:
                             >         repo-list \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1928,7 +1954,9 @@ assimilate:
                             >     borg \
                             >         repo-list \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test \
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname} \
                             >         --json \
                             >         --last=1
                         contains text:
@@ -2014,7 +2042,9 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
                         contains text:
                             > running:
                             >     borg \
@@ -2080,7 +2110,9 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains text:
@@ -2089,7 +2121,9 @@ assimilate:
                             >     >         check \
                             >     >         --last=1 \
                             >     >         --repo=/{run_dir}/REPO/test \
-                            >     >         --match-archives=sh:test
+                            >     >         --match-archives=id:test \
+                            >     >         --match-archives=user:{username} \
+                            >     >         --match-archives=host:{hostname}
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -2163,7 +2197,9 @@ assimilate:
                             >     borg \
                             >         mount \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test \
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname} \
                             >         /{run_dir}/ASSIMILATE
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -2172,7 +2208,9 @@ assimilate:
                             >     >     borg \
                             >     >         mount \
                             >     >         --repo=/{run_dir}/REPO/test \
-                            >     >         --match-archives=sh:test \
+                            >     >         --match-archives=id:test \
+                            >     >         --match-archives=user:{username} \
+                            >     >         --match-archives=host:{hostname} \
                             >     >         /{run_dir}/ASSIMILATE
 
                     ~/ASSIMILATE/{ar1}-{aid1}/{run_dir}/a:
@@ -2278,7 +2316,9 @@ assimilate:
                             >         repo-list \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test \
+                            >         --match-archives=user:{username} \
+                            >         --match-archives=host:{hostname}
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -2462,7 +2502,7 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --match-archives=sh:test1
+                            >         --match-archives=id:test1
                         contains text:
                             > running:
                             >     borg \
@@ -2472,7 +2512,7 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test1
+                            >         --match-archives=id:test1
                         contains text:
                             > running:
                             >     borg \
@@ -2514,7 +2554,7 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --match-archives=sh:test2
+                            >         --match-archives=id:test2
                         contains text:
                             > running:
                             >     borg \
@@ -2524,7 +2564,7 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test2
+                            >         --match-archives=id:test2
                         contains text:
                             > running:
                             >     borg \
@@ -2571,7 +2611,7 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --match-archives=sh:test1
+                            >         --match-archives=id:test1
                         contains text:
                             > running:
                             >     borg \
@@ -2581,7 +2621,7 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test1
+                            >         --match-archives=id:test1
                         contains text:
                             > running:
                             >     borg \
@@ -2619,7 +2659,7 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --match-archives=sh:test2
+                            >         --match-archives=id:test2
                         contains text:
                             > running:
                             >     borg \
@@ -2629,7 +2669,7 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test2
+                            >         --match-archives=id:test2
                         contains text:
                             > running:
                             >     borg \
@@ -2659,7 +2699,7 @@ assimilate:
                             >         repo-list \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --match-archives=sh:test1
+                            >         --match-archives=id:test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2815,7 +2855,7 @@ assimilate:
                             >     borg \
                             >         repo-list \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --match-archives=sh:test1 \
+                            >         --match-archives=id:test1 \
                             >         --json \
                             >         --last=1
                         contains text:
@@ -2889,7 +2929,7 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test1
+                            >         --match-archives=id:test1
                         contains text:
                             > running:
                             >     borg \
@@ -2914,7 +2954,7 @@ assimilate:
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
-                            >         --match-archives=sh:test2
+                            >         --match-archives=id:test2
                         contains text:
                             > running:
                             >     borg \
@@ -2985,7 +3025,7 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --match-archives=sh:test1 \
+                            >         --match-archives=id:test1 \
                             >         --verify-data
 
                     ~/.local/share/assimilate/test2.log:
@@ -2995,7 +3035,7 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --match-archives=sh:test2 \
+                            >         --match-archives=id:test2 \
                             >         --verify-data
 
                     ~/.local/share/assimilate/test1.log.nt:
@@ -3005,7 +3045,7 @@ assimilate:
                             >     >         check \
                             >     >         --last=1 \
                             >     >         --repo=/{run_dir}/REPO/test1 \
-                            >     >         --match-archives=sh:test1 \
+                            >     >         --match-archives=id:test1 \
                             >     >         --verify-data
 
                     ~/.local/share/assimilate/test2.log.nt:
@@ -3015,7 +3055,7 @@ assimilate:
                             >     >         check \
                             >     >         --last=1 \
                             >     >         --repo=/{run_dir}/REPO/test2 \
-                            >     >         --match-archives=sh:test2 \
+                            >     >         --match-archives=id:test2 \
                             >     >         --verify-data
 
                     ~/.local/share/assimilate/test1.latest.nt:
@@ -3083,7 +3123,7 @@ assimilate:
                             >     borg \
                             >         mount \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --match-archives=sh:test1 \
+                            >         --match-archives=id:test1 \
                             >         /{run_dir}/ASSIMILATE
 
                     ~/.local/share/assimilate/test1.log.nt:
@@ -3092,7 +3132,7 @@ assimilate:
                             >     >     borg \
                             >     >         mount \
                             >     >         --repo=/{run_dir}/REPO/test1 \
-                            >     >         --match-archives=sh:test1 \
+                            >     >         --match-archives=id:test1 \
                             >     >         /{run_dir}/ASSIMILATE
 
                     ~/.local/share/assimilate/test2.log:
@@ -3184,7 +3224,7 @@ assimilate:
                             >         repo-list \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --match-archives=sh:test1
+                            >         --match-archives=id:test1
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -3417,7 +3457,7 @@ assimilate:
                             >     borg \
                             >         check \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -3445,7 +3485,7 @@ assimilate:
                             >         repo-list \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
             indicate — repo-list --first=3 {{{2:
                 run: assimilate repo-list --first=3
@@ -3464,7 +3504,7 @@ assimilate:
                             >         --first=3 \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
             stockroom — repo-list --last=3 {{{2:
                 run: assimilate repo-list --last=3
@@ -3483,7 +3523,7 @@ assimilate:
                             >         --last=3 \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
             larder — repo-list --oldest=25h {{{2:
                 run: assimilate repo-list --oldest=25h
@@ -3504,7 +3544,7 @@ assimilate:
                             >         --oldest=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
             elevate — repo-list --newest=0.9d {{{2:
                 run: assimilate repo-list --newest=0.9d
@@ -3525,7 +3565,7 @@ assimilate:
                             >         --newest=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
             wrongdoer — repo-list --older=23h {{{2:
                 run: assimilate repo-list --older=23h
@@ -3541,7 +3581,7 @@ assimilate:
                             >         --older=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
             climb — repo-list --newer=1.1d {{{2:
                 run: assimilate repo-list --newer=1.1d
@@ -3562,7 +3602,7 @@ assimilate:
                             >         --newer=1d \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         --match-archives=id:test
 
             template — list --after=1d {{{2:
                 run: assimilate list --after=1d
@@ -3587,7 +3627,7 @@ assimilate:
                             >     borg \
                             >         repo-list \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test \
+                            >         --match-archives=id:test \
                             >         --json
                         contains text:
                             > running:
@@ -3621,7 +3661,7 @@ assimilate:
                             >     borg \
                             >         repo-list \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test \
+                            >         --match-archives=id:test \
                             >         --json
                         contains text:
                             > running:
@@ -3801,7 +3841,7 @@ assimilate:
                             >     borg \
                             >         mount \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test \
+                            >         --match-archives=id:test \
                             >         /{run_dir}/ASSIMILATE
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -3810,7 +3850,7 @@ assimilate:
                             >     >     borg \
                             >     >         mount \
                             >     >         --repo=/{run_dir}/REPO/test \
-                            >     >         --match-archives=sh:test \
+                            >     >         --match-archives=id:test \
                             >     >         /{run_dir}/ASSIMILATE
 
                     ~/ASSIMILATE/test-{aid1}/{run_dir}/a:
@@ -5199,20 +5239,63 @@ assimilate:
                         contains line: assimilate error: no diff command available.
                     status: 2
 
-    snarl — missing shared configuration file {{{1:
+    snarl — missing shared configuration file tests {{{1:
         initialization:
             create:
-                ~/.config/assimilate/test.conf.nt:
+                ~/.config/assimilate/patterns.nt:
                     contents:
-                        > repository: ~/REPO/⟪config_name⟫
-                        > archive: ⟪config_name⟫
-                        > match archives: id:⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
                         >     - - ~/.local
                         >     - - ~/bu
                         >     - - ~/REPO
+
+                ~/.config/assimilate/test1.conf.nt:
+                    contents:
+                        > include: patterns.nt
+                        > repository: ~/REPO/test
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
+                        >
+                        > # throw in some unused settings to test various validators
+                        > composite configs:
+                        > notifier: notify-send -u critical ⟪prog_name⟫ "⟪msg⟫"
+                        > notify: nobody@nowhere.com somebody@somewhere.com
+                        > create retries: 3
+                        > create retry sleep: 5
+                        > do not expand: notify
+                        > colorscheme: 'dark
+                        >
+                        > # the following settings should throw a warning
+                        > encryption: none
+                        > passphrase: toenail
+
+                ~/.config/assimilate/test2.conf.nt:
+                    contents:
+                        > repository: ~/REPO/test
+                        > archive: ⟪config_name⟫
+                        > include: patterns.nt
+                        >
+                        > # the following settings should throw warnings
+                        > composite configs:
+                        >     swill: test1 test2
+                        > default config: test
+                        > command aliases:
+                        >     overdue: od
+                        > match archives: diocese
+                        >
+                        > # the following settings should be valid
+                        > notify:
+                        >     - nobody@nowhere.com
+                        > overdue:
+                        >     sentinel root: ~/nutz
+
+                ~/.config/assimilate/test3.conf.nt:
+                    contents:
+                        > # the following setting is in the wrong form, test error handling
+                        > repository:
+                        >     - ~/REPO/⟪config_name⟫
 
                 ~/REPO/:
 
@@ -5226,9 +5309,9 @@ assimilate:
 
         tests:
             spinner — repo-create {{{2:
-                run: assimilate -c test repo-create
+                run: assimilate -c test1 repo-create
                 checks:
-                    ~/.local/share/assimilate/test.log:
+                    ~/.local/share/assimilate/test1.log:
                         contains text:
                             > running:
                             >     borg \
@@ -5236,5 +5319,38 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
+
+                    stderr:
+                        matches text: assimilate warning: passphrase given but not needed as encryption set to none.
+
+            lemming — must specify config error {{{2:
+                run: assimilate create
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate error: you must specify a config.
+                            >     Choose from: test1, test2, or test3.
+                    status: 2
+
+            mammoth — check warnings {{{2:
+                run: assimilate -c test2 create
+                checks:
+                    stderr:
+                        matches text:
+                            > assimilate warning: test2: default_config only valid in shared.conf.nt.
+                            > assimilate warning: test2: composite_configs only valid in shared.conf.nt.
+                            > assimilate warning: test2: command_aliases only valid in shared.conf.nt.
+                            > assimilate warning: match_archives=diocese should have a type prefix.
+
+            laxative — check error handling {{{2:
+                run: assimilate -c test3 create
+                checks:
+                    status: 2
+                    stderr:
+                        matches text:
+                            > assimilate error: /{run_dir}/.config/assimilate/test3.conf.nt@3, repository:
+                            >     expected text, found list item.
+                            >            3 ❬    - ~/REPO/⟪config_name⟫❭
+                            >                   ▲
 
 #  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:

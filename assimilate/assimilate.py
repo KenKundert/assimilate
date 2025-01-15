@@ -274,8 +274,6 @@ class Assimilate:
                 get_informer().colorscheme = None
             elif colorscheme in ('light', 'dark'):
                 get_informer().colorscheme = colorscheme
-            else:
-                warn(f'unknown colorscheme: {self.colorscheme}.')
 
         # determine the do_not_expand list
         do_not_expand = set(['monitoring', 'command_aliases', 'overdue'])
@@ -949,13 +947,13 @@ class Assimilate:
         archive = self.settings["archive"]
         match_archives = archive.replace('{{now}}', '*')
         match_archives = match_archives.replace('{{utcnow}}', '*')
-        self.settings["match_archives"] = ['sh:' + match_archives]
         self.match_local_archives = 'sh:' + match_archives
-        match_archives = self.settings["match_archives"]
-        for ma in match_archives:
+        if "match_archives" not in self.settings:
+            self.settings["match_archives"] = ['sh:' + match_archives]
+        for ma in self.settings["match_archives"]:
             prefix, _, identifier = ma.partition(':')
             if not identifier:
-                warn(f"match_identifier={ma} should have a type prefix")
+                warn(f"match_archives={ma} should have a type prefix.")
 
         # resolve other files and directories
         data_dir = to_path(DATA_DIR)

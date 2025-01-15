@@ -751,7 +751,7 @@ def read_config(path, validate_settings):
         if file_mode & 0o077:
             warn("file permissions are too loose.", culprit=path)
             chmod(file_mode & 0o700, path)
-            codicil(f"mode changed to {file_mode & 0o700:o}.")
+            codicil(f"Mode changed to {file_mode & 0o700:o}.")
 
     include = settings.pop('include', None)
     if include:
@@ -779,8 +779,10 @@ def read_settings(name, config_dir=None, shared_settings=None):
 
     if name != 'shared':
         new_settings['config_name'] = name
-        if new_settings.pop('default_configuration', None):
-            warn('default_configuration only valid in shared.conf.nt.', culprit=name)
+        if new_settings.pop('default_config', None):
+            warn('default_config only valid in shared.conf.nt.', culprit=name)
+        if new_settings.pop('composite_configs', None):
+            warn('composite_configs only valid in shared.conf.nt.', culprit=name)
         if new_settings.pop('command_aliases', None):
             warn('command_aliases only valid in shared.conf.nt.', culprit=name)
 
