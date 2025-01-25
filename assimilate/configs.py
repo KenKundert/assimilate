@@ -19,13 +19,13 @@
 
 # IMPORTS {{{1
 from .preferences import CONFIG_DIR
-from .shlib import lsf, to_path, chmod, getmod
-from .utilities import report_voluptuous_errors
+from .utilities import (
+    report_voluptuous_errors, Quantity, InvalidNumber, lsf, to_path, chmod, getmod
+)
 from collections import defaultdict
 from inform import (
     Error, codicil, conjoin, is_str, join, narrate, warn, terminate, truth
 )
-from quantiphy import Quantity, InvalidNumber
 from voluptuous import Schema, Invalid, MultipleInvalid, Extra
 import nestedtext as nt
 import functools

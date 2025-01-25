@@ -69,7 +69,6 @@ from .preferences import (
     CONFIG_DIR,
     DATA_DIR,
     DATE_FILE,
-    DEFAULT_ENCODING,
     DEFAULT_ENCRYPTION,
     INITIAL_CACHE_CONFIG_FILE_CONTENTS,
     INITIAL_HOME_CONFIG_FILE_CONTENTS,
@@ -83,16 +82,14 @@ from .preferences import (
 from . import overdue
     # unused here, but needed so that overdue extensions to settings file are
     # added before the files are read
-from .shlib import (
-    Run, cd, cwd, render_command, to_path,
-    set_prefs as set_shlib_prefs
+from .utilities import (
+    getfullhostname, gethostname, getusername, output,
+    Run, cd, cwd, render_command, set_shlib_prefs, to_path,
 )
-from .utilities import getfullhostname, gethostname, getusername, output
 import nestedtext as nt
 
 # Globals {{{1
 borg_commands_with_dryrun = "create delete extract prune upgrade recreate undelete".split()
-set_shlib_prefs(use_inform=True, log_cmd=True, encoding=DEFAULT_ENCODING)
 
 # Utilities {{{1
 hostname = gethostname()
@@ -263,7 +260,8 @@ class Assimilate:
         get_informer().set_logfile(LoggingCache())
         self.read_config(config, shared_settings, **kwargs)
         self.check()
-        set_shlib_prefs(encoding=self.encoding if self.encoding else DEFAULT_ENCODING)
+        if self.encoding:
+            set_shlib_prefs(encoding=self.encoding)
         self.hooks = Hooks(self)
         self.borg_ran = False
 
@@ -658,6 +656,8 @@ class Assimilate:
             if v in os.environ:
                 narrate(f"Using existing {v}.")
                 return
+        if self.encryption == 'none':
+            return
 
         passcommand = self.value('passcommand')
         passcode = self.passphrase

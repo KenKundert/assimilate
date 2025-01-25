@@ -28,9 +28,18 @@ from inform import (
     Error, conjoin, cull, error, full_stop, join, narrate, os_error, warn,
     output as output_raw, terminate
 )
-from quantiphy import Quantity, UnitConversion, QuantiPhyError, UnknownConversion
-from .shlib import Run, set_prefs as set_shlib_prefs
-set_shlib_prefs(use_inform=True, log_cmd=True)
+from quantiphy import (
+    Quantity, UnitConversion, QuantiPhyError, InvalidNumber, UnknownConversion
+)
+from .preferences import DEFAULT_ENCODING
+from .shlib import (
+    Cmd, Run, cd, chmod, cwd, lsd, lsf, getmod, mkdir, rm, render_command,
+    set_prefs as set_shlib_prefs, split_cmd, to_path
+)
+
+# preferences {{{1
+Quantity.set_prefs(spacer='', ignore_sf=True, form='fixed', prec=1)
+set_shlib_prefs(use_inform=True, log_cmd=True, encoding=DEFAULT_ENCODING)
 
 
 # output {{{1

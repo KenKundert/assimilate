@@ -44,26 +44,21 @@ from inform import (
     truth,
     warn,
 )
-from quantiphy import Quantity, QuantiPhyError
 from time import sleep
 from .assimilate import borg_commands_with_dryrun
 from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, RESERVED_SETTINGS
 from .overdue import overdue, OVERDUE_USAGE
 from .preferences import DEFAULT_COMMAND, PROGRAM_NAME
-from .shlib import (
-    Cmd, Run, cwd, lsd, mkdir, rm, set_prefs as set_shlib_prefs, split_cmd, to_path
-)
 from .utilities import (
     gethostname, output, pager, process_cmdline, read_latest, table, to_date,
-    to_days, to_seconds, two_columns, update_latest, when, UnknownConversion
+    to_days, to_seconds, two_columns, update_latest, when,
+    Quantity, QuantiPhyError, UnknownConversion,
+    Cmd, Run, cwd, lsd, mkdir, rm, split_cmd, to_path
 )
 
 
 # Globals {{{1
 hostname = gethostname()
-set_shlib_prefs(use_inform=True, log_cmd=True)
-Quantity.set_prefs(ignore_sf=True, spacer='')
-
 prune_intervals = """
     within last minutely hourly daily weekly monthly 3monthly 13weekly yearly
 """.split()
@@ -1890,9 +1885,6 @@ class ListCommand(Command):
                 raise Error('unknown key.', culprit=sort_key)
         if cmdline["--reverse-sort"]:
             lines.reverse()
-
-        # import QuantiPhy for Size
-        Quantity.set_prefs(spacer="")
 
         # generate formatted output
         if cmdline['--no-color']:

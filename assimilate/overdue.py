@@ -79,19 +79,15 @@ from inform import (
     warn,
 )
 import nestedtext as nt
-from quantiphy import Quantity
 from voluptuous import Schema
 from .configs import (
     add_setting, add_parents_of_non_identifier_keys,
     as_emails, as_path, as_abs_path, as_string, as_name
 )
 from .preferences import DATA_DIR
-from .shlib import Run, to_path, set_prefs as set_shlib_prefs
-from .utilities import output, read_latest
+from .utilities import output, read_latest, Quantity, Run, to_path
 
 # GLOBALS {{{1
-set_shlib_prefs(use_inform=True, log_cmd=True)
-Quantity.set_prefs(form='fixed', prec=1, ignore_sf=True)
 username = pwd.getpwuid(os.getuid()).pw_name
 hostname = socket.gethostname()
 now = arrow.now()
@@ -201,16 +197,13 @@ def get_remote_data(name, host, config, cmd):
                 repo_data['mtime'] = arrow.get(repo_data['mtime'])
             if 'overdue' in repo_data:
                 repo_data['overdue'] = truth(repo_data['overdue'] == 'yes')
-            if 'hours' in repo_data:
+            if repo_data.get('hours'):
                 repo_data['age'] = as_seconds(repo_data['hours'])
-            elif 'age' in repo_data:
+            elif repo_data.get('age'):
                 repo_data['age'] = as_seconds(repo_data['age'])
-            if 'max_age' in repo_data:
+            if repo_data.get('max_age'):
                 repo_data['max_age'] = as_seconds(repo_data['max_age'])
-            if 'locked' in repo_data:
-                repo_data['locked'] = truth(repo_data['locked'] == 'yes')
-            else:
-                repo_data['locked'] = truth(False)
+            repo_data['locked'] = truth(repo_data.get('locked') == 'yes')
             yield repo_data
     except Error as e:
         e.report(culprit=host)
