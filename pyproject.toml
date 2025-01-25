@@ -1,6 +1,6 @@
 [project]
 name = "assimilate"
-version = "0.0b3"
+version = "0.0b4"
 description = "Borg front end."
 readme = "README.rst"
 keywords = ["assimilate", "emborg", "borg", "borgmatic", "backups"]
