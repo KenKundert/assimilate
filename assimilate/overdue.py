@@ -82,10 +82,10 @@ import nestedtext as nt
 from voluptuous import Schema
 from .configs import (
     add_setting, add_parents_of_non_identifier_keys,
-    as_emails, as_path, as_abs_path, as_string, as_name
+    as_color, as_emails, as_path, as_abs_path, as_string, as_name
 )
 from .preferences import DATA_DIR
-from .utilities import output, read_latest, Quantity, Run, to_path
+from .utilities import output, read_latest, when, Quantity, InvalidNumber, Run, to_path
 
 # GLOBALS {{{1
 username = pwd.getpwuid(os.getuid()).pw_name
@@ -96,6 +96,7 @@ OVERDUE_USAGE = __doc__
 # colors {{{2
 current_color = "green"
 overdue_color = "red"
+locked_color = "magenta"
 
 # message templates {{{2
 verbose_status_message = dedent("""\
@@ -133,6 +134,9 @@ validate_settings = Schema(
         max_age = as_seconds,
         sentinel_root = as_abs_path,
         message = as_string,
+        current_color = as_color,
+        overdue_color = as_color,
+        locked_color = as_color,
         repositories = {
             str: dict(
                 config = as_name,
@@ -199,8 +203,12 @@ def get_remote_data(name, host, config, cmd):
                 repo_data['overdue'] = truth(repo_data['overdue'] == 'yes')
             if repo_data.get('hours'):
                 repo_data['age'] = as_seconds(repo_data['hours'])
+                del repo_data['hours']
             elif repo_data.get('age'):
-                repo_data['age'] = as_seconds(repo_data['age'])
+                try:
+                    repo_data['age'] = as_seconds(repo_data['age'])
+                except InvalidNumber:
+                    repo_data['age'] = as_seconds(0)
             if repo_data.get('max_age'):
                 repo_data['max_age'] = as_seconds(repo_data['max_age'])
             repo_data['locked'] = truth(repo_data.get('locked') == 'yes')
@@ -226,10 +234,14 @@ def overdue(cmdline, args, settings, options):
         message = verbose_status_message
 
     report_as_current = InformantFactory(
-        clone=display, message_color=current_color
+        clone=display, message_color=od_settings.get("current_color", current_color),
     )
     report_as_overdue = InformantFactory(
-        clone=display, message_color=overdue_color,
+        clone=display, message_color=od_settings.get("overdue_color", overdue_color),
+        notify=cmdline['--notify'] and not Color.isTTY()
+    )
+    report_as_active = InformantFactory(
+        clone=display, message_color=od_settings.get("locked_color", locked_color),
         notify=cmdline['--notify'] and not Color.isTTY()
     )
 
@@ -276,11 +288,16 @@ def overdue(cmdline, args, settings, options):
 
 
             for repo_data in repos_data:
-                repo_data['updated'] = repo_data['mtime'].humanize()
+                repo_data['updated'] = when(repo_data['mtime'])
                 overdue = repo_data['overdue']
                 locked = repo_data['locked']
                 description = repo_data['description']
-                report = report_as_overdue if overdue else report_as_current
+                if locked:
+                    report = report_as_active
+                elif overdue:
+                    report = report_as_overdue
+                else:
+                    report = report_as_current
 
                 with Quantity.prefs(spacer=' '):
                     if overdue or locked or not cmdline["--no-passes"]:

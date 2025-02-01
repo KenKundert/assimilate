@@ -244,6 +244,14 @@ def as_bool(arg):
 def as_colorscheme(arg):
     return arg[1:]
 
+# as_color{{{2
+@as_enum(
+    "'black", "'red", "'green", "'yellow", "'blue",
+    "'magenta", "'cyan", "'white", "'none"
+)
+def as_color(arg):
+    return arg[1:]
+
 # normalize_key {{{2
 # converts key to snake case
 # downcase; replace whitespace and dashes with underscores

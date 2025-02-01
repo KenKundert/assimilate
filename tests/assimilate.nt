@@ -4401,7 +4401,7 @@ assimilate:
                 checks:
                     stderr:
                         matches regex:
-                            > test: .* ago
+                            > test: [\d.]+ \w+
 
             locket — overdue --message {{{2:
                 run: assimilate overdue --message="⟪description⟫\n⟪max_age⟫\n⟪mtime⟫\n⟪age⟫\n⟪updated⟫\n⟪overdue:past due/up to date⟫\n⟪locked:active/not active⟫"

@@ -254,6 +254,28 @@ In addition, there are some shared settings available:
     - datetimes can include Arrow_ formats, ex: {mtime:DD MMM YY @ H:mm A}
     - booleans can include Inform_ true/false strings: {overdue:PAST DUE!/current}
 
+*locked_color*:
+    The text color to use for repositories that are currently locked.  Choose 
+    from:
+    ``'black``, ``'red``, ``'green``, ``'yellow``, ``'blue``, ``'magenta``,
+    ``'cyan``, ``'white``, or ``'none``.
+    The default is ``'magenta``.
+
+*overdue_color*:
+    The text color to use for repositories that are currently locked.  Choose 
+    from:
+    ``'black``, ``'red``, ``'green``, ``'yellow``, ``'blue``, ``'magenta``,
+    ``'cyan``, ``'white``, or ``'none``.
+    The default is ``'red``.
+
+*current_color*:
+    The text color to use for repositories that are currently locked.  Choose 
+    from:
+    ``'black``, ``'red``, ``'green``, ``'yellow``, ``'blue``, ``'magenta``,
+    ``'cyan``, ``'white``, or ``'none``.
+    The default is ``'green``.
+
+
 To run the program interactively, type:
 
 .. code-block:: bash
