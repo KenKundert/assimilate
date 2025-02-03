@@ -85,8 +85,16 @@ INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
     command aliases:
         repo-list:
             - archives
+            - a
             - recent --last=20
-        list: paths
+        list:
+            - paths
+            - l
+            - ln -N
+            - ls -S
+            - ld -D
+        overdue: od
+        umount: unmount
 
     # composite log file
     logging:
@@ -109,20 +117,17 @@ INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
     overdue:
         max age: 36 h
         message: {description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
-        # repositories:
-        #     # local
-        #     cache@❬host❭ (/home/❬user❭):
-        #         config: cache
-        #         max age: 15m
-        #     home@❬host❭ (/home/❬user❭):
-        #         config: home2
-        #     root@❬host❭ (/):
-        #         config: root
-        #         sentinel dir: ~root/.local/share/assimilate
-        #
-        #     # remote
-        #     ❬remote-host❭:
-        #         host: ❬remote-host❭
+        repositories:
+            # local
+            cache@❬host❭ (/home/❬user❭):
+                config: cache
+                max age: 15m
+            home@❬host❭ (/home/❬user❭):
+                config: home
+
+            # remote
+            ❬remote-host❭:
+                host: ❬remote-host❭
 """, strip_nl='l')
 
 # Root settings {{{3
@@ -187,13 +192,15 @@ INITIAL_HOME_CONFIG_FILE_CONTENTS = dedent("""
         # directories to be backed up
         - R ~
 
-        # directories/files to be excluded
-        - - ~/.cache
+        # patterns are applied in order
+        # get rid of some always uninteresting files early so they do not get
+        # pulled back in by inclusions later
         - - **/*~
         - - **/__pycache__
-        - - **/*.pyc
-        - - **/.*.swp
-        - - **/.*.swo
+        - - **/.*.sw[ponml]
+
+        # directories/files to be excluded
+        - - .cache
 
     # prune settings
     keep within: 1d
@@ -223,16 +230,19 @@ INITIAL_CACHE_CONFIG_FILE_CONTENTS = dedent("""
         # directories to be backed up
         - R ~
 
-        # directories/files to be excluded
-        - - ~/music
-        - - ~/videos
-        - - ~/photos
-        - - ~/.cache
+        # patterns are applied in order
+        # get rid of some always uninteresting files early so they do not get
+        # pulled back in by inclusions later
         - - **/*~
         - - **/__pycache__
-        - - **/*.pyc
-        - - **/.*.swp
-        - - **/.*.swo
+        - - **/.*.sw[ponml]
+        - - **/.sw[ponml]
+
+        # directories/files to be excluded
+        - - Music
+        - - Videos
+        - - Pictures
+        - - .cache
 
     # prune settings
     keep within: 1d

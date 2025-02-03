@@ -5,6 +5,7 @@
 .. _BorgBackup: https://borgbackup.readthedocs.io
 .. _BorgBase: https://www.borgbase.com
 .. _BorgMatic: https://torsion.org/borgmatic
+.. _BorgPatterns: https://borgbackup.readthedocs.io/en/master/usage/help.html#borg-help-patterns
 .. _Duplicity: http://duplicity.nongnu.org
 .. _Emborg: https://emborg.readthedocs.io/en/stable
 .. _GitHub: https://github.com/KenKundert/assimilate/issues

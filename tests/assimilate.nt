@@ -33,7 +33,14 @@ assimilate:
                             -     repo-list:
                             -         - archives
                             -         - recent --last=20
-                            -     list: paths
+                            -     list:
+                            -         - paths
+                            -         - l
+                            -         - ln -N
+                            -         - ls -S
+                            -         - ld -D
+                            -     overdue: od
+                            -     umount: unmount
                             - logging:
                             -     keep for: 1w
                             -     max entries: 20
@@ -50,6 +57,14 @@ assimilate:
                             - overdue:
                             -     max age: 36 h
                             -     message: ⟪description⟫: ⟪updated⟫ ago⟪locked: (currently active)⟫⟪overdue: — PAST DUE⟫
+                            -     repositories:
+                            -         cache@❬host❭ (/home/❬user❭):
+                            -             config: cache
+                            -             max age: 15m
+                            -         home@❬host❭ (/home/❬user❭):
+                            -             config: home
+                            -         ❬remote-host❭:
+                            -             host: ❬remote-host❭
 
                     ~/.config/assimilate/root.conf.nt:
                         contains lines in order:
@@ -85,12 +100,10 @@ assimilate:
                             > pass command: ❬command❭
                             > patterns:
                             >     - R ~
-                            >     - - ~/.cache
                             >     - - **/*~
                             >     - - **/__pycache__
-                            >     - - **/*.pyc
-                            >     - - **/.*.swp
-                            >     - - **/.*.swo
+                            >     - - **/.*.sw[ponml]
+                            >     - - .cache
                             > keep within: 1d
                             > keep daily: 7
                             > keep weekly: 4
@@ -103,15 +116,13 @@ assimilate:
                             > encryption: none
                             > patterns:
                             >     - R ~
-                            >     - - ~/music
-                            >     - - ~/videos
-                            >     - - ~/photos
-                            >     - - ~/.cache
                             >     - - **/*~
                             >     - - **/__pycache__
-                            >     - - **/*.pyc
-                            >     - - **/.*.swp
-                            >     - - **/.*.swo
+                            >     - - **/.*.sw[ponml]
+                            >     - - .cache
+                            >     - - Music
+                            >     - - Videos
+                            >     - - Pictures
                             > keep within: 1d
                             > keep hourly: 48
 
@@ -241,6 +252,12 @@ assimilate:
             binding — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
+                    stdout:
+                        matches text:
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -907,6 +924,12 @@ assimilate:
             albino — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
+                    stdout:
+                        matches text:
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -1693,6 +1716,9 @@ assimilate:
             epicenter — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
+                    stdout:
+                        contains text: assimilate borg key export -r @repo
+                        contains text: assimilate repo-space
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > Borg-related environment variables: ⟪
@@ -2418,6 +2444,9 @@ assimilate:
                             > === test1 ===
                             >
                             > === test2 ===
+                    stdout:
+                        contains text: assimilate borg key export -r @repo
+                        contains text: assimilate repo-space
 
                     ~/.local/share/assimilate/test1.log:
                         contains text:
@@ -3294,6 +3323,12 @@ assimilate:
             pantry — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
+                    stdout:
+                        matches text:
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -3953,6 +3988,12 @@ assimilate:
             annual — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
+                    stdout:
+                        matches text:
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -4838,6 +4879,12 @@ assimilate:
             megaphone — repo-create {{{2:
                 run: assimilate repo-create
                 checks:
+                    stdout:
+                        matches text:
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
                     ~/.local/share/assimilate/test1.log:
                         contains text:
                             > running:
@@ -5065,7 +5112,7 @@ assimilate:
                             >     Choose from: test, test1, or test2.
                     status: 2
 
-            agent — repo-create -ctest {{{2:
+            ebony — repo-create -ctest {{{2:
                 run: assimilate -ctest repo-create
                 checks:
                     stderr:
@@ -5073,6 +5120,17 @@ assimilate:
                             > === test1 ===
                             >
                             > === test2 ===
+
+                    stdout:
+                        matches text:
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
 
                     ~/.local/share/assimilate/test1.log:
                         contains text:
@@ -5311,6 +5369,16 @@ assimilate:
             spinner — repo-create {{{2:
                 run: assimilate -c test1 repo-create
                 checks:
+                    stdout:
+                        matches text:
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
+
+                    stderr:
+                        matches text: assimilate warning: passphrase given but not needed as encryption set to none.
+
                     ~/.local/share/assimilate/test1.log:
                         contains text:
                             > running:
@@ -5319,9 +5387,6 @@ assimilate:
                             >         --repo=/{run_dir}/REPO/test \
                             >         --make-parent-dirs \
                             >         --encryption=none
-
-                    stderr:
-                        matches text: assimilate warning: passphrase given but not needed as encryption set to none.
 
             lemming — must specify config error {{{2:
                 run: assimilate create

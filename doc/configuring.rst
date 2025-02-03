@@ -140,13 +140,15 @@ suffix.  It might look like the following:
         # directories to be backed up
         - R ~
 
-        # directories/files to be excluded
-        - - ~/.cache
+        # patterns are applied in order
+        # get rid of some always uninteresting files early so they do not get
+        # pulled back in by inclusions later
         - - **/*~
         - - **/__pycache__
-        - - **/*.pyc
-        - - **/.*.swp
-        - - **/.*.swo
+        - - **/.*.sw[ponml]
+
+        # specific directories/files to be excluded
+        - - ~/.cache
 
     # prune settings
     keep within: 2d
@@ -399,7 +401,10 @@ Patterns are an alternate way of specifying which files are backed up, and which
 are not.  Patterns can be specified in conjunction with, or instead of, 
 :ref:`src_dirs` and :ref:`excludes`.  One powerful feature of patterns is that 
 they allow you to specify that a directory or file should be backed up even if 
-it is contained within a directory that is being excluded.
+it is contained within a directory that is being excluded.  The patterns are 
+processed in the order given, so in this example the pattern that matches the 
+file to be included should be given before the pattern that matches the 
+containing directory that is to be excluded.
 
 An example that uses :ref:`patterns` in lieu of :ref:`src_dirs` and 
 :ref:`excludes` is:
@@ -441,8 +446,7 @@ and ``-`` specifies a path that should be excluded.  With this example,
 /usr/local is included while all other files and directories in /usr are not.
 The subdirectory to include must be specified before the directory that contains 
 it is excluded.  This is a relatively simple example, additional features are 
-described in the `Borg patterns documentation 
-<https://borgbackup.readthedocs.io/en/stable/usage/help.html>`_.
+described in BorgPatterns_.
 
 
 .. _retention:

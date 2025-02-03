@@ -2216,6 +2216,11 @@ class RepoCreateCommand(Command):
             cmd="repo-create",
             assimilate_opts = cmdline
         )
+        out = (borg.stderr or borg.stdout).rstrip()
+        if out:
+            out = out.replace('borg repo-space', 'assimilate repo-space')
+            out = out.replace('borg key export -r REPOSITORY', 'assimilate borg key export -r @repo')
+            output(out)
         if borg.status:
             return borg.status
 
@@ -2234,6 +2239,7 @@ class RepoCreateCommand(Command):
                 borg_opts = [f"--reserve={space}"],
                 assimilate_opts = cmdline
             )
+
             out = borg.stderr or borg.stdout
             if out:
                 output(out.rstrip())

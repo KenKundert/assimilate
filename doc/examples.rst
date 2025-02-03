@@ -94,7 +94,7 @@ And here is the contents of the *root* configuration file:
         > R /opt
         > R /usr/local
 
-        # directories/files to be excluded
+        # specific directories/files to be excluded
         > - /var/cache
         > - /var/lock
         > - /var/run
@@ -242,13 +242,16 @@ be run interactively, perhaps once per day.
         # directories to be backed up
         - R ~
 
-        # directories/files to be excluded
-        - - ~/.cache
+        # patterns are applied in order
+        # get rid of some always uninteresting files early so they do not get
+        # pulled back in by inclusions later
         - - **/*~
         - - **/__pycache__
-        - - **/*.pyc
-        - - **/.*.swp
-        - - **/.*.swo
+        - - **/.*.sw[ponml]
+
+        # specific directories/files to be excluded
+        - - ~/.cache
+        - - ~/tmp
 
     # prune settings
     keep within: 1d
@@ -320,16 +323,18 @@ And finally, here is the contents of the *snapshots* configuration file:
         # directories to be backed up
         - R ~
 
-        # directories/files to be excluded
-        - - ~/music
-        - - ~/videos
-        - - ~/photos
-        - - ~/.cache
+        # patterns are applied in order
+        # get rid of some always uninteresting files early so they do not get
+        # pulled back in by inclusions later
         - - **/*~
         - - **/__pycache__
-        - - **/*.pyc
-        - - **/.*.swp
-        - - **/.*.swo
+        - - **/.*.sw[ponml]
+
+        # specific directories/files to be excluded
+        - - ~/Music
+        - - ~/Videos
+        - - ~/Pictures
+        - - ~/.cache
 
     # prune settings
     keep within: 1d

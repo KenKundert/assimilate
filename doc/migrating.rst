@@ -233,6 +233,10 @@ Before starting, it is useful to carefully read the documentation for the *Borg
     and related settings.  *archive* should be chosen to match the archives in 
     your *Borg 1* repository.
 
+    You should choose *archive* or *match_archives* settings to match the 
+    archive naming of your old repository.  In addition, you should choose 
+    *working_dir* to maintain the same root paths.
+
 **Step 2**:
 
     Now create the new *Borg 2* repository

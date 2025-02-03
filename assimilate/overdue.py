@@ -193,7 +193,7 @@ def get_remote_data(name, host, config, cmd):
     display(f"\n{name}:")
     config = ['--config', config] if config else []
     try:
-        ssh = Run(['ssh', host] + config + cmd.split() + ['--nt'], 'sOEW1')
+        ssh = Run(['ssh', host] + config + cmd.split() + ['--nt', '--local'], 'sOEW1')
         for repo_data in nt.loads(ssh.stdout, top=list):
             if 'description' not in repo_data:
                 repo_data['description'] = repo_data.get('host', '')
