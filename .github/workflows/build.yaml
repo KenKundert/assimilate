@@ -1,6 +1,3 @@
-# These tests require that BorgBackup be installed,
-# which is not available on GitHub Actions.
-
 name: Assimilate
 on: [push, pull_request]
 jobs:
@@ -13,7 +10,8 @@ jobs:
       max-parallel: 6
 
     steps:
-      - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
@@ -35,8 +33,7 @@ jobs:
           pip install tox
           pip install coveralls
       - name: Run tests
-        run: |
-          tox
+        run: tox
       - name: Report test coverage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
