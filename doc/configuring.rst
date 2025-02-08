@@ -1582,8 +1582,8 @@ Exclude files flagged NODUMP.
 lock_wait
 ~~~~~~~~~
 
-Maximum time to wait for a repository or cache lock to be released.  The default 
-is 1.
+Maximum time to wait for a repository or cache lock to be released [seconds].  
+The default is 1.
 
 
 .. _keep_within:
@@ -1592,12 +1592,21 @@ keep_within
 ~~~~~~~~~~~
 
 Keep all archives created within this time interval.  Specify as a number and 
-a unit, where the available units are s, m, h, d, w, M, and y and they
-represent seconds, minutes, hours, days, weeks, months, and years.  For example:
+a unit, where the available units are "y", "m", "w", "d", "H", "M", and "S"
+and they represent years, months, weeks, days, hours, minutes, and seconds.
+
+For example:
+
 
 .. code-block:: nestedtext
 
     keep_within: 1d
+
+Be aware that *keep_within* is passed to *Borg* and so uses the *Borg* time 
+interval conventions, and that those conventions differ from the *Assimilate* 
+conventions.  *Borg* uses lower case letters for the longer intervals whereas 
+*Assimilate* uses upper case letters.
+
 
 .. _keep_last:
 

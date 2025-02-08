@@ -476,14 +476,16 @@ class BreakLockCommand(Command):
         # read command line
         process_cmdline(cls.USAGE, argv=[command] + args)
 
-        # run borg
+        # remove assimilate lock file
+        rm(settings.lockfile)
+
+        # run borg to break the lock
         borg = settings.run_borg(
             cmd="break-lock", assimilate_opts=options,
         )
         out = borg.stderr or borg.stdout
         if out:
             output(out.rstrip())
-        rm(settings.lockfile)
 
         return borg.status
 
@@ -1869,7 +1871,7 @@ class ListCommand(Command):
             archive,
         ]
         if path:
-            args.append(str(settings.working_dir / path))
+            args.append(str(path))
 
         borg = settings.run_borg(cmd="list", args=args, assimilate_opts=options)
 
