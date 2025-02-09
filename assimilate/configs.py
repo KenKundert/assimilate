@@ -502,19 +502,19 @@ BORG_SETTINGS = dict(
         validator = as_bool,
     ),
     chunker_params = dict(
-        cmds = ["create"],
+        cmds = ["create", "recreate"],
         arg = "PARAMS",
         desc = "specify the chunker parameters",
         validator = as_string,
     ),
     compression = dict(
-        cmds = ["create"],
+        cmds = ["create", "recreate"],
         arg = "COMPRESSION",
         desc = "compression algorithm",
         validator = as_string,
     ),
     exclude_caches = dict(
-        cmds = ["create"],
+        cmds = ["create", "recreate"],
         desc = "exclude directories that contain a CACHEDIR.TAG file",
         validator = as_bool,
     ),
@@ -524,7 +524,7 @@ BORG_SETTINGS = dict(
         validator = as_bool,
     ),
     exclude_if_present = dict(
-        cmds = ["create"],
+        cmds = ["create", "recreate"],
         arg = "NAME",
         desc = "exclude directories that are tagged by containing a filesystem object with the given NAME",
         validator = as_string,
@@ -606,8 +606,9 @@ BORG_SETTINGS = dict(
         desc = "name of borg executable on remote platform",
         validator = as_string,
     ),
+    # # this is commented out as it is not supported as a setting.
     # reserve = dict(
-    #     cmds = ["repo-create", "repo-space"],
+    #     cmds = ["repo-space"],
     #     desc = "amount of space to keep in reserve [B]",
     #     validator = as_quantity,
     # ),

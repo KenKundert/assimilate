@@ -2185,6 +2185,63 @@ class PruneCommand(Command):
         return max([prune_status, compact_status])
 
 
+# RecreateCommand command {{{1
+class RecreateCommand(Command):
+    NAMES = "recreate".split()
+    DESCRIPTION = "recreate archives"
+    USAGE = dedent(
+        """
+
+        Usage:
+            assimilate recreate [options] [<path> ...]
+
+        Options:
+            -f, --first <N>         consider first N archives that remain
+            -l, --last <N>          consider last N archives that remain
+            -n, --newer <age>       only consider archives newer than age
+            -o, --older <age>       only consider archives older than age
+            -N, --newest <range>    only consider archives between newest and
+                                    newest-range
+            -O, --oldest <range>    only consider archives between oldest and
+                                    oldest+range
+            -e, --include-external  list all archives in repository, not just
+                                    those associated with chosen configuration
+
+        The recreate command applies the current exclude rules to existing
+        archives, which can reduce their size if the rules have changed since
+        the archives were created.  The disk space is not reclaimed until a
+        compact command is run.
+        """
+    ).strip()
+    REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = "all"
+    LOG_COMMAND = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        updated = []
+        repo_size = None
+
+        # read command line
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
+        announce = narrate
+        borg_opts = archive_filter_options(settings, cmdline, default='all')
+        paths = get_archive_paths(cmdline['<path>'], settings)
+
+        # args = [settings.value('archive')] + paths,
+        # run borg
+        borg = settings.run_borg(
+            cmd = "recreate",
+            borg_opts = borg_opts,
+            args = paths,
+            assimilate_opts = options,
+            strip_archive_matcher = cmdline["--include-external"]
+        )
+        out = (borg.stderr or borg.stdout).rstrip()
+        if out:
+            output(out)
+        return borg.status
+
 # RepoCreateCommand command {{{1
 class RepoCreateCommand(Command):
     NAMES = "repo-create".split()

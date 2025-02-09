@@ -44,6 +44,7 @@ The available commands are:
     :mount:       :ref:`mount a repository or archive <mount>`
     :overdue:     :ref:`show status of known repositories <overdue>`
     :prune:       :ref:`prune the repository of excess archives <prune>`
+    :recreate:    :ref:`recreate archives <recreate>`
     :repo-create: :ref:`create the repository <repo-create>`
     :repo-list:   :ref:`list the archives currently contained in the repository <repo-list>`
     :repo-space:  :ref:`manage the amount of space kept in reserve <repo-space>`
@@ -829,6 +830,17 @@ the prune rules.  However, the disk space is not reclaimed until the
 performed as part of the prune by setting :ref:`compact_after_delete`.  If set, 
 the ``--fast`` flag causes the compaction to be skipped.  If not set, the 
 ``--fast`` flag has no effect.
+
+
+.. _recreate:
+
+Recreate
+--------
+
+The recreate command applies the current exclude rules to existing archives, 
+which can reduce their size if the rules have changed since the archives were 
+created.  The disk space is not reclaimed until a :ref:`compact <compact>` 
+command is run.
 
 
 .. _repo-create:

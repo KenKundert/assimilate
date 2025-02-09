@@ -217,6 +217,7 @@ assimilate:
                             >     mount             mount a repository or archive
                             >     overdue           show status of known repositories
                             >     prune             prune the repository of excess archives
+                            >     recreate          recreate archives
                             >     repo-create       initialize the repository
                             >     repo-list         display available archives
                             >     repo-space        manage the amount of space kept in reserve
@@ -531,6 +532,62 @@ assimilate:
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
 
+            mealtime — recreate {{{2:
+                initialization:
+                    remove: ~/b
+                    create:
+                        ~/.config/assimilate/test.conf.nt:
+                            contents:
+                                > repository: ~/REPO/⟪config_name⟫
+                                > patterns:
+                                >     - R ~
+                                >     - - ~/.cache
+                                >     - - ~/.local
+                                >     - - ~/bu
+                                >     - - ~/REPO
+                                >     - - ~/.config
+                                > logging:
+                                >     keep for: 1w
+                                >     max entries: 20
+                                >     day header: D MMMM YYYY  ⟪⟪⟪⟪⟪⟪1
+                                >     entry header: h:mm A  ⟪⟪⟪⟪⟪⟪2
+                                >     description: ⟪cmd_name⟫
+                                >     editor: vim
+                run: assimilate recreate
+                checks:
+                    stdout:
+                        contains regex: Processing .*
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         recreate \
+                            >         --repo=/{run_dir}/REPO/test
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains text:
+                            >     > running:
+                            >     >     borg \
+                            >     >         recreate \
+                            >     >         --repo=/{run_dir}/REPO/test
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        contains regex: ^compact last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+
+            grimace — list {{{2:
+                run: assimilate list
+                checks:
+                    stdout:
+                        contains lines:
+                            - {run_dir}/
+                            - {run_dir}/a
+                            - {run_dir}/b
+
+                    stderr:
+                        matches regex:
+                            > archive: {aid0} {ar0} .*
+
 
             pullet — check {{{2:
                 run: assimilate check
@@ -614,6 +671,7 @@ assimilate:
                             >                             - - ~/\.local
                             >                             - - ~/bu
                             >                             - - ~/REPO
+                            >                             - - ~/\.config
                             >                 repository: ~/REPO/⟪config_name⟫
                             >            ❬when resolved❭: ~/REPO/test
                             >             squirrels_love: ⟪nutz⟫
@@ -861,6 +919,7 @@ assimilate:
                             >     mount             mount a repository or archive
                             >     overdue           show status of known repositories
                             >     prune             prune the repository of excess archives
+                            >     recreate          recreate archives
                             >     repo-create       initialize the repository
                             >     repo-list         display available archives
                             >     repo-space        manage the amount of space kept in reserve
@@ -1653,6 +1712,7 @@ assimilate:
                             >     mount             mount a repository or archive
                             >     overdue           show status of known repositories
                             >     prune             prune the repository of excess archives
+                            >     recreate          recreate archives
                             >     repo-create       initialize the repository
                             >     repo-list         display available archives
                             >     repo-space        manage the amount of space kept in reserve

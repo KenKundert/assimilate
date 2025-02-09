@@ -19,8 +19,7 @@
 
 
 # Imports {{{1
-from textwrap import dedent
-from inform import Error, error
+from inform import Error, error, dedent
 from .command import Command
 from .utilities import output, pager, two_columns
 
