@@ -2219,12 +2219,9 @@ class RecreateCommand(Command):
 
     @classmethod
     def run(cls, command, args, settings, options):
-        updated = []
-        repo_size = None
 
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
-        announce = narrate
         borg_opts = archive_filter_options(settings, cmdline, default='all')
         paths = get_archive_paths(cmdline['<path>'], settings)
 
