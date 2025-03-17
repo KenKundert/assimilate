@@ -937,7 +937,6 @@ class CreateCommand(Command):
                         )
                         break
                     except Error as e:
-                        narrate('Borg failed.', codicil=indent(f"error = {e!s}"))
                         if e.stderr and "is not a valid repository" in e.stderr:
                             e.reraise(codicil="Run 'assimilate init' to initialize the repository.")
                         tries_left -= 1

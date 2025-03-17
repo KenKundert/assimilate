@@ -21,7 +21,7 @@ earlier versions of *Borg* you should use Emborg_.
        which does not seem to be working.
 
     2. Normally *Assimilate* saves the size of the repository to the *latest.nt* 
-       file.  However the repository size is not yet available in *Borg 2*.
+       file.  However the repository size is not yet available from *Borg 2*.
 
     3. Currently the resolution of ``--newer``, ``--older``, ``--newest``, 
        ``--oldest`` is constrained to one day by *Borg*. That should be fixed in 

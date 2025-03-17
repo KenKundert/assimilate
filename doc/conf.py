@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'assimilate'
-copyright = u'2018-2024, Ken Kundert'
+copyright = u'2018-2025, Ken Kundert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

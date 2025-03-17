@@ -11,15 +11,15 @@ Assimilate — Front-End to Borg Backup
 :Released: 2025-02-08
 
 *Assimilate* is a simple command line utility to orchestrate backups. It is 
-built as a front-end to Borg_, a powerful and fast de-duplicating backup 
-program.  With *Assimilate*, you specify all the details about your backups once 
-in advance, and then use a very simple command line interface for your 
-day-to-day activities.  
+designed to make common tasks simple and efficient.  With *Assimilate*, you 
+specify all the details about your backups once in advance, and then use 
+a simple command line interface for your day-to-day activities.
 
-Use of *Assimilate* does not preclude the use of *Borg* directly on the same 
-repository.  The philosophy of *Assimilate* is to provide commands that you 
-would use often and in an interactive manner with the expectation that you would 
-use Borg directly for the remaining commands.
+*Assimilate* is a front-end to Borg_, a powerful and fast de-duplicating backup 
+program.  Use of *Assimilate* does not preclude the use of *Borg* directly on 
+the same repository.  The philosophy of *Assimilate* is to provide commands that 
+you would use often and in an interactive manner with the expectation that you 
+would use Borg directly for the remaining commands.
 
 *Assimilate* is intended for use with Borg_ 2.0 or newer, which is currently not 
 available in a stable release and is not recommended for general use.  If you 

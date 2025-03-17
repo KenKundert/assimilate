@@ -533,7 +533,7 @@ def file_ops(operations):
 def add_script(home_dir):
     path = to_path(home_dir, SCRIPT_NAME)
     path.write_text(SCRIPT.format(home_dir=home_dir))
-    path.chmod(0o777)
+    path.chmod(0o755)
 
 # gethostname {{{2
 def gethostname():

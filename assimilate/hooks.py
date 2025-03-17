@@ -18,8 +18,8 @@
 
 
 # Imports {{{1
-from inform import Error, conjoin, full_stop, is_str, log, os_error, truth
-from .configs import add_setting, as_string, as_dict, report_setting_error
+from inform import Error, conjoin, full_stop, is_str, log, os_error, truth, warn
+from .configs import add_setting, as_integer, as_string, as_dict, report_setting_error
 from voluptuous import Any, Invalid, Schema
 import requests
 
@@ -78,18 +78,24 @@ class Hooks:
 
     def __enter__(self):
         for hook in self.active_hooks:
-            hook.signal_start()
+            try:
+                hook.signal_start()
+            except Error as e:
+                warn(e)
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         for hook in self.active_hooks:
-            hook.signal_end(exc_value)
+            try:
+                hook.signal_end(exc_value)
+            except Error as e:
+                warn(e)
 
     def signal_start(self):
         url = self.START_URL.format(url=self.url, uuid=self.uuid)
         log(f'signaling start of backups to {self.NAME}: {url}.')
         try:
-            requests.get(url)
+            requests.get(url, timeout=self.timeout)
         except requests.exceptions.RequestException as e:
             raise Error(f'{self.NAME} connection error.', codicil=full_stop(e))
 
@@ -102,7 +108,7 @@ class Hooks:
             result = 'success'
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
         try:
-            requests.get(url)
+            requests.get(url, timeout=self.timeout)
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
@@ -116,7 +122,8 @@ class Custom(Hooks):
         start = as_action,
         success = as_action,
         failure = as_action,
-        finish = as_action
+        finish = as_action,
+        timeout = as_integer,
     )
 
     def __init__(self, assimilate_settings):
@@ -132,6 +139,12 @@ class Custom(Hooks):
         self.placeholders = placeholders
         self.settings = settings
         self.borg = None
+        self.timeout = settings.get('timeout')
+        if self.timeout:
+            try:
+                self.timeout = int(self.timeout)
+            except ValueError:
+                warn("invalid value given for timeout.", culprit=self.timeout)
 
     def is_active(self):
         return bool(self.settings)
@@ -207,9 +220,9 @@ class Custom(Hooks):
         log(f'signaling {name} of backups to {self.NAME}: {url} via {method}.')
         try:
             if method == 'get':
-                requests.get(url, params=params)
+                requests.get(url, params=params, timeout=self.timeout)
             else:
-                requests.post(url, params=params, data=data)
+                requests.post(url, params=params, data=data, timeout=self.timeout)
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
@@ -271,7 +284,7 @@ class HealthChecks(Hooks):
         url = f'{self.url}/{self.uuid}/start'
         log(f'signaling start of backups to {self.NAME}: {url}.')
         try:
-            requests.post(url)
+            requests.post(url, timeout=self.timeout)
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 
@@ -301,9 +314,9 @@ class HealthChecks(Hooks):
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
         try:
             if payload:
-                requests.post(url, data=payload.encode('utf-8'))
+                requests.post(url, data=payload.encode('utf-8'), timeout=self.timeout)
             else:
-                requests.post(url)
+                requests.post(url, timeout=self.timeout)
         except requests.exceptions.RequestException as e:
             raise Error('{self.NAME} connection error.', codicil=full_stop(e))
 

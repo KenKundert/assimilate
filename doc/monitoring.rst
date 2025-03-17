@@ -114,17 +114,24 @@ Local client configs:
     If *sentinel_dir* is a relative directory, it is relative to 
     *sentinel_root*.
 
+    The *latest.nt* file is only updated after a back-up successfully completes, 
+    making reports of this type reliable.
+
 Local server repositories:
     In this case you are running the *overdue* command on the machine that is 
     the destination of the backups.  Here you must not specify the *config*.  
     Instead, specify the *sentinel_dir* as the destination directory for the 
     *Borg* repository.
 
-    One limitation of this type is that *overdue* reports on the status of the 
+    A limitation of this type is that *overdue* reports on the status of the 
     repository, not on any specific config that deposits to the repository.  So, 
     for example, if two machines are depositing archives to the same repository, 
     and the backups on one machine begins failing, it will likely not be noticed 
     because the second machine will continue refreshing the repository.
+
+    Another issue is that the files in the repositories may be updated even when 
+    a backup fails to complete.  Again in this case failing backups may go 
+    unnoticed.
 
 Remote repositories:
     In this case you are running the *overdue* command on a remote machine that 
@@ -219,10 +226,10 @@ In addition, there are some shared settings available:
     | **seconds**: *s* *sec* *second* *seconds*
     | **minutes**: *m* *min* *minute* *minutes*
     | **hours**: *h* *hr* *hour* *hours*
-    | **days**: *d* *day* *days*
-    | **weeks**: *w* *week* *weeks*
+    | **days**: *D* *d* *day* *days*
+    | **weeks**: *W* *w* *week* *weeks*
     | **months**: *M* *month* *months*
-    | **years**: *y* *year* *years*
+    | **years**: *Y* *y* *year* *years*
 
     Examples::
 
@@ -373,6 +380,11 @@ like this::
 
     0 8 * * *  assimilate --quiet overdue --mail
 
+As mentioned above, checking the status of repositories from the destination 
+host can be unreliable because it based on the modification times of files in 
+the repository and those files can be modified even when a backup fails.  It is 
+recommended that you not rely solely on this method for determining if your 
+backups are succeeding.
 
 
 .. _client_overdue:
@@ -563,6 +575,10 @@ success:
     URL used to communicate the completion message.  In this example, the URL is 
     specified as ``{url}/{success:0/fail}``.  Here ``{success:0/fail}`` 
     evaluates to ``0`` if *Borg* succeeds and ``fail`` otherwise.
+
+timeout:
+    An integer indicating how long to wait (in seconds) for a response from the 
+    web monitoring service.
 
 .. code-block:: nestedtext
 

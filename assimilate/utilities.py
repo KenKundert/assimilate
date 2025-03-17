@@ -98,12 +98,12 @@ def when(time, relative_to=None, as_past=None, as_future=None):
         as_past (bool or str):
             If true, the word “ago” will be added to the end of the returned
             time difference if it is negative, indicating it occurred in the
-            past.  It it a string, it should contain ‘{}’, which is replaced
+            past.  If it a string, it should contain ‘{}’, which is replaced
             with the time difference.
         as_future (bool or str):
             If true, the word “in” will be added to the front of the returned
             time difference if it is positive, indicating it occurs in the
-            past.  It it a string, it should contain ‘{}’, which is replaced
+            past.  If it a string, it should contain ‘{}’, which is replaced
             with the time difference.
     Returns:
         A user friendly string that describes the time difference.

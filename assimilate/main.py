@@ -77,6 +77,7 @@ def main():
 
         try:
             worst_exit_status = 0
+            exit_status = 0
 
             # assimilate fails if the current working directory does not exist and
             # the message returned by OSError does not make the problem obvious.
@@ -132,19 +133,20 @@ def main():
                         exit_status = cmd.execute(
                             cmd_name, args, settings, options
                         )
+                        exit_status = exit_status or 0
                     except Error as e:
                         exit_status = 2
                         settings.fail(e, cmd=' '.join(sys.argv))
                         e.report()
 
-                if exit_status and exit_status > worst_exit_status:
-                    worst_exit_status = exit_status
-                    inform.errors_accrued(reset=True)
+                if inform.errors_accrued(reset=True):
+                    exit_status = min(exit_status, 2)
+                worst_exit_status = max(worst_exit_status, exit_status)
 
             # execute the command termination
             exit_status = cmd.execute_late(cmd_name, args, None, options)
-            if exit_status and exit_status > worst_exit_status:
-                worst_exit_status = exit_status
+            exit_status = exit_status or 0
+            worst_exit_status = max(worst_exit_status, exit_status)
 
         except Error as e:
             exit_status = 2
@@ -153,8 +155,5 @@ def main():
             exit_status = 2
             error(os_error(e))
         except KeyboardInterrupt:
-            exit_status = 0
             display("Terminated by user.")
-        if exit_status and exit_status > worst_exit_status:
-            worst_exit_status = exit_status
-        terminate(worst_exit_status)
+        terminate(max(worst_exit_status, exit_status))

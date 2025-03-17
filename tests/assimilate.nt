@@ -1405,7 +1405,6 @@ assimilate:
                     stdout:
                         contains lines:
                             - Only in .: ASSIMILATE
-                            - Only in .: bu
                             - Only in .: .cache
                             - Only in .: REPO
 
@@ -1422,7 +1421,6 @@ assimilate:
                         contains lines:
                             - Only in .: ASSIMILATE
                             - Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
-                            - Only in .: bu
                             - Only in .: .cache
                             - Only in .: REPO
                     status: 1
@@ -2221,7 +2219,6 @@ assimilate:
                     stdout:
                         contains lines:
                             - Only in .: ASSIMILATE
-                            - Only in .: bu
                             - Only in .: .cache
                             - Only in .: REPO
 
@@ -2238,7 +2235,6 @@ assimilate:
                         contains lines:
                             - Only in .: ASSIMILATE
                             - Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
-                            - Only in .: bu
                             - Only in .: c
                             - Only in .: .cache
                             - Only in .: REPO
@@ -3157,7 +3153,6 @@ assimilate:
                     stdout:
                         contains lines:
                             - Only in .: ASSIMILATE
-                            - Only in .: bu
                             - Only in .: .cache
                             - Only in .: REPO
 
@@ -3174,7 +3169,6 @@ assimilate:
                         contains lines:
                             - Only in .: ASSIMILATE
                             - Only in /{run_dir}/ASSIMILATE/{ar1}/{run_dir}: b
-                            - Only in .: bu
                             - Only in .: c
                             - Only in .: .cache
                             - Only in .: REPO
@@ -4074,7 +4068,6 @@ assimilate:
                 checks:
                     stderr:
                         contains lines:
-                            - - bu
                             - A .config/assimilate/shared.conf.nt
                             - A .config/assimilate/test.conf.nt
                             - d .config/assimilate
