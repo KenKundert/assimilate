@@ -36,7 +36,7 @@ Finally, you can install it using `pip
 
 .. code-block:: bash
 
-    $ pip install borgbackup==2.0.0b14
+    $ pip install borgbackup[pyfuse3]==2.0.0b14
 
 Download and install *Assimilate* as follows (requires Python3.6 or better):
 
@@ -74,9 +74,8 @@ sets of files. Regardless, you use a separate configuration for each set up,
 plus there is a common configuration file shared by all setups. You are free to 
 place most settings in either file, whichever is most convenient.  All the 
 configuration files are placed in ~/.config/assimilate. If you run *Assimilate* without 
-creating your configuration files, *Assimilate* will create some starter files for 
-you.  A configuration is specified using Python, thus the content of these files 
-is formatted as Python code and is read by a Python interpreter.
+creating your configuration files, *Assimilate* will create some starter files 
+for you.  A configuration is specified using NestedText_.
 
 As a demonstration on how to configure *Assimilate*, imagine wanting to back up your 
 home directory in two ways. First, you want to backup the files to an off-site 
