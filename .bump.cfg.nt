@@ -1,7 +1,7 @@
 major: 0
 minor: 0
 patch: 0
-revision: 6
+revision: 7
 type: beta
 files:
     pyproject.toml:

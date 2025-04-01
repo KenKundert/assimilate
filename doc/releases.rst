@@ -30,8 +30,8 @@ earlier versions of *Borg* you should use Emborg_.
 
 Latest development release
 --------------------------
-| Version: 0.0b6
-| Released: 2025-02-08
+| Version: 0.0b7
+| Released: 2025-04-01
 
 0.0.0 (2025-??-??)
 ------------------
