@@ -350,6 +350,9 @@ class Assimilate:
             self.settings["home_dir"] = home_dir
         self.settings["config_dir"] = CONFIG_DIR
         self.settings["log_dir"] = DATA_DIR
+        self.settings["host_name"] = hostname
+        self.settings["user_name"] = username
+        self.settings["prog_name"] = PROGRAM_NAME
         self.do_not_expand = Collection(self.settings.get("do_not_expand", ""))
 
         # gather the string valued settings together (can be used by resolve)
@@ -491,17 +494,12 @@ class Assimilate:
 
         # expand names contained in braces
         try:
-            # build kwargs in a way so that user can override values normally
-            # provided by assimilate itself in settings file.
-            kwargs = dict(
-                host_name = hostname,
-                user_name = username,
-                prog_name = PROGRAM_NAME,
-            )
-            kwargs.update(self.str_settings)
-            resolved = value.format(**kwargs)
+            resolved = value.format(**self.str_settings)
         except KeyError as e:
-            raise Error("unknown setting.", culprit=e)
+            k = e.args[0]
+            if k in self.settings and k not in self.str_settings:
+                raise Error("not a text setting.", culprit=k)
+            raise Error("unknown setting.", culprit=k)
         except ValueError as e:
             raise Error(full_stop(e), codicil=name)
         if resolved != value:

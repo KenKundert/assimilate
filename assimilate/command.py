@@ -46,7 +46,7 @@ from inform import (
 )
 from time import sleep
 from .assimilate import borg_commands_with_dryrun
-from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, RESERVED_SETTINGS
+from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, READ_ONLY_SETTINGS
 from .overdue import overdue, OVERDUE_USAGE
 from .preferences import DEFAULT_COMMAND, PROGRAM_NAME
 from .utilities import (
@@ -970,30 +970,17 @@ class CreateCommand(Command):
 
         # check and prune the archives if requested
         try:
-            check_after_create = settings.check_after_create
-            if is_str(check_after_create):
-                check_after_create = check_after_create.lower()
-            if check_after_create and check_after_create not in [
-                "'no", "'yes", "'latest", "'all", "'all_in_repository"
-            ]:
-                warn(
-                    "unknown value: {}".format(
-                        settings.check_after_create
-                    ),
-                    culprit = "check_after_create",
-                )
-                check_after_create = "'latest"
-
             with make_quiet():
                 # check the archives if requested
                 check_status = 0
-                if check_after_create and check_after_create != "'no":
+                check_after_create = settings.check_after_create
+                if check_after_create and check_after_create != "no":
                     activity = "checking"
                     announce("Checking repository ...")
                     args = []
-                    if settings.check_after_create == "'all":
+                    if check_after_create == "all":
                         args = ["--all"]
-                    elif settings.check_after_create == "'all_in_repository":
+                    elif check_after_create == "all_in_repository":
                         args = ["--all", "--include-external"]
                     check = CheckCommand()
                     try:
@@ -2546,6 +2533,7 @@ class SettingsCommand(Command):
         unknown = Color("yellow", enable=Color.isTTY())
         known = Color("cyan", enable=Color.isTTY())
         resolved = Color("magenta", enable=Color.isTTY())
+        read_only = Color("blue", enable=Color.isTTY())
         len_color_codes = len(known('x')) - 1
 
         def render(value):
@@ -2566,7 +2554,8 @@ class SettingsCommand(Command):
 
             output("Assimilate settings:")
             for name in sorted(ASSIMILATE_SETTINGS):
-                show_setting(name, ASSIMILATE_SETTINGS[name]['desc'])
+                if name not in READ_ONLY_SETTINGS:
+                    show_setting(name, ASSIMILATE_SETTINGS[name]['desc'])
 
             output()
             output("Borg settings:")
@@ -2576,8 +2565,9 @@ class SettingsCommand(Command):
 
             output()
             output("Read-only:")
-            for name, desc in RESERVED_SETTINGS.items():
-                show_setting(name, desc)
+            for name in sorted(ASSIMILATE_SETTINGS):
+                if name in READ_ONLY_SETTINGS:
+                    show_setting(name, ASSIMILATE_SETTINGS[name]['desc'])
 
             return 0
 
@@ -2585,7 +2575,10 @@ class SettingsCommand(Command):
             requested = cmdline['<name>']
             for k, v in sorted(settings):
                 is_known = k in ASSIMILATE_SETTINGS or k in BORG_SETTINGS
-                key = known(k) if is_known else unknown(k)
+                if is_known:
+                    key = read_only(k) if k in READ_ONLY_SETTINGS else known(k)
+                else:
+                    key = unknown(k)
                 if requested and requested != k:
                     continue
                 if k == "passphrase":
@@ -2606,16 +2599,8 @@ class SettingsCommand(Command):
                 except Error:
                     pass
 
-            if not requested:
-                output()
-                output("Read-only:")
-                for name, desc in RESERVED_SETTINGS.items():
-                    key = known(name)
-                    value = render(settings.resolve(None, "{"+name+"}"))
-                    output(f"{key:>{width + len_color_codes}}: {value}")
-
     run_early = run
-    # --available is handled in run_early
+        # --available is handled in run_early
 
 
 # UmountCommand command {{{1

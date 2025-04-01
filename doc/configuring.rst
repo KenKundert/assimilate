@@ -70,6 +70,11 @@ There are a few things to notice.
    Thus, the key may be `Tempus Fugit` or `tempus-fugit`, but either of those is 
    converted to *tempus_fugit*.
 
+6. A choice from an *Assimilate*-specified set of possible choices is always 
+   given with a leading single quote.  For example, Booleans are given as either 
+   ``'yes`` or ``'no``.  The case of the name is unimportant, so Booleans may 
+   also be given as ``'YES`` or ``'No``.
+
 
 .. _shared_settings:
 
@@ -643,9 +648,10 @@ colorscheme
 
 A few commands colorize the text to convey extra information. You can optimize 
 the tints of those colors to make them more visible and attractive.  
-*colorscheme* should be set to "none", "light", or "dark".  With "none" the text 
-is not colored.  In general it is best to use the "light" colorscheme on dark 
-backgrounds and the "dark" colorscheme on light backgrounds.
+*colorscheme* should be set to ``'none``, ``'light``, or ``'dark``.  With 
+``'none`` the text is not colored.  In general it is best to use the ``'light`` 
+colorscheme on dark backgrounds and the ``'dark`` colorscheme on light 
+backgrounds.
 
 
 command aliases
@@ -1443,7 +1449,7 @@ show_progress
 Show progress when running *Borg*'s *create* command.
 You also get this by adding the ``--progress`` command line option to the 
 *create* command, but if this option is set to ``'yes`` then this command always 
-show the progress.
+shows the progress.
 
 
 .. _show_stats:

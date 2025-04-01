@@ -237,7 +237,7 @@ def as_enum(*choices):
 # as_bool {{{2
 @as_enum("'yes", "'no", "'true", "'false")
 def as_bool(arg):
-    return truth(arg in ["'yes", "'true"], formatter="'yes/'no")
+    return truth(arg in ["'yes", "'true"], formatter="yes/no")
 
 # as_colorscheme {{{2
 @as_enum("'light", "'dark")
@@ -250,6 +250,11 @@ def as_colorscheme(arg):
     "'magenta", "'cyan", "'white", "'none"
 )
 def as_color(arg):
+    return arg[1:]
+
+# as_check{{{2
+@as_enum("'no", "'yes", "'latest", "'all", "'all_in_repository")
+def as_check(arg):
     return arg[1:]
 
 # normalize_key {{{2
@@ -268,14 +273,6 @@ def normalize_key(key, parent_keys):
     return '_'.join(key.lower().replace('-', '_').split())
 
 # SETTINGS {{{1
-# Reserved settings {{{2
-# These are read only settings created by Assimilate
-RESERVED_SETTINGS = dict(
-    host_name = "the name of the computer running Assimlate",
-    user_name = "the name of the user running Assimilate",
-    prog_name = "the name of the command that runs Assimilate",
-)
-
 # Assimilate settings {{{2
 # Any setting found in the users settings files that is not found in
 # ASSIMILATE_SETTINGS or BORG_SETTINGS is highlighted as a unknown setting by
@@ -295,24 +292,12 @@ ASSIMILATE_SETTINGS = dict(
         validator = as_path
     ),
     check_after_create = dict(
-        desc = "run check as the last step of an archive creation",
-        validator = as_string,
-    ),
-    cmd_name = dict(
-        desc = "name of Assimilate command being run (read only)",
-        validator = read_only,
+        desc = "run check after archive creation",
+        validator = as_check,
     ),
     colorscheme = dict(
         desc = "the color scheme",
         validator = as_colorscheme,
-    ),
-    config_dir = dict(
-        desc = "absolute path to configuration directory (read only)",
-        validator = read_only
-    ),
-    config_name = dict(
-        desc = "name of active configuration (read only)",
-        validator = read_only,
     ),
     composite_configs = dict(
         desc = "composite configurations and their children",
@@ -354,17 +339,9 @@ ASSIMILATE_SETTINGS = dict(
         desc = "file that contains exclude patterns",
         validator = as_path,
     ),
-    home_dir = dict(
-        desc = "users home directory (read only)",
-        validator = read_only,
-    ),
     include = dict(
         desc = "include the contents of another file",
         validator = as_path,
-    ),
-    log_dir = dict(
-        desc = "log directory (read_only)",
-        validator = read_only,
     ),
     manage_diffs_cmd = dict(
         desc = "command to use to manage differences in files and directories",
@@ -433,27 +410,27 @@ ASSIMILATE_SETTINGS = dict(
     ),
     run_after_backup = dict(
         desc = "commands to run after archive has been created",
-        validator = as_string,
+        validator = as_lines,
     ),
     run_before_backup = dict(
         desc = "commands to run before archive is created",
-        validator = as_string,
+        validator = as_lines,
     ),
     run_after_last_backup = dict(
         desc = "commands to run after last archive has been created",
-        validator = as_string,
+        validator = as_lines,
     ),
     run_before_first_backup = dict(
         desc = "commands to run before first archive is created",
-        validator = as_string,
+        validator = as_lines,
     ),
     run_after_borg = dict(
         desc = "commands to run after last Borg command has run",
-        validator = as_string,
+        validator = as_lines,
     ),
     run_before_borg = dict(
         desc = "commands to run before first Borg command is run",
-        validator = as_string,
+        validator = as_lines,
     ),
     show_progress = dict(
         desc = "show borg progress when running create command",
@@ -487,7 +464,42 @@ ASSIMILATE_SETTINGS = dict(
         desc = "logging options",
         validator = as_dict,
     ),
+
+# Read only values
+    cmd_name = dict(
+        desc = "name of the Assimilate command being run",
+        validator = read_only,
+    ),
+    config_dir = dict(
+        desc = "path to Assimilate’s configuration directory",
+        validator = read_only
+    ),
+    config_name = dict(
+        desc = "name of active configuration",
+        validator = read_only,
+    ),
+    home_dir = dict(
+        desc = "path to the user’s home directory",
+        validator = read_only,
+    ),
+    host_name = dict(
+        desc = "name of the computer running Assimlate",
+        validator = read_only,
+    ),
+    log_dir = dict(
+        desc = "path to Assimilate’s log directory",
+        validator = read_only,
+    ),
+    prog_name = dict(
+        desc = "name of the command that runs Assimilate",
+        validator = read_only,
+    ),
+    user_name = dict(
+        desc = "login name of the user running Assimilate",
+        validator = read_only,
+    ),
 )
+READ_ONLY_SETTINGS = set(k for k, v in ASSIMILATE_SETTINGS.items() if v["validator"] == read_only)
 
 # add_setting() {{{3
 def add_setting(name, desc, validator):
@@ -660,7 +672,7 @@ BORG_SETTINGS = dict(
         validator = as_lines,
     ),
 )
-
+assert not (ASSIMILATE_SETTINGS.keys() & BORG_SETTINGS.keys())
 
 # SCHEMA {{{1
 # build_validator() {{{2

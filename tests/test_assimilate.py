@@ -18,6 +18,7 @@ from shlib import Run, cd, to_path, set_prefs as shlib_set_prefs
 from voluptuous import Schema, Optional, Required, Any, Invalid
 import nestedtext as nt
 import arrow
+from itertools import zip_longest
 import os
 import pytest
 import pwd
@@ -289,14 +290,14 @@ class Checker:
                 issue = f"found {object}."
 
         if expected and '\n' in expected:
-            expected = f"expected:\n{indent(expected)}"
+            expected = f"EXPECTED:\n{indent(expected)}"
         else:
-            expected = f"expected: {expected}"
+            expected = f"EXPECTED: {expected}"
 
         if '\n' in self.contents:
-            realized = f"realized:\n{indent(self.contents)}"
+            realized = f"REALIZED:\n{indent(self.contents)}"
         else:
-            realized = f"realized: {self.contents}"
+            realized = f"REALIZED: {self.contents}"
 
         cmd = f"cmd: {self.cmd}" if self.cmd else None
         status = None if self.status is None else f"exit status: {self.status}"
@@ -311,11 +312,22 @@ class Checker:
             'regex' not in match and
             'in order' not in match
         ):
-            new = []
-            for e, r in zip(expected.splitlines(), realized.splitlines()):
+            new_expected = []
+            new_realized = []
+            for e, r in zip_longest(expected.splitlines(), realized.splitlines()):
                 okay = '✓' if e == r else '✗'
-                new.append(f"{okay}: {e}")
-            expected = '\n'.join(new)
+                if e is None:
+                    okay = '—'
+                    e = "❬missing line❭"
+                new_expected.append(f"{okay}: {e}")
+
+                if r is None:
+                    okay = '—'
+                    r = "❬missing line❭"
+                new_realized.append(f"{okay}: {r}")
+
+            expected = '\n'.join(new_expected)
+            realized = '\n'.join(new_realized)
 
         return '\n'.join(cull([
             full_stop(issue),

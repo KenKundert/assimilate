@@ -642,15 +642,16 @@ assimilate:
                 run: assimilate settings
                 checks:
                     stdout:
-                        matches regex:
+                        matches text:
                             >                    archive: ⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-⟪⟪now⟫⟫
                             >            ❬when resolved❭: {hostname}-{username}-test-⟪now⟫
                             >                   cmd_name: settings
-                            >                 config_dir: /{run_dir}/\.config/assimilate
+                            >                 config_dir: /{run_dir}/.config/assimilate
                             >                config_name: test
                             >                 encryption: none
                             >                   home_dir: /{run_dir}
-                            >                    log_dir: /{run_dir}/\.local/share/assimilate
+                            >                  host_name: {hostname}
+                            >                    log_dir: /{run_dir}/.local/share/assimilate
                             >                    logging: keep_for: 1w
                             >                             max_entries: 20
                             >                             day_header: D MMMM YYYY  ⟪⟪⟪⟪⟪⟪1
@@ -663,19 +664,21 @@ assimilate:
                             >                             entry_header: h:mm A  ⟪⟪⟪2
                             >                             description: settings
                             >                             editor: vim
-                            >             match_archives: - sh:⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-\*
-                            >            ❬when resolved❭: - sh:{hostname}-{username}-test-\*
+                            >             match_archives: - sh:⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-*
+                            >            ❬when resolved❭: - sh:{hostname}-{username}-test-*
                             >                       nutz: peanuts
                             >                   patterns: - R ~
-                            >                             - - ~/\.cache
-                            >                             - - ~/\.local
+                            >                             - - ~/.cache
+                            >                             - - ~/.local
                             >                             - - ~/bu
                             >                             - - ~/REPO
-                            >                             - - ~/\.config
+                            >                             - - ~/.config
+                            >                  prog_name: assimilate
                             >                 repository: ~/REPO/⟪config_name⟫
                             >            ❬when resolved❭: ~/REPO/test
                             >             squirrels_love: ⟪nutz⟫
                             >            ❬when resolved❭: peanuts
+                            >                  user_name: ken
 
             druggist — setting archive {{{2:
                 run: assimilate setting archive
@@ -696,18 +699,12 @@ assimilate:
                             >         avendesora_account: account name that holds passphrase for
                             >                             encryption key in Avendesora
                             >            borg_executable: path to borg
-                            >         check_after_create: run check as the last step of an archive
-                            >                             creation
-                            >                   cmd_name: name of Assimilate command being run (read
-                            >                             only)
+                            >         check_after_create: run check after archive creation
                             >                colorscheme: the color scheme
                             >            command_aliases: command aliases
                             >       compact_after_delete: run compact after deleting an archive or
                             >                             pruning a repository
                             >          composite_configs: composite configurations and their children
-                            >                 config_dir: absolute path to configuration directory (read
-                            >                             only)
-                            >                config_name: name of active configuration (read only)
                             >             create_retries: number of times to retry a create if failures
                             >                             occur
                             >         create_retry_sleep: time to sleep between retries [s]
@@ -723,10 +720,8 @@ assimilate:
                             >               exclude_from: file that contains exclude patterns
                             >                   excludes: list of glob strings of files or directories
                             >                             to skip
-                            >                   home_dir: users home directory (read only)
                             >                    include: include the contents of another file
                             >               list_formats: named format strings available to list command
-                            >                    log_dir: log directory (read_only)
                             >                    logging: logging options
                             >           manage_diffs_cmd: command to use to manage differences in files
                             >                             and directories
@@ -809,9 +804,14 @@ assimilate:
                             >                             a remote network (default: 0=unlimited)
                             >
                             > Read-only:
-                            >                  host_name: the name of the computer running Assimlate
-                            >                  user_name: the name of the user running Assimilate
-                            >                  prog_name: the name of the command that runs Assimilate
+                            >                   cmd_name: name of the Assimilate command being run
+                            >                 config_dir: path to Assimilate’s configuration directory
+                            >                config_name: name of active configuration
+                            >                   home_dir: path to the user’s home directory
+                            >                  host_name: name of the computer running Assimlate
+                            >                    log_dir: path to Assimilate’s log directory
+                            >                  prog_name: name of the command that runs Assimilate
+                            >                  user_name: login name of the user running Assimilate
 
             sixth — setting config_name {{{2:
                 run: assimilate setting config_name
@@ -5350,11 +5350,48 @@ assimilate:
                         contains line: assimilate error: no diff command available.
                     status: 2
 
-    snarl — missing shared configuration file tests {{{1:
+    toggle — run commands {{{1:
         initialization:
             create:
-                ~/.config/assimilate/patterns.nt:
+                ~/.config/assimilate/shared.conf.nt:
                     contents:
+                        > default config: test
+                        > composite configs:
+                        >     test: test1 test2
+                        > encryption: none
+                        > keep within: 1d
+                        >
+                        > # user defined placeholders
+                        > nutz: peanuts
+                        > squirrels love: ⟪⟪nutz⟫⟫
+                        >
+                        > # commands
+                        > run_after_backup: echo ⟪config_name⟫ run_after_backup: squirrels love ⟪squirrels_love⟫
+                        > run_before_backup:
+                        >     - echo ⟪config_name⟫ run_before_backup: archive = ⟪archive⟫
+                        > run_after_last_backup:
+                        >     - echo ⟪config_name⟫ run_after_last_backup: repository = ⟪repository⟫
+                        >     -
+                        > run_before_first_backup:
+                        >     - echo ⟪config_name⟫ run_before_first_backup 1: default config = ⟪default_config⟫
+                        >     - echo ⟪config_name⟫ run_before_first_backup 2: ⟪nutz⟫ are nuts
+                        > run_after_borg:
+                        >     - echo ⟪config_name⟫ run_after_borg 1: program name = ⟪prog_name⟫
+                        >     - echo ⟪config_name⟫ run_after_borg 2: command name = ⟪cmd_name⟫
+                        >     -
+                        > run_before_borg:
+                        >     - echo ⟪config_name⟫ run_before_borg 1: home directory = ⟪home_dir⟫
+                        >     - echo ⟪config_name⟫ run_before_borg 2: config directory = ⟪config_dir⟫
+                        >     - echo ⟪config_name⟫ run_before_borg 3: log directory = ⟪log_dir⟫
+                        >
+
+                ~/REPO/:
+
+                ~/.config/assimilate/test1.conf.nt:
+                    contents:
+                        > repository: ~/REPO/⟪config_name⟫
+                        > archive: ⟪config_name⟫
+                        > match archives: id:⟪config_name⟫
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
@@ -5362,113 +5399,154 @@ assimilate:
                         >     - - ~/bu
                         >     - - ~/REPO
 
-                ~/.config/assimilate/test1.conf.nt:
-                    contents:
-                        > include: patterns.nt
-                        > repository: ~/REPO/test
-                        > archive: ⟪config_name⟫
-                        > match archives: id:⟪config_name⟫
-                        >
-                        > # throw in some unused settings to test various validators
-                        > composite configs:
-                        > notifier: notify-send -u critical ⟪prog_name⟫ "⟪msg⟫"
-                        > notify: nobody@nowhere.com somebody@somewhere.com
-                        > create retries: 3
-                        > create retry sleep: 5
-                        > do not expand: notify
-                        > colorscheme: 'dark
-                        >
-                        > # the following settings should throw a warning
-                        > encryption: none
-                        > passphrase: toenail
-
                 ~/.config/assimilate/test2.conf.nt:
                     contents:
-                        > repository: ~/REPO/test
+                        > repository: ~/REPO/⟪config_name⟫
                         > archive: ⟪config_name⟫
-                        > include: patterns.nt
-                        >
-                        > # the following settings should throw warnings
-                        > composite configs:
-                        >     swill: test1 test2
-                        > default config: test
-                        > command aliases:
-                        >     overdue: od
-                        > match archives: diocese
-                        >
-                        > # the following settings should be valid
-                        > notify:
-                        >     - nobody@nowhere.com
-                        > overdue:
-                        >     sentinel root: ~/nutz
-
-                ~/.config/assimilate/test3.conf.nt:
-                    contents:
-                        > # the following setting is in the wrong form, test error handling
-                        > repository:
-                        >     - ~/REPO/⟪config_name⟫
-
-                ~/REPO/:
+                        > match archives: id:⟪config_name⟫
+                        > patterns:
+                        >     - R ~
+                        >     - - ~/.cache
+                        >     - - ~/.local
+                        >     - - ~/bu
+                        >     - - ~/REPO
 
                 ~/a:
-                    contents: aaa
+                    contents:
+                        > aaa
                     mtime: 2024-11-27
 
-                ~/b:
-                    contents: bbb
-                    mtime: 2024-11-26
-
         tests:
-            spinner — repo-create {{{2:
-                run: assimilate -c test1 repo-create
+            deduce — repo-create {{{2:
+                run: assimilate repo-create
                 checks:
+                    stderr:
+                        matches text:
+                            > === test1 ===
+                            >
+                            > === test2 ===
                     stdout:
                         matches text:
+                            > test1 run_before_borg 1: home directory = /{run_dir}
+                            > test1 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test1 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
                             >
                             > Reserve some repository storage space now for emergencies like 'disk full'
                             > by running:
                             >     assimilate repo-space --reserve 1G
+                            > test1 run_after_borg 1: program name = assimilate
+                            > test1 run_after_borg 2: command name = repo-create
+                            > test2 run_before_borg 1: home directory = /{run_dir}
+                            > test2 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test2 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            >
+                            > Reserve some repository storage space now for emergencies like 'disk full'
+                            > by running:
+                            >     assimilate repo-space --reserve 1G
+                            > test2 run_after_borg 1: program name = assimilate
+                            > test2 run_after_borg 2: command name = repo-create
 
-                    stderr:
-                        matches text: assimilate warning: passphrase given but not needed as encryption set to none.
-
-                    ~/.local/share/assimilate/test1.log:
-                        contains text:
-                            > running:
-                            >     borg \
-                            >         repo-create \
-                            >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
-                            >         --encryption=none
-
-            lemming — must specify config error {{{2:
+            handcart — create using both configs {{{2:
                 run: assimilate create
                 checks:
                     stderr:
                         matches text:
-                            > assimilate error: you must specify a config.
-                            >     Choose from: test1, test2, or test3.
-                    status: 2
+                            > === test1 ===
+                            >
+                            > === test2 ===
+                    stdout:
+                        matches text:
+                            > test1 run_before_first_backup 1: default config = test
+                            > test1 run_before_first_backup 2: peanuts are nuts
+                            > test1 run_before_backup: archive = test1
+                            > test1 run_before_borg 1: home directory = /{run_dir}
+                            > test1 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test1 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test1 run_after_backup: squirrels love ⟪nutz⟫
+                            > test1 run_after_borg 1: program name = assimilate
+                            > test1 run_after_borg 2: command name = create
+                            > test2 run_before_backup: archive = test2
+                            > test2 run_before_borg 1: home directory = /{run_dir}
+                            > test2 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test2 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test2 run_after_backup: squirrels love ⟪nutz⟫
+                            > test2 run_after_last_backup: repository = /{run_dir}/REPO/test2
+                            > test2 run_after_borg 1: program name = assimilate
+                            > test2 run_after_borg 2: command name = create
 
-            mammoth — check warnings {{{2:
+            pogrom — create using only first configs {{{2:
+                run: assimilate -c test1 create
+                checks:
+                    stdout:
+                        matches text:
+                            > test1 run_before_first_backup 1: default config = test
+                            > test1 run_before_first_backup 2: peanuts are nuts
+                            > test1 run_before_backup: archive = test1
+                            > test1 run_before_borg 1: home directory = /{run_dir}
+                            > test1 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test1 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test1 run_after_backup: squirrels love ⟪nutz⟫
+                            > test1 run_after_last_backup: repository = /{run_dir}/REPO/test1
+                            > test1 run_after_borg 1: program name = assimilate
+                            > test1 run_after_borg 2: command name = create
+
+            laxative — create using only second configs {{{2:
                 run: assimilate -c test2 create
                 checks:
-                    stderr:
+                    stdout:
                         matches text:
-                            > assimilate warning: test2: default_config only valid in shared.conf.nt.
-                            > assimilate warning: test2: composite_configs only valid in shared.conf.nt.
-                            > assimilate warning: test2: command_aliases only valid in shared.conf.nt.
-                            > assimilate warning: match_archives=diocese should have a type prefix.
+                            > test2 run_before_first_backup 1: default config = test
+                            > test2 run_before_first_backup 2: peanuts are nuts
+                            > test2 run_before_backup: archive = test2
+                            > test2 run_before_borg 1: home directory = /{run_dir}
+                            > test2 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test2 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test2 run_after_backup: squirrels love ⟪nutz⟫
+                            > test2 run_after_last_backup: repository = /{run_dir}/REPO/test2
+                            > test2 run_after_borg 1: program name = assimilate
+                            > test2 run_after_borg 2: command name = create
 
-            laxative — check error handling {{{2:
-                run: assimilate -c test3 create
+            convict — prune using both configs {{{2:
+                run: assimilate prune
                 checks:
-                    status: 2
                     stderr:
                         matches text:
-                            > assimilate error: /{run_dir}/.config/assimilate/test3.conf.nt@3, repository:
-                            >     expected text, found list item.
-                            >            3 ❬    - ~/REPO/⟪config_name⟫❭
-                            >                   ▲
+                            > === test1 ===
+                            >
+                            > === test2 ===
+                    stdout:
+                        matches text:
+                            > test1 run_before_borg 1: home directory = /{run_dir}
+                            > test1 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test1 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test1 run_after_borg 1: program name = assimilate
+                            > test1 run_after_borg 2: command name = prune
+                            > test2 run_before_borg 1: home directory = /{run_dir}
+                            > test2 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test2 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test2 run_after_borg 1: program name = assimilate
+                            > test2 run_after_borg 2: command name = prune
+
+            idiocracy — prune using only first configs {{{2:
+                run: assimilate -c test1 prune
+                checks:
+                    stdout:
+                        matches text:
+                            > test1 run_before_borg 1: home directory = /{run_dir}
+                            > test1 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test1 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test1 run_after_borg 1: program name = assimilate
+                            > test1 run_after_borg 2: command name = prune
+
+            hailstone — prune using only second configs {{{2:
+                run: assimilate -c test2 prune
+                checks:
+                    stdout:
+                        matches text:
+                            > test2 run_before_borg 1: home directory = /{run_dir}
+                            > test2 run_before_borg 2: config directory = /{run_dir}/.config/assimilate
+                            > test2 run_before_borg 3: log directory = /{run_dir}/.local/share/assimilate
+                            > test2 run_after_borg 1: program name = assimilate
+                            > test2 run_after_borg 2: command name = prune
 
 #  vim: set sw=4 sts=4 tw=999 fo=ntcqwa12jor et spell:
