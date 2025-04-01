@@ -678,7 +678,7 @@ assimilate:
                             >            ❬when resolved❭: ~/REPO/test
                             >             squirrels_love: ⟪nutz⟫
                             >            ❬when resolved❭: peanuts
-                            >                  user_name: ken
+                            >                  user_name: {username}
 
             druggist — setting archive {{{2:
                 run: assimilate setting archive
