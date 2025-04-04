@@ -25,8 +25,8 @@ import sys
 import nestedtext as nt
 from docopt import docopt, DocoptExit
 from inform import (
-    Error, conjoin, cull, error, full_stop, join, narrate, os_error, warn,
-    output as output_raw, terminate
+    Error, conjoin, cull, full_stop, is_str, join, os_error,
+    error, narrate, output as output_raw, terminate, warn
 )
 from quantiphy import (
     Quantity, UnitConversion, QuantiPhyError, InvalidNumber, UnknownConversion
@@ -194,6 +194,8 @@ def when(time, relative_to=None, as_past=None, as_future=None):
 # update_latest {{{1
 def update_latest(commands, path, repo_size=None):
     narrate(f"updating date file for {conjoin(commands)}: {str(path)}")
+    if is_str(commands):
+        commands = [commands]
     latest = {}
     try:
         latest = nt.load(path, dict)

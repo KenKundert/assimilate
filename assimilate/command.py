@@ -589,7 +589,8 @@ class CheckCommand(Command):
             raise Error('repository is corrupt.')
 
         # update the date file
-        update_latest(['check'], settings.date_file)
+        if not("problems found" in borg.stderr or "errors found" in borg.stderr):
+            update_latest('check', settings.date_file)
 
 
 # CompactCommand command {{{1
@@ -637,7 +638,7 @@ class CompactCommand(Command):
             output(out.rstrip())
 
         # update the date file
-        update_latest(['compact'], settings.date_file)
+        update_latest('compact', settings.date_file)
 
         return borg.status
 
@@ -882,7 +883,6 @@ class CreateCommand(Command):
 
     @classmethod
     def run(cls, command, args, settings, options):
-        updated = []
         repo_size = None
 
         # read command line
@@ -947,7 +947,7 @@ class CreateCommand(Command):
                         seconds = max(settings.value("create_retry_sleep", 0), 0)
                         narrate(f"waiting for {seconds:.0f} seconds.")
                         sleep(seconds)
-                updated.append('create')
+                update_latest('create', settings.date_file)
                 create_status = borg.status
                 hooks.report_results(borg)
             finally:
@@ -965,7 +965,6 @@ class CreateCommand(Command):
 
         if cmdline["--fast"]:
             # update the date file
-            update_latest(updated, settings.date_file)
             return create_status
 
         # check and prune the archives if requested
@@ -985,7 +984,6 @@ class CreateCommand(Command):
                     check = CheckCommand()
                     try:
                         check.run("check", args, settings, options)
-                        updated.append('check')
                     except Error:
                         check_status = 1
 
@@ -995,7 +993,6 @@ class CreateCommand(Command):
                     announce("Pruning repository ...")
                     prune = PruneCommand()
                     prune_status = prune.run("prune", [], settings, options)
-                    updated.append('prune')
                 else:
                     prune_status = 0
 
@@ -1024,8 +1021,6 @@ class CreateCommand(Command):
                 )
             )
 
-        # update the date file
-        update_latest(updated, settings.date_file, repo_size)
         return max([create_status, check_status, prune_status, info.status])
 
 # DeleteCommand command {{{1
@@ -2146,7 +2141,7 @@ class PruneCommand(Command):
         prune_status = borg.status
 
         # update the date file
-        update_latest(['prune'], settings.date_file)
+        update_latest('prune', settings.date_file)
 
         if fast:
             return prune_status
