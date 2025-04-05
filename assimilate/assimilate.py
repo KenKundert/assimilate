@@ -596,7 +596,6 @@ class Assimilate:
                 borg_opts.append("--list")
 
         elif cmd == "repo-create":
-            borg_opts.append("--make-parent-dirs")
             if self.passphrase or self.passcommand or self.avendesora_account:
                 encryption = self.encryption or DEFAULT_ENCRYPTION
                 borg_opts.append(f"--encryption={encryption}")

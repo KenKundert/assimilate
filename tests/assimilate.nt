@@ -265,7 +265,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
                             >         --encryption=none
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -274,7 +273,6 @@ assimilate:
                             -     >     borg \
                             -     >         repo-create \
                             -     >         --repo=/{run_dir}/REPO/test \
-                            -     >         --make-parent-dirs \
                             -     >         --encryption=none
 
             putter — create {{{2:
@@ -995,7 +993,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
                             >         --encryption=none
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -1789,7 +1786,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
                             >         --encryption=repokey-blake2-chacha20-poly1305
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -2510,7 +2506,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --make-parent-dirs \
                             >         --encryption=repokey-blake2-chacha20-poly1305
 
                     ~/.local/share/assimilate/test1.log.nt:
@@ -2524,7 +2519,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --make-parent-dirs \
                             >         --encryption=repokey-blake2-chacha20-poly1305
 
                     ~/.local/share/assimilate/test2.log.nt:
@@ -3389,7 +3383,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
                             >         --encryption=none
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -4054,7 +4047,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
                             >         --encryption=none
 
 
@@ -4597,7 +4589,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
                             >         --encryption=none
                         contains text:
                             > running:
@@ -4944,7 +4935,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --make-parent-dirs \
                             >         --encryption=none
 
 
@@ -5191,7 +5181,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --make-parent-dirs \
                             >         --encryption=none
 
                     ~/.local/share/assimilate/test2.log:
@@ -5200,7 +5189,6 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --make-parent-dirs \
                             >         --encryption=none
 
             pharmacy — list {{{2:
