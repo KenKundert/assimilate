@@ -1446,10 +1446,10 @@ redirections and pipelines are not available.
 show_progress
 ~~~~~~~~~~~~~
 
-Show progress when running *Borg*'s *create* command.
+Show progress when running *Borg*'s *create* and *compact* commands.
 You also get this by adding the ``--progress`` command line option to the 
-*create* command, but if this option is set to ``'yes`` then this command always 
-shows the progress.
+command, but if this option is set to ``'yes`` then this command always shows 
+the progress.
 
 
 .. _show_stats:
@@ -1457,7 +1457,7 @@ shows the progress.
 show_stats
 ~~~~~~~~~~
 
-Show statistics when running *Borg*'s *create*, *delete* and *prune* commands.
+Show statistics when running *Borg*'s *create* and *compact* commands.
 You can always get this by adding the ``--stats`` command line option to the 
 appropriate commands, but if this option is set to ``'yes`` then these commands 
 always show the statistics.  If the statistics are not requested, they will be 

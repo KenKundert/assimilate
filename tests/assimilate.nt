@@ -1018,7 +1018,7 @@ assimilate:
                 checks:
                     stdout:
                         matches text:
-                            > --match-archives ['sh:kundert-ken-test-*'] does not match any archives
+                            > --match-archives ['sh:{hostname}-{username}-test-*'] does not match any archives
                             > --last 1 archives: only found 0 archives
 
                     ~/.local/share/assimilate/test.log:
