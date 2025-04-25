@@ -89,7 +89,7 @@ from .utilities import (
 import nestedtext as nt
 
 # Globals {{{1
-borg_commands_with_dryrun = "create delete extract prune upgrade recreate undelete".split()
+borg_commands_with_dryrun = "compact create delete extract prune upgrade recreate undelete".split()
 
 # Utilities {{{1
 hostname = gethostname()
@@ -238,16 +238,15 @@ class Assimilate:
         self.config_dir = set_config_dir(config_dir)
 
         # assimilate options
-        self.assimilate_opts = assimilate_opts
         if assimilate_opts is None:
-            self.assimilate_opts = {"no-log": True}
+            assimilate_opts = {"no-log": True}
                 # no-log as True is suitable for API default
+        self.assimilate_opts = assimilate_opts
         if config:
-            if assimilate_opts and assimilate_opts.get("config"):
+            if assimilate_opts.get("config"):
                 assert config == assimilate_opts.get("config")
         else:
-            if assimilate_opts.get("config"):
-                config = assimilate_opts.get("config")
+            config = assimilate_opts.get("config")
 
         # read shared setting if not already available
         if shared_settings is None:
@@ -262,7 +261,7 @@ class Assimilate:
         self.check()
         if self.encoding:
             set_shlib_prefs(encoding=self.encoding)
-        self.hooks = Hooks(self)
+        self.hooks = Hooks(self, dry_run='dry-run' in assimilate_opts)
         self.borg_ran = False
 
         # set colorscheme

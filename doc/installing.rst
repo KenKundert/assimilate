@@ -24,8 +24,8 @@ need to be adjusted to get the latest version):
 .. code-block:: bash
 
     $ cd ~/bin
-    $ wget https://github.com/borgbackup/borg/releases/download/2.0.0b14/borg-linux-glibc236.tgz
-    $ wget https://github.com/borgbackup/borg/releases/download/2.0.0b14/borg-linux-glibc236.tgz.asc
+    $ wget https://github.com/borgbackup/borg/releases/download/2.0.0b15/borg-linux-glibc236.tgz
+    $ wget https://github.com/borgbackup/borg/releases/download/2.0.0b15/borg-linux-glibc236.tgz.asc
     $ gpg --recv-keys 6D5BEF9ADD2075805747B70F9F88FB52FAF7B393
     $ gpg --verify borg-linux64.asc
     $ rm borg-linux64.asc
@@ -36,7 +36,7 @@ Finally, you can install it using `pip
 
 .. code-block:: bash
 
-    $ pip install borgbackup[pyfuse3]==2.0.0b14
+    $ pip install borgbackup[pyfuse3]==2.0.0b15
 
 Download and install *Assimilate* as follows (requires Python3.6 or better):
 

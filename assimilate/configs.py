@@ -433,11 +433,11 @@ ASSIMILATE_SETTINGS = dict(
         validator = as_lines,
     ),
     show_progress = dict(
-        desc = "show borg progress when running create command",
+        desc = "show borg progress when running create or compact commands",
         validator = as_bool,
     ),
     show_stats = dict(
-        desc = "show borg statistics when running create, delete, and prune commands",
+        desc = "show borg statistics when running create or compact commands",
         validator = as_bool,
     ),
     src_dirs = dict(

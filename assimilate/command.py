@@ -590,7 +590,7 @@ class CheckCommand(Command):
 
         # update the date file
         if not("problems found" in borg.stderr or "errors found" in borg.stderr):
-            update_latest('check', settings.date_file)
+            update_latest('check', settings.date_file, options)
 
 
 # CompactCommand command {{{1
@@ -603,7 +603,8 @@ class CompactCommand(Command):
             assimilate compact [options]
 
         Options:
-            -p, --progress          shows Borg progress
+            -p, --progress   shows Borg progress
+            -s, --stats      show Borg statistics
 
         This command frees repository space by compacting segments.
 
@@ -626,19 +627,22 @@ class CompactCommand(Command):
         borg_opts = []
         if cmdline["--progress"] or settings.show_progress:
             borg_opts.append("--progress")
+        if cmdline["--stats"] or settings.show_stats:
+            borg_opts.append("--stats")
 
         # run borg
         borg = settings.run_borg(
             cmd = "compact",
             borg_opts = borg_opts,
             assimilate_opts = options,
+            show_borg_output = "--stats" in borg_opts,
         )
         out = borg.stderr or borg.stdout
         if out:
             output(out.rstrip())
 
         # update the date file
-        update_latest('compact', settings.date_file)
+        update_latest('compact', settings.date_file, options)
 
         return borg.status
 
@@ -947,7 +951,7 @@ class CreateCommand(Command):
                         seconds = max(settings.value("create_retry_sleep", 0), 0)
                         narrate(f"waiting for {seconds:.0f} seconds.")
                         sleep(seconds)
-                update_latest('create', settings.date_file)
+                update_latest('create', settings.date_file, options)
                 create_status = borg.status
                 hooks.report_results(borg)
             finally:
@@ -1870,8 +1874,9 @@ class ListCommand(Command):
             lines.reverse()
 
         # generate formatted output
+        no_color = lambda x: x
         if cmdline['--no-color']:
-            healthy_color = broken_color = lambda x: x
+            healthy_color = broken_color = no_color
         else:
             healthy_color = Color("green", enable=Color.isTTY())
             broken_color = Color("red", enable=Color.isTTY())
@@ -1886,11 +1891,11 @@ class ListCommand(Command):
                 if not recursive:
                     if '/' in values['path'][len(path)+1:]:
                         continue  # skip files is subdirs of specified path
-            if values['healthy']:
-                colorize = healthy_color
+            if 'healthy' in values:
+                colorize = healthy_color if values['healthy'] else broken_color
+                values['healthy'] = truth(values['healthy'], formatter='healthy/broken')
             else:
-                colorize = broken_color
-            values['healthy'] = truth(values['healthy'], formatter='healthy/broken')
+                colorize = no_color
             type = values['mode'][0]
             values['Type'] = ''
             values['extra'] = ''
@@ -2141,7 +2146,7 @@ class PruneCommand(Command):
         prune_status = borg.status
 
         # update the date file
-        update_latest('prune', settings.date_file)
+        update_latest('prune', settings.date_file, options)
 
         if fast:
             return prune_status

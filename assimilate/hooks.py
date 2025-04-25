@@ -59,8 +59,9 @@ class Hooks:
             validator = Schema(schema)
         )
 
-    def __init__(self, settings):
+    def __init__(self, settings, dry_run=False):
         self.active_hooks = []
+        self.dry_run = dry_run
         for subclass in self.__class__.__subclasses__():
             c = subclass(settings)
             if c.is_active():
@@ -77,19 +78,21 @@ class Hooks:
             hook.borg = borg
 
     def __enter__(self):
-        for hook in self.active_hooks:
-            try:
-                hook.signal_start()
-            except Error as e:
-                warn(e)
+        if not self.dry_run:
+            for hook in self.active_hooks:
+                try:
+                    hook.signal_start()
+                except Error as e:
+                    warn(e)
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        for hook in self.active_hooks:
-            try:
-                hook.signal_end(exc_value)
-            except Error as e:
-                warn(e)
+        if not self.dry_run:
+            for hook in self.active_hooks:
+                try:
+                    hook.signal_end(exc_value)
+                except Error as e:
+                    warn(e)
 
     def signal_start(self):
         url = self.START_URL.format(url=self.url, uuid=self.uuid)

@@ -754,9 +754,10 @@ assimilate:
                             >                             run
                             >    run_before_first_backup: commands to run before first archive is
                             >                             created
-                            >              show_progress: show borg progress when running create command
-                            >                 show_stats: show borg statistics when running create,
-                            >                             delete, and prune commands
+                            >              show_progress: show borg progress when running create or
+                            >                             compact commands
+                            >                 show_stats: show borg statistics when running create or
+                            >                             compact commands
                             >                   src_dirs: the directories to archive
                             >                ssh_command: command to use for SSH, can be used to specify
                             >                             SSH options
@@ -1012,7 +1013,52 @@ assimilate:
                     ~/.local/share/assimilate/test.log.nt:
                         excludes line:     > running command: due - fuxme
 
-            clammy — create {{{2:
+            clammy — create --dry-run {{{2:
+                run: assimilate --dry-run create
+                checks:
+                    stdout:
+                        matches text:
+                            > --match-archives ['sh:kundert-ken-test-*'] does not match any archives
+                            > --last 1 archives: only found 0 archives
+
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         create \
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --dry-run \
+                            >         '--pattern=R /{run_dir}' \
+                            >         '--pattern=- /{run_dir}/.cache' \
+                            >         '--pattern=- /{run_dir}/.local' \
+                            >         '--pattern=- /{run_dir}/bu' \
+                            >         '--pattern=- /{run_dir}/REPO' \
+                            >         --exclude-caches \
+                            >         --exclude-nodump \
+                            >         --exclude-if-present=.nobackup \
+                            >         '{hostname}-{username}-test-⟪now⟫'
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        contains lines in order:
+                            -     > running command: create
+                            -
+
+                    ~/.local/share/assimilate/test.latest.nt:
+                        excludes regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            garret — due {{{2:
+                run: assimilate due
+                checks:
+                    stdout:
+                        matches text:
+                            > test backup never run.
+                            > test compact never run.
+                            > test check never run.
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        excludes line:     > running command: due - fuxme
+
+            mango — create {{{2:
                 run: assimilate create
                 checks:
                     ~/.local/share/assimilate/test.log:
@@ -1039,6 +1085,18 @@ assimilate:
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            toffee — due {{{2:
+                run: assimilate due
+                checks:
+                    stdout:
+                        matches regex:
+                            > test backup completed .* ago\.
+                            > test squeeze completed .* ago\.
+                            > test check completed .* ago\.
+
+                    ~/.local/share/assimilate/test.log.nt:
+                        excludes line:     > running command: due - fuxme
 
             ceasefire — create again {{{2:
                 initialization:
@@ -4341,10 +4399,10 @@ assimilate:
                 checks:
                     stderr:
                         contains lines in order:
-                            - Computing used/wanted chunks 0.0%
-                            - Computing used/wanted chunks 25.0%
-                            - Computing used/wanted chunks 50.0%
-                            - Computing used/wanted chunks 75.0%
+                            - Computing used chunks 0.0%
+                            - Computing used chunks 25.0%
+                            - Computing used chunks 50.0%
+                            - Computing used chunks 75.0%
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -4424,10 +4482,13 @@ assimilate:
                     stderr:
                         matches regex:
                             > archive: {aid0} {ar0} .*
-                            > \.config
-                            > \.config/assimilate
-                            > \.config/assimilate/shared\.conf\.nt
-                            > \.config/assimilate/test\.conf\.nt
+                            > - \.
+                            > \+ \.config
+                            > \+ \.config/assimilate
+                            > \+ \.config/assimilate/shared\.conf\.nt
+                            > \+ \.config/assimilate/test\.conf\.nt
+                            > - a
+                            > - b
 
             embargo — restore --list .config {{{2:
                 run: assimilate restore --list .config
@@ -4435,10 +4496,13 @@ assimilate:
                     stderr:
                         matches regex:
                             > archive: {aid0} {ar0} .*
-                            > \.config
-                            > \.config/assimilate
-                            > \.config/assimilate/shared\.conf\.nt
-                            > \.config/assimilate/test\.conf\.nt
+                            > - \.
+                            > \+ \.config
+                            > \+ \.config/assimilate
+                            > \+ \.config/assimilate/shared\.conf\.nt
+                            > \+ \.config/assimilate/test\.conf\.nt
+                            > - a
+                            > - b
 
             tassel — prune --list  {{{2:
                 run: assimilate prune --list
@@ -4477,10 +4541,17 @@ assimilate:
                             >         --match-archives=sh:test
 
                         excludes text: compact
-                            # running:
-                            #     borg \
-                            #         compact \
-                            #         --repo=/{run_dir}/REPO/test
+
+            takeover — compact  {{{2:
+                run: assimilate compact
+                checks:
+                    ~/.local/share/assimilate/test.log:
+                        contains text:
+                            > running:
+                            >     borg \
+                            >         compact
+                            >         --repo=/{run_dir}/REPO/test \
+                            >         --match-archives=sh:test
 
             cannon — overdue {{{2:
                 run: assimilate overdue
@@ -5321,8 +5392,11 @@ assimilate:
                 run: assimilate --dry-run --config=test compact
                 checks:
                     stderr:
-                        contains line: assimilate error: --dry-run is not available with compact command.
-                    status: 2
+                        matches text:
+                            > === test1 ===
+                            >
+                            > === test2 ===
+
 
             evocation — compare nutz {{{2:
                 run: assimilate --config=test1 compare nutz

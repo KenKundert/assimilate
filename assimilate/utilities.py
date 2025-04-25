@@ -192,7 +192,11 @@ def when(time, relative_to=None, as_past=None, as_future=None):
 
 
 # update_latest {{{1
-def update_latest(commands, path, repo_size=None):
+def update_latest(commands, path, options, repo_size=None):
+    if 'dry-run' in options:
+        return
+    if is_str(commands):
+        commands = [commands]
     narrate(f"updating date file for {conjoin(commands)}: {str(path)}")
     if is_str(commands):
         commands = [commands]
