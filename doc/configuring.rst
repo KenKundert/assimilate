@@ -956,6 +956,19 @@ processed directly by *Borg*, which does not allow ``~`` to represent users'
 home directories, unlike the patterns specified using :ref:`patterns`.
 
 
+.. _get_repo_size:
+
+get_repo_size
+~~~~~~~~~~~~~
+
+A Boolean that when ``'yes`` causes the repository size to be saved to the 
+*latest.nt* file.  The repository size is produced by the :ref:`compact command 
+<compact>` and requires the use of the ``--stats`` option, which can be very 
+slow for some type of repositories (sftp and cloud storage).
+
+Must be enabled when using :ref:`borg space`.
+
+
 .. _healthchecks_url:
 
 healthchecks_url

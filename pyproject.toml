@@ -23,7 +23,7 @@ dependencies = [
     "appdirs",
     "arrow>=1.3",
     "docopt",
-    "inform>=1.33",
+    "inform>=1.34",
     "nestedtext",
     "ntlog",
     "quantiphy",

@@ -726,8 +726,9 @@ class Assimilate:
         borg_opts=None,
         assimilate_opts=None,
         strip_archive_matcher=False,
-        show_borg_output=False,
+        show_borg_output=None,
         use_working_dir=False,
+        show_progress=False,
     ):
         assimilate_opts = assimilate_opts or {}
 
@@ -761,7 +762,9 @@ class Assimilate:
         # run the command
         with cd(self.working_dir if use_working_dir else "."):
             narrate("running in:", cwd())
-            if "--json" in command or "--json-lines" in command:
+            if show_borg_output is False:
+                narrating = False
+            elif "--json" in command or "--json-lines" in command:
                 narrating = False
             else:
                 narrating = (
@@ -776,6 +779,8 @@ class Assimilate:
                 modes = "soeW1"
             else:
                 modes = "sOEW1"
+            if show_progress:
+                modes = modes.replace('W', 'w')
             narrate(
                 "running:\n{}".format(
                     indent(render_command(command, borg_options_arg_count))
@@ -785,8 +790,15 @@ class Assimilate:
             log("starts at: {!s}".format(starts_at))
             try:
                 borg = Run(command, modes=modes, stdin="", env=os.environ, log=False)
+                if show_progress:
+                    borg.from_show_progress = show_progress(borg.process.stderr)
+                    borg.wait()
             except Error as e:
                 self.report_borg_error(e, cmd)
+            except KeyboardInterrupt:
+                borg.kill()
+                borg.status = 0
+                raise
             finally:
                 # remove passcode env variables created by assimilate
                 if self.borg_passcode_env_var_set_by_assimilate:
@@ -799,16 +811,17 @@ class Assimilate:
         if borg.status == 1 and borg.stderr:
             warnings = borg.stderr.partition(72*'-')[0]
             warn('warning emitted by Borg:', codicil=warnings)
+        empty = f"❬{'not captured' if narrating or show_progress else 'empty'}❭"
         if borg.stdout:
             narrate("Borg stdout:")
             narrate(indent(borg.stdout.rstrip()))
         else:
-            narrate("Borg stdout: ❬empty❭")
+            narrate(f"Borg stdout: {empty}")
         if borg.stderr:
             narrate("Borg stderr:")
             narrate(indent(borg.stderr.rstrip()))
         else:
-            narrate("Borg stderr: ❬empty❭")
+            narrate(f"Borg stderr: {empty}")
 
         return borg
 

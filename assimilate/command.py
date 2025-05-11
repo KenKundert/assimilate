@@ -25,9 +25,11 @@ import sys
 from textwrap import dedent, fill
 import arrow
 from contextlib import contextmanager
+import re
 from inform import (
     Color,
     Error,
+    ProgressBar,
     conjoin,
     display,
     full_stop,
@@ -603,17 +605,13 @@ class CompactCommand(Command):
             assimilate compact [options]
 
         Options:
-            -p, --progress   shows Borg progress
             -s, --stats      show Borg statistics
 
         This command frees repository space by compacting segments.
 
         Use this regularly to avoid running out of space, however you do not
         need to it after each Borg command. It is especially useful after
-        deleting archives, because only compaction will really free repository
-        space.
-
-        Requires Borg version 1.2 or newer.
+        deleting archives, because only compaction frees repository space.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -625,24 +623,55 @@ class CompactCommand(Command):
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         borg_opts = []
-        if cmdline["--progress"] or settings.show_progress:
-            borg_opts.append("--progress")
-        if cmdline["--stats"] or settings.show_stats:
+        show_stats =  cmdline["--stats"] or settings.show_stats
+        if show_stats or settings.get_repo_size:
             borg_opts.append("--stats")
+            borg_opts.append("--verbose")
+                # need --verbose or --stats does not output anything
+
+        def show_progress(stream):
+            repo_size = None
+            stats = []
+            informant = display if Color.isTTY() else None
+            with ProgressBar(666, width=-1, informant=informant) as progress:
+                initialize = True
+                for line in stream:
+                    match = re.search(rb'\((\d+)/(\d+)\)', line)
+                    if match:
+                        if initialize:
+                            progress.override_limits(float(match[2]), 0, False)
+                            initialize = False
+                        progress.draw(float(match[1]))
+
+                    if line.startswith(b'Source data size'):
+                        stats.append(line.decode('utf8'))
+                    if line.startswith(b'Repository size'):
+                        stats.append(line.decode('utf8'))
+                        matched = re.search(rb' (\d+ \wB) ', line)
+                        if matched:
+                            repo_size = Quantity(matched[1].decode('utf8'))
+                    if line.startswith(b'Compaction saved'):
+                        stats.append(line.decode('utf8'))
+
+            return dict(repo_size=repo_size, stats=stats)
 
         # run borg
         borg = settings.run_borg(
             cmd = "compact",
             borg_opts = borg_opts,
             assimilate_opts = options,
-            show_borg_output = "--stats" in borg_opts,
+            show_borg_output = False,
+            show_progress = show_progress
         )
-        out = borg.stderr or borg.stdout
-        if out:
-            output(out.rstrip())
 
-        # update the date file
-        update_latest('compact', settings.date_file, options)
+        # output stats
+        if show_stats:
+            for each in borg.from_show_progress['stats']:
+                display(each.strip())
+
+        # update date file
+        repo_size = borg.from_show_progress['repo_size']
+        update_latest('compact', settings.date_file, options, repo_size=repo_size)
 
         return borg.status
 
@@ -887,7 +916,6 @@ class CreateCommand(Command):
 
     @classmethod
     def run(cls, command, args, settings, options):
-        repo_size = None
 
         # read command line
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
@@ -936,7 +964,7 @@ class CreateCommand(Command):
                             borg_opts = borg_opts.copy(),
                             args = [settings.value('archive')] + src_dirs,
                             assimilate_opts = options,
-                            show_borg_output = "--stats" in borg_opts,
+                            show_borg_output = "--stats" in borg_opts or None,
                             use_working_dir = True,
                         )
                         break
@@ -1000,23 +1028,6 @@ class CreateCommand(Command):
                 else:
                     prune_status = 0
 
-                # get the size of the repository
-                activity = "sizing"
-                # now output the information from borg about the repository
-                info = settings.run_borg(
-                    cmd = "repo-info",
-                    assimilate_opts = options,
-                    borg_opts = ['--json'],
-                    strip_archive_matcher = True,
-                )
-                data = json.loads(info.stdout)
-                try:
-                    repo_size = Quantity(data['cache']['stats']['unique_csize'], 'B')
-                    repo_size = repo_size.render(prec='full')
-                except KeyError:
-                    repo_size = None
-                    #KSK warn('repository size information is not available.')
-
         except Error as e:
             e.reraise(
                 codicil = (
@@ -1025,7 +1036,7 @@ class CreateCommand(Command):
                 )
             )
 
-        return max([create_status, check_status, prune_status, info.status])
+        return max([create_status, check_status, prune_status])
 
 # DeleteCommand command {{{1
 class DeleteCommand(Command):
@@ -1553,7 +1564,7 @@ class ExtractCommand(Command):
             borg_opts = borg_opts,
             args = [archive] + paths,
             assimilate_opts = options,
-            show_borg_output = bool(borg_opts),
+            show_borg_output = bool(borg_opts) or None,
         )
         out = borg.stderr or borg.stdout
         if out:
@@ -2491,7 +2502,7 @@ class RestoreCommand(Command):
             borg_opts = borg_opts,
             args = [archive] + paths,
             assimilate_opts = options,
-            show_borg_output = bool(borg_opts),
+            show_borg_output = bool(borg_opts) or None,
             use_working_dir = True,
         )
         out = borg.stderr or borg.stdout

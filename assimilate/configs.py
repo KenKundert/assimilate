@@ -339,6 +339,10 @@ ASSIMILATE_SETTINGS = dict(
         desc = "file that contains exclude patterns",
         validator = as_path,
     ),
+    get_repo_size = dict(
+        desc = "record the amount of disk space need to hold the repository",
+        validator = as_bool,
+    ),
     include = dict(
         desc = "include the contents of another file",
         validator = as_path,

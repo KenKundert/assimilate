@@ -718,6 +718,8 @@ assimilate:
                             >               exclude_from: file that contains exclude patterns
                             >                   excludes: list of glob strings of files or directories
                             >                             to skip
+                            >              get_repo_size: record the amount of disk space need to hold
+                            >                             the repository
                             >                    include: include the contents of another file
                             >               list_formats: named format strings available to list command
                             >                    logging: logging options
@@ -1230,11 +1232,9 @@ assimilate:
                             > Repository ID: [a-f0-9]+
                             > Location: /{run_dir}/REPO/test
                             > Repository version: 3
-                            > Append only: False
                             > Encrypted: No
-                            > Storage quota: 0 B used
-                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
                             > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
             atomizer — info --archive sh:❬ar0❭ {{{2:
                 run: assimilate info --archive sh:{ar0}
@@ -2039,11 +2039,9 @@ assimilate:
                             > Repository ID: [a-f0-9]+
                             > Location: /{run_dir}/REPO/test
                             > Repository version: 3
-                            > Append only: False
                             > Encrypted: Yes \(repokey BLAKE2b ChaCha20-Poly1305\)
-                            > Storage quota: 0 B used
-                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
                             > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -2944,11 +2942,9 @@ assimilate:
                             > Repository ID: [a-f0-9]+
                             > Location: /{run_dir}/REPO/test1
                             > Repository version: 3
-                            > Append only: False
                             > Encrypted: Yes \(repokey BLAKE2b ChaCha20-Poly1305\)
-                            > Storage quota: 0 B used
-                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
                             > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+                            > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
                     stderr:
                         matches text:
@@ -4394,22 +4390,22 @@ assimilate:
                             >     >         --find-lost-archives
 
 
-            valency — compact --progress  {{{2:
-                run: assimilate compact --progress
+            valency — compact --stats  {{{2:
+                run: assimilate compact --stats
                 checks:
                     stderr:
-                        contains lines in order:
-                            - Computing used chunks 0.0%
-                            - Computing used chunks 25.0%
-                            - Computing used chunks 50.0%
-                            - Computing used chunks 75.0%
+                        matches regex:
+                            > Source data size was \d+ \w?B in \d+ files.
+                            > Repository size is \d+ \w?B in \d+ objects.
+                            > Compaction saved \d+ \w?B.
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
                             >     borg \
                             >         compact \
-                            >         --progress \
+                            >         --stats \
+                            >         --verbose \
                             >         --repo=/{run_dir}/REPO/test
 
             canyon — delete  {{{2:
@@ -4549,9 +4545,8 @@ assimilate:
                         contains text:
                             > running:
                             >     borg \
-                            >         compact
-                            >         --repo=/{run_dir}/REPO/test \
-                            >         --match-archives=sh:test
+                            >         compact \
+                            >         --repo=/{run_dir}/REPO/test
 
             cannon — overdue {{{2:
                 run: assimilate overdue

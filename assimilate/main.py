@@ -156,4 +156,4 @@ def main():
             error(os_error(e))
         except KeyboardInterrupt:
             display("Terminated by user.")
-        terminate(max(worst_exit_status, exit_status))
+        terminate(max(worst_exit_status, exit_status or 0))
