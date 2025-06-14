@@ -50,7 +50,7 @@ like *GitHub*.
     *Borg* and if you are currently an *Emborg* user you will need to switch to 
     *Assimilate* when you upgrade to *Borg 2.0*.
 
-    All future development is moving to *Assimilate* and *Emborg* is 
+    All future development is moving to *Assimilate* while *Emborg* is 
     transitioning to maintenance support only.
 
 
@@ -137,12 +137,12 @@ In addition, *Assimilate* add a new concept.
     prune out archives that are no longer worth keeping, etc.
 
 In *Borg* everything needed by a command must be specified as command line 
-options.  In *Assimilate* the addition of configurations allows you to simply 
-specify the configuration to the command.  The command can then extract the 
-information it needs from the configuration.  In this case, command line options 
-are only needed for things not available from the configuration, which are 
-things that tend to vary from invocation to invocation, like which file you wish 
-to extract.
+options or environment variables.  In *Assimilate* the addition of 
+configurations allows you to simply specify the configuration to the command.  
+The command can then extract the information it needs from the configuration.  
+In this case, command line options are only needed for things not available from 
+the configuration, which are things that tend to vary from invocation to 
+invocation, such as which file you wish to extract.
 
 *Assimilate* also allows you to specify a default configuration, so in most 
 cases you need not even specify the configuration to a command.
