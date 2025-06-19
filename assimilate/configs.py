@@ -534,11 +534,6 @@ BORG_SETTINGS = dict(
         desc = "exclude directories that contain a CACHEDIR.TAG file",
         validator = as_bool,
     ),
-    exclude_nodump = dict(
-        cmds = ["create"],
-        desc = "exclude files flagged NODUMP",
-        validator = as_bool,
-    ),
     exclude_if_present = dict(
         cmds = ["create", "recreate"],
         arg = "NAME",

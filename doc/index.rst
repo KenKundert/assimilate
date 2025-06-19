@@ -172,7 +172,6 @@ all configurations. This is a NestedText_ file located at
     # things to exclude
     exclude if present: .nobackup
     exclude caches: 'yes
-    exclude nodump: 'yes
 
     # command aliases
     command aliases:

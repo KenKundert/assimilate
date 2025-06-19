@@ -46,7 +46,6 @@ Here is the contents of the settings file:
     # excludes
     exclude if present: .nobackup
     exclude caches: 'yes
-    exclude nodump: 'yes
 
     # personalize assimilate
     command aliases:
@@ -187,7 +186,6 @@ Here is the contents of the shared settings file: ~/.config/assimilate/settings.
     # excludes
     exclude if present: .nobackup
     exclude caches: 'yes
-    exclude nodump: 'yes
 
     # personalize assimilate
     command aliases:

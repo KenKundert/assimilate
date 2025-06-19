@@ -79,7 +79,6 @@ INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
     # excludes
     exclude if present: .nobackup
     exclude caches: 'yes
-    exclude nodump: 'yes
 
     # personalize assimilate
     command aliases:

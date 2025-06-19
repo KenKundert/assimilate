@@ -104,7 +104,6 @@ It might look like the following:
     # excludes
     exclude if present: .nobackup
     exclude caches: 'yes
-    exclude nodump: 'yes
 
     # personalize assimilate
     command aliases:
@@ -1586,14 +1585,6 @@ Exclude directories that are tagged by containing a filesystem object with the
 given NAME.  For example if *exclude_if_present* is set to ``.nobackup`` then 
 a directory that contains a file named ``.nobackup`` will be excluded from the 
 back ups.
-
-
-.. _exclude_nodump:
-
-exclude_nodump
-~~~~~~~~~~~~~~
-
-Exclude files flagged NODUMP.
 
 
 .. _lock_wait:
