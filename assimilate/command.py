@@ -465,7 +465,7 @@ class BreakLockCommand(Command):
             assimilate break-lock
 
         Breaks both the local and the repository locks.  Use carefully and only
-        if no *Borg* process (on any machine) is trying to access the cache or
+        if no Borg process (on any machine) is trying to access the cache or
         the repository.
         """
     ).strip()
@@ -731,12 +731,12 @@ class CompareCommand(Command):
         comparison, and then unmounting the directory.  Problems sometimes occur
         that can result in the archive remaining mounted.  In this case you will
         need to resolve any issues that are preventing the unmounting, and then
-        explicitly run the :ref:`unmount command <umount>` before you can use
-        this *Borg* repository again.
+        explicitly run the unmount command before you can use this Borg
+        repository again.
 
-        This command differs from the :ref:`diff command <diff>` in that it
-        compares local files to those in an archive where as :ref:`diff <diff>`
-        compares the files contained in two archives.
+        This command differs from the diff command in that it compares local
+        files to those in an archive where as diff compares the files contained
+        in two archives.
         """
     ).strip()
     REQUIRES_EXCLUSIVITY = True
@@ -1733,7 +1733,7 @@ class ListCommand(Command):
         contained in the current working directory.  The path given should be a
         file system path, meaning it is either an absolute path or a relative
         path from the direction from which *Assimilae* is being run.  It is not
-        a *Borg* path.
+        a Borg path.
 
         You can specify a particular archive if you wish:
 
