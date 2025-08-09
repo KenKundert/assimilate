@@ -67,6 +67,7 @@ from inform import (
     Color,
     Error,
     InformantFactory,
+    bar,
     conjoin,
     cull,
     dedent,
@@ -84,7 +85,7 @@ from .configs import (
     add_setting, add_parents_of_non_identifier_keys,
     as_color, as_emails, as_path, as_abs_path, as_string, as_name
 )
-from .preferences import DATA_DIR
+from .preferences import DATA_DIR, DEFAULT_AGE_BAR_WIDTH
 from .utilities import output, read_latest, when, Quantity, InvalidNumber, Run, to_path
 
 # GLOBALS {{{1
@@ -298,6 +299,10 @@ def overdue(cmdline, args, settings, options):
                     report = report_as_overdue
                 else:
                     report = report_as_current
+                repo_data["age_bar"] = bar(
+                    repo_data["age"]/repo_data["max_age"],
+                    width=DEFAULT_AGE_BAR_WIDTH, pad=True, clip=1.5, overflow="▋▍▎▏"
+                )
 
                 with Quantity.prefs(spacer=' '):
                     if overdue or locked or not cmdline["--no-passes"]:

@@ -51,6 +51,7 @@ INCLUDE_SETTING = "include"
 DEFAULT_ENCODING = "utf-8"
 DEFAULT_COMMAND = "create"
 DEFAULT_ENCRYPTION = "none"
+DEFAULT_AGE_BAR_WIDTH = 20
 
 # Initial contents of files {{{2
 # Shared settings {{{3

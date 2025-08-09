@@ -248,18 +248,44 @@ In addition, there are some shared settings available:
     | *description*: replaced by the description or the repository, a string.
     | *max_age*: replaced by the max_age field from the config file, a quantity.
     | *mtime*: replaced by modification time, a datetime object.
-    | *age*: replaced by the number of hours since last update, a quantity.
+    | *age*: replaced by the time since last update, a quantity.
     | *updated*: replaced by time since last update, a string (a humanized version of *age*).
+    | *age_bar*: replaced by bar the width of which is a graphical version of *age* normalized to *max_age*
     | *overdue*: is the back-up overdue, a boolean.
     | *locked*: is the back-up currently active, a boolean.
 
     The message is a Python formatted string, and so the various fields can include
     formatting directives.  For example:
 
-    - strings than include field width and justification, ex. {host:>20}
+    - strings_ can include field width and justification, ex. {host:>20}
     - quantities can include QuantiPhy_ formats, ex. {age:0.1phours}
     - datetimes can include Arrow_ formats, ex: {mtime:DD MMM YY @ H:mm A}
-    - booleans can include Inform_ true/false strings: {overdue:PAST DUE!/current}
+    - booleans can include Inform_ truth_ strings: ex: {overdue:PAST DUE!/current}
+    - bars can include Inform_ bar_ strings: ex: {age_bar:20FC}
+
+    A typical value for *message* is::
+
+        message: {description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
+
+    A fancy value for *message* is::
+
+        message:
+            > {age_bar:20F1.5▋▍▎▏
+            >                     }{description}: {updated} ago{locked: (currently active)}{overdue: — PAST DUE}
+
+    This version adds a bar that depicts the age of the last backup normalized 
+    to the maximum allowed age.  If the age exceeds 1.5× the maximum age, the 
+    bar is truncated, with several vertical bars added to suggest this, and 
+    a newline and indent is added to line up the description with any others 
+    being displayed.  It might produce the following display::
+
+        █████████████▎      root@shinara (/): 17 hours ago
+        ██████████████████████████▎root@arafel (/): 33 hours ago
+        ███████▎            root@kandor (/): 9 hours ago
+        ██                  root@saldea (/): 4 hours ago
+        ██▋                 home@shinara (/): 5 hours ago
+        ██████████████████████████████▋▍▎▏
+                            cache@shinara (/): 38 minutes ago — PAST DUE
 
 *locked_color*:
     The text color to use for repositories that are currently locked.  Choose 
@@ -269,17 +295,11 @@ In addition, there are some shared settings available:
     The default is ``'magenta``.
 
 *overdue_color*:
-    The text color to use for repositories that are currently locked.  Choose 
-    from:
-    ``'black``, ``'red``, ``'green``, ``'yellow``, ``'blue``, ``'magenta``,
-    ``'cyan``, ``'white``, or ``'none``.
+    The text color to use for repositories that are currently locked.
     The default is ``'red``.
 
 *current_color*:
-    The text color to use for repositories that are currently locked.  Choose 
-    from:
-    ``'black``, ``'red``, ``'green``, ``'yellow``, ``'blue``, ``'magenta``,
-    ``'cyan``, ``'white``, or ``'none``.
+    The text color to use for repositories that are currently locked.
     The default is ``'green``.
 
 
