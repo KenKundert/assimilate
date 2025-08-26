@@ -279,13 +279,13 @@ In addition, there are some shared settings available:
     a newline and indent is added to line up the description with any others 
     being displayed.  It might produce the following display::
 
-        █████████████▎      root@shinara (/): 17 hours ago
-        ██████████████████████████▎root@arafel (/): 33 hours ago
-        ███████▎            root@kandor (/): 9 hours ago
-        ██                  root@saldea (/): 4 hours ago
-        ██▋                 home@shinara (/): 5 hours ago
+        █████████████▎      root@shinara/: 17 hours ago
+        ██████████████████████████▎root@arafel/: 33 hours ago
+        ███████▎            root@kandor/: 9 hours ago
+        ██                  root@saldea/: 4 hours ago
+        ██▋                 home@shinara/: 5 hours ago
         ██████████████████████████████▋▍▎▏
-                            cache@shinara (/): 38 minutes ago — PAST DUE
+                            cache@shinara/: 38 minutes ago — PAST DUE
 
 *locked_color*:
     The text color to use for repositories that are currently locked.  Choose 

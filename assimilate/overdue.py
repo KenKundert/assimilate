@@ -170,7 +170,7 @@ def get_local_data(description, config, path, max_age):
     else:
         if not path:
            raise Error("‘sentinel_dir’ setting is required.", culprit=description)
-        paths = list(path.glob("index.*"))
+        paths = list(p for p in path.glob("index.*") if p.suffix != '.tmp')
         if not paths:
             raise Error("no sentinel file found.", culprit=path)
         if len(paths) > 1:
