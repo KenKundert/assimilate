@@ -157,7 +157,7 @@ are required.  First is the file that contains settings that are shared between
 all configurations. This is a NestedText_ file located at 
 ``~/.config/assimilate/shared.conf.nt``.  Here is an example:
 
-.. code-block:: bash
+.. code-block:: nestedtext
 
     # configurations
     default config: home
@@ -191,7 +191,7 @@ configuration.  The configuration is described in
 ``~/.config/assimilate/root.conf.nt``, an example of which is given below.  It 
 is designed to back up the whole machine:
 
-.. code-block:: bash
+.. code-block:: nestedtext
 
     # repository settings
     repository: borgbase:backups
@@ -223,9 +223,9 @@ is designed to back up the whole machine:
         - /home/*/.cache
 
     # prune settings
-    keep_daily = 7
-    keep_weekly = 4
-    keep_monthly = 6
+    keep_daily: 7
+    keep_weekly: 4
+    keep_monthly: 6
 
 Since this configuration needs to back up files that may not be accessible by 
 normal users, it should be run by the root user.

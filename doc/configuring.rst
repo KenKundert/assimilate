@@ -55,9 +55,10 @@ a dictionary.  Here is an example of each:
 
 There are a few things to notice.
 
-1. The structures can be nested.  The top level is a dictionary, and the example 
-   shows that it itself may contain other dictionaries.  Similarly both list and 
-   dictionary values may be lists or dictionaries.
+1. The structures can be nested.  The top level is a dictionary (a collection of 
+   key-value pairs), and the example shows that it itself may contain other 
+   dictionaries.  Similarly both list and dictionary values may be lists or 
+   dictionaries.
 
 2. The hierarchy is imposed through indentation.
 
@@ -97,9 +98,9 @@ It might look like the following:
     passphrase: watershed valuation gibbet washday
 
     # composite commands
-    prune_after_create: 'yes
-    check_after_create: 'latest
-    compact_after_delete: 'yes
+    prune after create: 'yes
+    check after create: 'latest
+    compact after delete: 'yes
 
     # excludes
     exclude if present: .nobackup
@@ -1895,11 +1896,11 @@ On Linux systems it is ``~/.config``.
 XDG_DATA_HOME
 ~~~~~~~~~~~~~
 
-Specifies the directory that contains data directories.  When set, *Assimilate*s 
-data directory will be ``$XDG_DATA_HOME/assimilate``.  If not set, the location 
-of the configuration directories is system specific.  On Linux systems it is 
-``~/.local/share``.  The *Assimilate* data directory is where *Assimilate* 
-places its log files.
+Specifies the directory that contains data directories.  When set, 
+*Assimilate*'s data directory will be ``$XDG_DATA_HOME/assimilate``.  If not 
+set, the location of the configuration directories is system specific.  On Linux 
+systems it is ``~/.local/share``.  The *Assimilate* data directory is where 
+*Assimilate* places its log files.
 
 
 PAGER
