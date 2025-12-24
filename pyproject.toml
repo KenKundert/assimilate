@@ -1,7 +1,7 @@
 [project]
 name = "assimilate"
 version = "0.0b12"
-description = "Borg front end."
+description = "Front end for BorgBackup version 2."
 readme = "README.rst"
 keywords = ["assimilate", "emborg", "borg", "borgmatic", "vorta", "backups"]
 authors = [

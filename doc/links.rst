@@ -23,3 +23,4 @@
 .. _strings: https://docs.python.org/3/library/string.html#format-specification-mini-language
 .. _transfer: https://borgbackup.readthedocs.io/en/latest/usage/transfer.html
 .. _Vorta: https://github.com/borgbase/vorta
+.. _backup strategy: https://www.securedatarecovery.com/blog/ultimate-guide-to-data-backups

@@ -401,11 +401,15 @@ backup you should :ref:`mount <mount>` the most recent archive and then
 carefully examine the resulting snapshot and make sure it contains all the 
 expected files.
 
-Finally, it is a good idea to practice a recovery. Pretend that you have lost
+It is a extremely important to practice a recovery. Pretend that you have lost
 all your files and then see if you can do a restore from backup. Doing this and
 working out the kinks before you lose your files can save you if you ever do
 lose your files.
 
+Finally, you should have a well considered `backup strategy`_. Common strategies 
+include the 3-2-1 strategy (3 copies, 2 types of media, 1 offsite) and the 
+3-2-1-1-0 strategy (3-2-1 plus 1 copy offline or immutable, 0 recovery errors 
+through routine verification).
 
 Issues
 ------

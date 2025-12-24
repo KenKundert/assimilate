@@ -1485,7 +1485,7 @@ class ExtractCommand(Command):
 
         You extract a file or directory using:
 
-            assimilate extract home/ken/src/avendesora/doc/overview.rst
+            assimilate extract etc/ssh/sshd_config
 
         The path or paths given should match those found in the Borg archive.
         Use list to determine what path you should specify (the paths are
@@ -1508,7 +1508,7 @@ class ExtractCommand(Command):
         The extracted files are placed in the current working directory with
         the original hierarchy.  Thus, the above commands create the file:
 
-            ./home/ken/src/avendesora/doc/overview.rst
+            ./etc/ssh/sshd_config
 
         Normally, extract refuses to run if your current directory is the
         working directory used by Assimilate so as to avoid overwriting an
