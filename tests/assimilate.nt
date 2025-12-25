@@ -131,6 +131,7 @@ assimilate:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > encryption: none
+                        > archive: ⟪host_name⟫-⟪⟪now:%y%m%d@%H:%M:%S.%f⟫⟫
                         >
                         > # user defined placeholders
                         > nutz: peanuts
@@ -289,7 +290,7 @@ assimilate:
                             >         '--pattern=- /{run_dir}/bu' \
                             >         '--pattern=- /{run_dir}/REPO' \
                             >         --stats \
-                            >         '{hostname}-{username}-test-⟪now⟫'
+                            >         '{hostname}-⟪now:%y%m%d@%H:%M:%S.%f⟫'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -303,7 +304,7 @@ assimilate:
                             >     >         '--pattern=- /{run_dir}/bu' \
                             >     >         '--pattern=- /{run_dir}/REPO' \
                             >     >         --stats \
-                            >     >         '{hostname}-{username}-test-⟪now⟫'
+                            >     >         '{hostname}-⟪now:%y%m%d@%H:%M:%S.%f⟫'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -339,7 +340,7 @@ assimilate:
                             >         '--pattern=- /{run_dir}/bu' \
                             >         '--pattern=- /{run_dir}/REPO' \
                             >         --stats \
-                            >         '{hostname}-{username}-test-⟪now⟫'
+                            >         '{hostname}-⟪now:%y%m%d@%H:%M:%S.%f⟫'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains text:
@@ -353,7 +354,7 @@ assimilate:
                             >     >         '--pattern=- /{run_dir}/bu' \
                             >     >         '--pattern=- /{run_dir}/REPO' \
                             >     >         --stats \
-                            >     >         '{hostname}-{username}-test-⟪now⟫'
+                            >     >         '{hostname}-⟪now:%y%m%d@%H:%M:%S.%f⟫'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -378,7 +379,7 @@ assimilate:
                             >         repo-list \
                             >         --json \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         '--match-archives=sh:{hostname}-{username}-test-*'
+                            >         '--match-archives=sh:{hostname}-*'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains text:
@@ -392,7 +393,7 @@ assimilate:
                             >     >         repo-list \
                             >     >         --json \
                             >     >         --repo=/{run_dir}/REPO/test \
-                            >     >         '--match-archives=sh:{hostname}-{username}-test-*'
+                            >     >         '--match-archives=sh:{hostname}-*'
 
             ampere — delete {{{2:
                 run: assimilate delete -a {ar1}
@@ -407,7 +408,7 @@ assimilate:
                             > running:
                             >     borg \\
                             >         delete \\
-                            >         --match-archives={hostname}-{username}-test-.* \\
+                            >         --match-archives={hostname}-.* \\
                             >         --repo=/{run_dir}/REPO/test
                         excludes line: running command: compact
 
@@ -463,7 +464,7 @@ assimilate:
                             >     borg \
                             >         repo-list \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         '--match-archives=sh:{hostname}-{username}-test-*' \
+                            >         '--match-archives=sh:{hostname}-*' \
                             >         --json \
                             >         --last=1
                         contains regex:
@@ -596,7 +597,7 @@ assimilate:
                             >         check \
                             >         --last=1 \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         '--match-archives=sh:{hostname}-{username}-test-*'
+                            >         '--match-archives=sh:{hostname}-*'
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains text:
@@ -605,7 +606,7 @@ assimilate:
                             >     >         check \
                             >     >         --last=1 \
                             >     >         --repo=/{run_dir}/REPO/test \
-                            >     >         '--match-archives=sh:{hostname}-{username}-test-*'
+                            >     >         '--match-archives=sh:{hostname}-*'
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^check last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
@@ -640,8 +641,8 @@ assimilate:
                 checks:
                     stdout:
                         matches text:
-                            >                    archive: ⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-⟪⟪now⟫⟫
-                            >            ❬when resolved❭: {hostname}-{username}-test-⟪now⟫
+                            >                    archive: ⟪host_name⟫-⟪⟪now:%y%m%d@%H:%M:%S.%f⟫⟫
+                            >            ❬when resolved❭: {hostname}-⟪now:%y%m%d@%H:%M:%S.%f⟫
                             >                   cmd_name: settings
                             >                 config_dir: /{run_dir}/.config/assimilate
                             >                config_name: test
@@ -661,8 +662,8 @@ assimilate:
                             >                             entry_header: h:mm A  ⟪⟪⟪2
                             >                             description: settings
                             >                             editor: vim
-                            >             match_archives: - sh:⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-*
-                            >            ❬when resolved❭: - sh:{hostname}-{username}-test-*
+                            >             match_archives: - sh:⟪host_name⟫-*
+                            >            ❬when resolved❭: - sh:{hostname}-*
                             >                       nutz: peanuts
                             >                   patterns: - R ~
                             >                             - - ~/.cache
@@ -682,8 +683,8 @@ assimilate:
                 checks:
                     stdout:
                         matches regex:
-                            >                    archive: ⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-⟪⟪now⟫⟫
-                            >            ❬when resolved❭: .*-test-⟪now⟫
+                            >                    archive: ⟪host_name⟫-⟪⟪now:%y%m%d@%H:%M:%S.%f⟫⟫
+                            >            ❬when resolved❭: .*-⟪now:%y%m%d@%H:%M:%S.%f⟫
 
             nettle — settings --available {{{2:
                 run: assimilate settings --available
@@ -957,7 +958,7 @@ assimilate:
                             >                             those associated with chosen configuration
                             >     -d, --deleted           only consider archives marked for deletion
                             >
-                            > By default all archives will listed, however you can limit the
+                            > By default all archives are listed, however you can limit the
                             > number shown using various command line options.
                             >
                             > Select the oldest N archives using ––first=N.
@@ -1802,7 +1803,7 @@ assimilate:
                             >                             those associated with chosen configuration
                             >     -d, --deleted           only consider archives marked for deletion
                             >
-                            > By default all archives will listed, however you can limit the
+                            > By default all archives are listed, however you can limit the
                             > number shown using various command line options.
                             >
                             > Select the oldest N archives using ––first=N.

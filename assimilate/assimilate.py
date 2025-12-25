@@ -87,9 +87,12 @@ from .utilities import (
     Run, cd, cwd, render_command, set_shlib_prefs, to_path,
 )
 import nestedtext as nt
+import re
 
 # Globals {{{1
 borg_commands_with_dryrun = "compact create delete extract prune upgrade recreate undelete".split()
+now_pattern = r'{{(now|utcnow)(:[^}]*)?}}'
+now_matcher = re.compile(now_pattern)
 
 # Utilities {{{1
 hostname = gethostname()
@@ -954,8 +957,7 @@ class Assimilate:
         if "archive" not in self.settings:
             self.settings["archive"] = "{host_name}-{user_name}-{config_name}-{{now}}"
         archive = self.settings["archive"]
-        match_archives = archive.replace('{{now}}', '*')
-        match_archives = match_archives.replace('{{utcnow}}', '*')
+        match_archives = now_matcher.sub('*', archive)
         self.match_local_archives = 'sh:' + match_archives
         if "match_archives" not in self.settings:
             self.settings["match_archives"] = ['sh:' + match_archives]

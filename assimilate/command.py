@@ -513,8 +513,8 @@ class CheckCommand(Command):
                                         newest-range
             -O, --oldest <range>        only consider archives between oldest and
                                         oldest+range
-            -*, --all                   check all available archives
-            -e, --include-external      check all archives in repository, not just
+            -e, --all                   check all available archives
+            -E, --include-external      check all archives in repository, not just
                                         those associated with chosen configuration
             -r, --repair                attempt to repair any inconsistencies found
             -v, --verify-data           perform a full integrity verification (slow)
@@ -2323,7 +2323,7 @@ class RepoListCommand(Command):
                                     those associated with chosen configuration
             -d, --deleted           only consider archives marked for deletion
 
-        By default all archives will listed, however you can limit the
+        By default all archives are listed, however you can limit the
         number shown using various command line options.
 
         Select the oldest N archives using ––first=N.
