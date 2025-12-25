@@ -1193,7 +1193,9 @@ assimilate:
                 checks:
                     stdout:
                         contains regex:
-                            > Freed [0-9.]+ MB in repository.
+                            > Freed [0-9.]+ MB in the repository\.
+                            > Now run borg prune or borg delete plus borg compact to free more space\.
+                            > After that, do not forget to reserve space again for next time!
 
                     ~/.local/share/assimilate/test.log:
                         contains text:
@@ -1227,7 +1229,7 @@ assimilate:
                             > Location: /{run_dir}/REPO/test
                             > Repository version: 3
                             > Encrypted: No
-                            > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+                            > Security directory: /{run_dir}/.local/share/borg/security/[a-f0-9]+
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
             atomizer — info --archive sh:❬ar0❭ {{{2:
@@ -1245,6 +1247,7 @@ assimilate:
                             > Time \(end\): .+
                             > Duration: .+
                             > Command line: .+
+                            > Working Directory: /
                             > Number of files: 3
                             > Original size: \d+ B
 
@@ -1263,6 +1266,7 @@ assimilate:
                             > Time \(end\): .+
                             > Duration: .+
                             > Command line: .+
+                            > Working Directory: /
                             > Number of files: 3
                             > Original size: \d+ B
 
@@ -2031,7 +2035,7 @@ assimilate:
                             > Location: /{run_dir}/REPO/test
                             > Repository version: 3
                             > Encrypted: Yes \(repokey BLAKE2b ChaCha20-Poly1305\)
-                            > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+                            > Security directory: /{run_dir}/.local/share/borg/security/[a-f0-9]+
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
                     ~/.local/share/assimilate/test.log:
@@ -2877,11 +2881,11 @@ assimilate:
 
                     stdout:
                         contains regex:
-                            > Freed [0-9.]+ MB in repository.
-                            > Now run borg prune or borg delete plus borg compact to free more space.
+                            > Freed [0-9.]+ MB in the repository\.
+                            > Now run borg prune or borg delete plus borg compact to free more space\.
                             > After that, do not forget to reserve space again for next time!
-                            > Freed [0-9.]+ MB in repository.
-                            > Now run borg prune or borg delete plus borg compact to free more space.
+                            > Freed [0-9.]+ MB in the repository\.
+                            > Now run borg prune or borg delete plus borg compact to free more space\.
                             > After that, do not forget to reserve space again for next time!
 
                     ~/.local/share/assimilate/test1.log:
@@ -2929,7 +2933,7 @@ assimilate:
                             > Location: /{run_dir}/REPO/test1
                             > Repository version: 3
                             > Encrypted: Yes \(repokey BLAKE2b ChaCha20-Poly1305\)
-                            > Security dir: /{run_dir}/.local/share/borg/security/[a-f0-9]+
+                            > Security directory: /{run_dir}/.local/share/borg/security/[a-f0-9]+
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
                     stderr:
