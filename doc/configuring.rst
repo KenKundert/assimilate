@@ -9,9 +9,8 @@ Typically the settings files go in the default location for configuration files
 on your system.  On Linux systems, that location is `~/.config/assimilate`.
 Other systems use more awkward locations, so *Assimilate* allows you to specify
 the configuration directory using the `XDG_CONFIG_HOME` environment variable.
-If `XDG_CONFIG_HOME` is set to `/home/$HOME/.config`, then the *Assimilate* 
-configuration directory will be `/home/$HOME/.config/assimilate`, as on Linux 
-systems.
+If `XDG_CONFIG_HOME` is set to `$HOME/.config`, then the *Assimilate* 
+configuration directory will be `$HOME/.config/assimilate`, as on Linux systems.
 
 You need a shared settings file and then a settings file for each backup 
 configuration you need.  Except for :ref:`composite_configs` and 
@@ -431,8 +430,8 @@ An example that uses :ref:`patterns` in lieu of :ref:`src_dirs` and
 The *NestedText* list item indicators (the first dash on the line) can be 
 visually confusing when holding a *Borg* exclude specification (second dash on 
 most lines).  You might find less confusing to use a multiline string rather 
-than a list to hold the patters.  In that case the multiline string is converted 
-to a list by splitting on newlines:
+than a list to hold the patterns.  In that case the multiline string is 
+converted to a list by splitting on newlines:
 
 .. code-block:: nestedtext
 
@@ -446,9 +445,12 @@ to a list by splitting on newlines:
         > - /tmp
 
 In this example, ``R`` specifies a root, which would otherwise be specified by 
-:ref:`src_dirs`.  ``+`` specifies path that should be included in the backups 
-and ``-`` specifies a path that should be excluded.  With this example, 
-/usr/local is included while all other files and directories in /usr are not.
+:ref:`src_dirs`.  ``+`` specifies path that should be included in the backups, 
+``-`` specifies a path that should be excluded, and ``!`` specifies a path that 
+should not be traversed.
+
+With this example, /usr/local is included while all other files and directories 
+in /usr are not.
 The subdirectory to include must be specified before the directory that contains 
 it is excluded.  This is a relatively simple example, additional features are 
 described in BorgPatterns_.
@@ -1550,6 +1552,15 @@ append_only
 Create an append-only mode repository.
 
 
+.. _atime:
+
+atime
+~~~~~
+
+Do store *atime* into archive.
+Specify ``'yes`` or ``'no``.
+
+
 .. _chunker_params:
 
 chunker_params
@@ -1586,6 +1597,23 @@ Exclude directories that are tagged by containing a filesystem object with the
 given NAME.  For example if *exclude_if_present* is set to ``.nobackup`` then 
 a directory that contains a file named ``.nobackup`` will be excluded from the 
 back ups.
+
+
+.. _files_cache:
+
+files_cache
+~~~~~~~~~~~
+
+Operate files cache in given mode (default: ctime,size,inode).
+
+
+.. _files_changed:
+
+files_changed
+~~~~~~~~~~~~~
+
+Specify how to detect if a file has changed during backup (choose from: ctime, 
+mtime, disabled; default: ctime).
 
 
 .. _lock_wait:
@@ -1700,6 +1728,51 @@ If not specified, it is constructed from :ref:`archive` by replacing ``{{now}}``
 or ``{{utcnow}}`` with ``*`` and adding ``sh:`` as a prefix.
 
 
+.. _noacls:
+
+noacls
+~~~~~~
+
+Do not read and store ACLs into archive.
+Specify ``'yes`` or ``'no``.
+
+
+.. _nobirthtime:
+
+nobirthtime
+~~~~~~~~~~~
+
+Do not store *birthtime* (creation date) into archive.
+Specify ``'yes`` or ``'no``.
+
+
+.. _noflags:
+
+noflags
+~~~~~~~
+
+Do not read and store flags (e.g. *NODUMP*, *IMMUTABLE*) into archive.
+Specify ``'yes`` or ``'no``.
+
+
+.. _noxattrs:
+
+noxattrs
+~~~~~~~~
+
+Do not read and store *xattrs* into archive.
+Specify ``'yes`` or ``'no``.
+
+
+.. _noctime:
+
+noctime
+~~~~~~~
+
+Do not store *ctime* into archive.
+Specify ``'yes`` or ``'no``.
+
+
 .. _one_file_system:
 
 one_file_system
@@ -1780,6 +1853,16 @@ or files that contain the patterns. If given as relative paths, they are
 relative to :ref:`working_dir`.  These files are processed directly by *Borg*, 
 which does not allow ``~`` to represent users' home directories, unlike the 
 patterns specified using :ref:`patterns`.
+
+
+.. _read_special:
+
+read_special
+~~~~~~~~~~~~
+
+Open and read block and char device files as well as FIFOs as if they were 
+regular files. Also follows symlinks pointing to these kinds of files.
+Specify ``'yes`` or ``'no``.
 
 
 .. _remote_path:

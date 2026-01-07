@@ -517,6 +517,11 @@ BORG_SETTINGS = dict(
         desc = "create an append-only mode repository",
         validator = as_bool,
     ),
+    atime = dict(
+        cmds = ["create"],
+        desc = "do store atime into archive",
+        validator = as_bool,
+    ),
     chunker_params = dict(
         cmds = ["create", "recreate"],
         arg = "PARAMS",
@@ -540,11 +545,17 @@ BORG_SETTINGS = dict(
         desc = "exclude directories that are tagged by containing a filesystem object with the given NAME",
         validator = as_string,
     ),
-    lock_wait = dict(
-        cmds = ["all"],
-        arg = "SECONDS",
-        desc = "wait at most SECONDS for acquiring a repository/cache lock (default: 1)",
-        validator = as_integer,
+    files_cache = dict(
+        cmds = ["create"],
+        arg = "MODE",
+        desc = "operate files cache in given mode (default: ctime,size,inode)",
+        validator = as_string,
+    ),
+    files_changed = dict(
+        cmds = ["create"],
+        arg = "MODE",
+        desc = "specify how to detect if a file has changed during backup (choose from: ctime, mtime, disabled; default: ctime)",
+        validator = as_string,
     ),
     keep_within = dict(
         cmds = ["prune"],
@@ -606,9 +617,50 @@ BORG_SETTINGS = dict(
         desc = "number of yearly archives to keep",
         validator = as_integer,
     ),
+    lock_wait = dict(
+        cmds = ["all"],
+        arg = "SECONDS",
+        desc = "wait at most SECONDS for acquiring a repository/cache lock (default: 1)",
+        validator = as_integer,
+    ),
+    noacls = dict(
+        cmds = ["create", "extract"],
+        desc = "do not read and store ACLs into archive",
+        validator = as_bool,
+    ),
+    noxattrs = dict(
+        cmds = ["create", "extract"],
+        desc = "do not read and store xattrs into archive",
+        validator = as_bool,
+    ),
+    nobirthtime = dict(
+        cmds = ["create"],
+        desc = "do not store birthtime (creation date) into archive",
+        validator = as_bool,
+    ),
+    noctime = dict(
+        cmds = ["create"],
+        desc = "do not store ctime into archive",
+        validator = as_bool,
+    ),
+    noflags = dict(
+        cmds = ["create", "extract"],
+        desc = "do not read and store flags (e.g. NODUMP, IMMUTABLE) into archive",
+        validator = as_bool,
+    ),
+    numeric_ids = dict(
+        cmds = ["create", "extract"],
+        desc = "only store numeric user and group identifiers",
+        validator = as_bool,
+    ),
     one_file_system = dict(
         cmds = ["create"],
         desc = "stay in the same file system and do not store mount points of other file systems",
+        validator = as_bool,
+    ),
+    read_special = dict(
+        cmds = ["create"],
+        desc = "open and read block and char device files as well as FIFOs as if they were regular files",
         validator = as_bool,
     ),
     remote_path = dict(
@@ -624,7 +676,7 @@ BORG_SETTINGS = dict(
     #     validator = as_quantity,
     # ),
     sparse = dict(
-        cmds = ["create"],
+        cmds = ["create", "extract"],
         desc = "detect sparse holes in input (supported only by fixed chunker)",
         validator = as_bool,
     ),

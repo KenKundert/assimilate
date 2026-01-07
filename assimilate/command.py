@@ -591,8 +591,10 @@ class CheckCommand(Command):
             raise Error('repository is corrupt.')
 
         # update the date file
-        if not("problems found" in borg.stderr or "errors found" in borg.stderr):
-            update_latest('check', settings.date_file, options)
+        if borg.stderr:
+            if "problems found" in borg.stderr or "errors found" in borg.stderr:
+                return
+        update_latest('check', settings.date_file, options)
 
 
 # CompactCommand command {{{1

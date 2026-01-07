@@ -4,7 +4,7 @@
 # shell-script-like things relatively easily in Python.
 
 # MIT License {{{1
-# Copyright (C) 2016-2065 Kenneth S. Kundert
+# Copyright (C) 2016-2026 Kenneth S. Kundert
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

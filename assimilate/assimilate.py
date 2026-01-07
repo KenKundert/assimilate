@@ -84,7 +84,7 @@ from . import overdue
     # added before the files are read
 from .utilities import (
     getfullhostname, gethostname, getusername, output,
-    Run, cd, cwd, render_command, set_shlib_prefs, to_path,
+    Cmd, Run, cd, cwd, render_command, set_shlib_prefs, to_path,
 )
 import nestedtext as nt
 import re
@@ -792,7 +792,8 @@ class Assimilate:
             starts_at = arrow.now()
             log("starts at: {!s}".format(starts_at))
             try:
-                borg = Run(command, modes=modes, stdin="", env=os.environ, log=False)
+                borg = Cmd(command, modes=modes, env=os.environ, log=False)
+                borg.run(stdin="")
                 if show_progress:
                     borg.from_show_progress = show_progress(borg.process.stderr)
                     borg.wait()
@@ -800,7 +801,7 @@ class Assimilate:
                 self.report_borg_error(e, cmd)
             except KeyboardInterrupt:
                 borg.kill()
-                borg.status = 0
+                borg.status = 1
                 raise
             finally:
                 # remove passcode env variables created by assimilate
@@ -858,9 +859,14 @@ class Assimilate:
             starts_at = arrow.now()
             log("starts at: {!s}".format(starts_at))
             try:
-                borg = Run(command, modes="soeW1", env=os.environ, log=False)
+                borg = Cmd(command, modes="soeW1", env=os.environ, log=False)
+                borg.run()
             except Error as e:
                 self.report_borg_error(e, executable)
+            except KeyboardInterrupt:
+                borg.kill()
+                borg.status = 1
+                raise
             ends_at = arrow.now()
             log("ends at: {!s}".format(ends_at))
             log("elapsed: {!s}".format(ends_at - starts_at))

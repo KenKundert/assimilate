@@ -768,6 +768,7 @@ assimilate:
                             >
                             > Borg settings:
                             >                append_only: create an append-only mode repository
+                            >                      atime: do store atime into archive
                             >             chunker_params: specify the chunker parameters
                             >                compression: compression algorithm
                             >             exclude_caches: exclude directories that contain a
@@ -775,6 +776,11 @@ assimilate:
                             >         exclude_if_present: exclude directories that are tagged by
                             >                             containing a filesystem object with the given
                             >                             NAME
+                            >                files_cache: operate files cache in given mode (default:
+                            >                             ctime,size,inode)
+                            >              files_changed: specify how to detect if a file has changed
+                            >                             during backup (choose from: ctime, mtime,
+                            >                             disabled; default: ctime)
                             >              keep_13weekly: number of 13 week quarter archives to keep
                             >              keep_3monthly: number of 3 month quarter archives to keep
                             >                 keep_daily: number of daily archives to keep
@@ -789,8 +795,18 @@ assimilate:
                             >                             repository/cache lock (default: 1)
                             >             match_archives: only consider archive names that match the
                             >                             given glob pattern
+                            >                     noacls: do not read and store ACLs into archive
+                            >                nobirthtime: do not store birthtime (creation date) into
+                            >                             archive
+                            >                    noctime: do not store ctime into archive
+                            >                    noflags: do not read and store flags (e.g. NODUMP,
+                            >                             IMMUTABLE) into archive
+                            >                   noxattrs: do not read and store xattrs into archive
+                            >                numeric_ids: only store numeric user and group identifiers
                             >            one_file_system: stay in the same file system and do not store
                             >                             mount points of other file systems
+                            >               read_special: open and read block and char device files as
+                            >                             well as FIFOs as if they were regular files
                             >                remote_path: name of borg executable on remote platform
                             >                     sparse: detect sparse holes in input (supported only
                             >                             by fixed chunker)
