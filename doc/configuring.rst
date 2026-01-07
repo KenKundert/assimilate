@@ -1605,6 +1605,8 @@ files_cache
 ~~~~~~~~~~~
 
 Operate files cache in given mode (default: ctime,size,inode).
+This specifies the things that need to change of a file to indicate that it has 
+changed and so a new copy needs to be saved in the archive.
 
 
 .. _files_changed:
@@ -1613,8 +1615,15 @@ files_changed
 ~~~~~~~~~~~~~
 
 Specify how to detect if a file has changed during backup (choose from: ctime, 
-mtime, disabled; default: ctime).
+mtime, disabled; default: ctime).  This differs from *files_cache* in the 
+following way: *files_cache* determines if a new file should be included in the 
+archive and it applies before reading it whereas *files_changed* determines if 
+the file changes while reading the file and so requires a re-read.
 
+.. note::
+
+    This option must be set to ``'yes`` on Macs to avoid "file changed while we 
+    read it" messages.
 
 .. _lock_wait:
 

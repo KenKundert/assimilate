@@ -295,11 +295,11 @@ In addition, there are some shared settings available:
     The default is ``'magenta``.
 
 *overdue_color*:
-    The text color to use for repositories that are currently locked.
+    The text color to use for repositories that are overdue.
     The default is ``'red``.
 
 *current_color*:
-    The text color to use for repositories that are currently locked.
+    The text color to use for repositories that are current.
     The default is ``'green``.
 
 
