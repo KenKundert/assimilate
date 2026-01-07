@@ -1622,7 +1622,7 @@ the file changes while reading the file and so requires a re-read.
 
 .. note::
 
-    This option must be set to ``'yes`` on Macs to avoid "file changed while we 
+    This option must be set to ``'yes`` on MacOS to avoid "file changed while we 
     read it" messages.
 
 .. _lock_wait:
@@ -1885,9 +1885,11 @@ Name of *Borg* executable on remote platform.
 .. _sparse:
 
 sparse
-~~~~~~~~~
+~~~~~~
 
 Detect sparse holes in input (supported only by fixed chunker).
+Replace long runs of zeros with holes, which results in smaller archives and 
+smaller sizes when extracted.
 
 
 .. _threshold:
