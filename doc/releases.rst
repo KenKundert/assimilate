@@ -16,8 +16,8 @@ earlier versions of *Borg* you should use Emborg_.
 
 Latest development release
 --------------------------
-| Version: 0.0b13
-| Released: 2025-12-25
+| Version: 0.0b14
+| Released: 2026-01-10
 
 0.0.0 (2025-??-??)
 ------------------
