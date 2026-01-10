@@ -665,7 +665,7 @@ the log, specify the ``--narrate`` command line option.
 .. _list:
 
 List
---------
+----
 
 Once a backup has been performed, you can list the files available in your 
 archive using:

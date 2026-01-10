@@ -311,6 +311,10 @@ ASSIMILATE_SETTINGS = dict(
         desc = "time to sleep between retries [s]",
         validator = as_quantity,
     ),
+    time_format = dict(
+        desc = "default time format",
+        validator = as_string,
+    ),
     default_config = dict(
         desc = "default Assimilate configuration",
         validator = as_name,
@@ -351,14 +355,14 @@ ASSIMILATE_SETTINGS = dict(
         desc = "command to use to manage differences in files and directories",
         validator = as_string,
     ),
+    list_default_format = dict(
+        desc = "the format that the list command should use if none are specified",
+        validator = as_identifier,
+    ),
     list_formats = dict(
         desc = "named format strings available to list command",
         validator = as_dict,
         do_not_expand = True,
-    ),
-    default_list_format = dict(
-        desc = "the format that the list command should use if none is specified",
-        validator = as_identifier,
     ),
     must_exist = dict(
         desc = "if set, each of these files or directories must exist or create will quit with an error",
@@ -407,6 +411,15 @@ ASSIMILATE_SETTINGS = dict(
     report_diffs_cmd = dict(
         desc = "shell command to use to report differences in files and directories",
         validator = as_string,
+    ),
+    repo_list_formats = dict(
+        desc = "named format strings available to repo-list command",
+        validator = as_dict,
+        do_not_expand = True,
+    ),
+    repo_list_default_format = dict(
+        desc = "the format that the repo-list command should use if none are specified",
+        validator = as_identifier,
     ),
     repository = dict(
         desc = "path to remote directory that contains repository",

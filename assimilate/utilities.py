@@ -281,20 +281,6 @@ def report_voluptuous_errors(multiple_invalid, keymap, source=None, sep="›", p
         # report error
         error(full_stop(msg), culprit=culprit, codicil=codicil)
 
-# table {{{1
-def table(rows):
-    if not rows:
-        return []
-    cols = len(rows[0]) * [0]
-    for row in rows:
-        for i, col in enumerate(row):
-            width = len(col)
-            cols[i] = max(cols[i], width)
-    table = []
-    for row in rows:
-        table.append('  '.join(f"{c:<{cols[i]}}" for i, c in enumerate(row)))
-    return table
-
 # process_cmdline {{{1
 def process_cmdline(*args, **kwargs):
     try:

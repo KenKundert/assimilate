@@ -52,7 +52,7 @@ from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, READ_ONLY_SETTINGS
 from .overdue import overdue, OVERDUE_USAGE
 from .preferences import DEFAULT_COMMAND, PROGRAM_NAME
 from .utilities import (
-    gethostname, output, pager, process_cmdline, read_latest, table, to_date,
+    gethostname, output, pager, process_cmdline, read_latest, to_date,
     to_days, to_seconds, two_columns, update_latest, when,
     Quantity, QuantiPhyError, UnknownConversion,
     Cmd, Run, cwd, lsd, mkdir, rm, split_cmd, to_path
@@ -106,7 +106,7 @@ def find_archive(settings, options):
     def desc_and_id(archive):
         if not archive:  # pragma: no cover
             raise Error('no suitable archive found.')
-        return f"aid:{archive['id']}", archive_desc(archive)
+        return f"aid:{archive['id']}", archive_desc(archive, settings)
             # aid: prefix indicates that what follows is an archive id
 
     # find archive closest to time threshold
@@ -217,7 +217,7 @@ def archive_filter_options(settings, given_options, default):
 
 
 # list_archives {{{2
-def list_archives(data, cmdline):
+def list_archives(data, cmdline, fmt, settings):
     archives = []
     no_index = any(
         cmdline[n]
@@ -227,27 +227,31 @@ def list_archives(data, cmdline):
         ]
     )
     num_archives = len(data['archives'])
-    for i, each in enumerate(data['archives']):
-        id = each.get('id', '')[:8]
-        date = each.get('time', '')
-        if date:
-            date = arrow.get(date)
-            date = f"{date.format('YYYY-MM-DD h:mm A')} ({date.humanize()})"
-        archive = each.get('archive', '')
-        if no_index:
-            archives.append((f"aid:{id}", archive, date))
-        else:
-            archives.append((f"{num_archives-i-1:<3} aid:{id}", archive, date))
-    return '\n'.join(table(archives))
+    for i, metadata in enumerate(data['archives']):
+        time = arrow.get(metadata['time'])
+        metadata['time'] = time
+        ago = time.humanize()
+        metadata['comment'] = truth(metadata['comment'])
+        metadata['tags'] = ', '.join(metadata['tags'])
+        date = time.format(settings.time_format)
+        index = None if no_index else num_archives - i - 1
+        index = truth(index, '%/   /<3', is_true=index is not None)
+        try:
+            archives.append(fmt.format(index=index, date=date, ago=ago, **metadata))
+        except KeyError as e:
+            raise Error('unknown field.', culprit=('repo-list format', full_stop(e)))
+        except ValueError as e:
+            raise Error(e, culprit='repo-list format')
+    return '\n'.join(archives)
 
 # archive_desc {{{2
-def archive_desc(archive):
+def archive_desc(archive, settings):
     name = archive.get('archive')
     id = archive.get('id')[:8]
     date = archive.get('time', '')
     if date:
         date = arrow.get(date)
-        date = f" {date.format('YYYY-MM-DD h:mm A')} ({date.humanize()})"
+        date = f" {date.format(settings.time_format)} ({date.humanize()})"
     return f"{id} {name}{date}"
 
 # get_archive_paths() {{{2
@@ -903,10 +907,15 @@ class CreateCommand(Command):
             assimilate create [options]
 
         Options:
-            -f, --fast       skip pruning and checking for a faster backup on a slow network
-            -l, --list       list the files and directories as they are processed
-            -p, --progress   shows Borg progress
-            -s, --stats      show Borg statistics
+            -f, --fast        skip pruning and checking for a faster backup on a slow network
+            -l, --list        list the files and directories as they are processed
+            -p, --progress    shows Borg progress
+            -s, --stats       show Borg statistics
+            --timestamp <ts>  manually specify the archive creation date/time (yyyy-
+                              mm-ddThh:mm:ss[(+|-)HH:MM] format, (+|-)HH:MM is the
+                              UTC offset, default: local time zone). Alternatively,
+                              give a reference file/directory.
+            --comment <text>  add a comment text to the archive
 
         To see the files listed as they are backed up, use the Assimilate -v option.
         This can help you debug slow create operations.
@@ -926,6 +935,10 @@ class CreateCommand(Command):
             borg_opts.append("--stats")
         if cmdline["--list"]:
             borg_opts.append("--list")
+        if cmdline["--timestamp"]:
+            borg_opts.append(f"--timestamp={cmdline['--timestamp']}")
+        if cmdline["--comment"]:
+            borg_opts.append(f"--comment={cmdline['--comment']}")
         if cmdline["--progress"] or settings.show_progress:
             borg_opts.append("--progress")
             announce = display
@@ -1708,8 +1721,8 @@ class ListCommand(Command):
             -s, --short                 use short listing format
             -l, --long                  use long listing format
             -n, --name                  use name only listing format
-            -f, --format <fmt>          use <fmt> listing format
-            -F, --show-formats          show available formats and exit
+            -F, --format <fmt>          use <fmt> listing format
+            --show-formats              show available formats and exit
             -N, --sort-by-name          sort by filename
             -D, --sort-by-date          sort by date
             -S, --sort-by-size          sort by size
@@ -1923,22 +1936,28 @@ class ListCommand(Command):
                 values['Type'] = '|'
             elif type != '-':
                 log('UNKNOWN TYPE:', type, values['path'])
-            if 'mtime' in values and 'MTime' in template:
-                values['MTime'] = arrow.get(values['mtime'])
-            if 'ctime' in values and 'CTime' in template:
-                values['CTime'] = arrow.get(values['ctime'])
-            if 'atime' in values and 'ATime' in template:
-                values['ATime'] = arrow.get(values['atime'])
+            if 'mtime' in values and 'mTime' in template:
+                values['mTime'] = arrow.get(values['mtime'])
+            if 'mtime' in values and 'mAgo' in template:
+                values['mAgo'] = arrow.get(values['mtime']).humanize()
+            if 'ctime' in values and 'cTime' in template:
+                values['cTime'] = arrow.get(values['ctime'])
+            if 'ctime' in values and 'cAgo' in template:
+                values['cAgo'] = arrow.get(values['ctime']).humanize()
+            if 'atime' in values and 'aTime' in template:
+                values['aTime'] = arrow.get(values['atime'])
+            if 'atime' in values and 'aAgo' in template:
+                values['aAgo'] = arrow.get(values['atime']).humanize()
             if 'size' in values:
                 total_size += values['size']
                 if 'Size' in template:
                     values['Size'] = Quantity(values['size'], "B")
-            if 'csize' in values and '{CSize' in template:
-                values['CSize'] = Quantity(values['csize'], "B")
-            if 'dsize' in values and '{DSize' in template:
-                values['DSize'] = Quantity(values['dsize'], "B")
-            if 'dcsize' in values and '{DCSize' in template:
-                values['DCSize'] = Quantity(values['dcsize'], "B")
+            if 'csize' in values and '{cSize' in template:
+                values['cSize'] = Quantity(values['csize'], "B")
+            if 'dsize' in values and '{dSize' in template:
+                values['dSize'] = Quantity(values['dsize'], "B")
+            if 'dcsize' in values and '{dcSize' in template:
+                values['dcSize'] = Quantity(values['dcsize'], "B")
             try:
                 # use print rather than output because it is faster
                 print(colorize(template.format(**values)))
@@ -2324,6 +2343,8 @@ class RepoListCommand(Command):
             -e, --include-external  list all archives in repository, not just
                                     those associated with chosen configuration
             -d, --deleted           only consider archives marked for deletion
+            -F, --format <fmt>      use <fmt> listing format
+            --show-formats          show available formats and exit
 
         By default all archives are listed, however you can limit the
         number shown using various command line options.
@@ -2357,6 +2378,39 @@ class RepoListCommand(Command):
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline["--include-external"]
 
+        # predefined formats
+        formats = dict(
+            short = "{index:% //<3}aid:{id:.8} {ago}{comment: (%)/}",
+            date = "{index:% //<3}aid:{id:.8} {date} ({ago}){comment: (%)/}",
+            name = "{index:% //<3}aid:{id:.8} {name} {date} ({ago}){comment: (%)/}",
+            long = "{index:% //<3}aid:{id:.8}  {archive}  {date} ({ago}){comment: (%)/}",
+        )
+
+        # choose format
+        default_format = settings.repo_list_default_format
+        if not default_format:
+            default_format = 'short'
+        user_formats = settings.repo_list_formats
+        if user_formats:
+            formats.update(user_formats)
+        if cmdline["--show-formats"]:
+            for k, v in formats.items():
+                output(f'{k:>9}: {v}')
+            output()
+            output(f'default format: {default_format}')
+            return
+        if cmdline.get("--format"):
+            fmt_name = cmdline.get("--format")
+        else:
+            fmt_name = default_format
+        if fmt_name:
+            try:
+                fmt = formats[fmt_name]
+            except KeyError as e:
+                raise Error("unknown format.", culprit=e)
+        else:
+            fmt = None
+
         # run borg
         borg_opts = archive_filter_options(settings, cmdline, default='all')
         borg = settings.run_borg(
@@ -2366,7 +2420,7 @@ class RepoListCommand(Command):
             strip_archive_matcher = include_external_archives,
         )
         if not borg.status:
-            archives = list_archives(json.loads(borg.stdout), cmdline)
+            archives = list_archives(json.loads(borg.stdout), cmdline, fmt, settings)
             if archives:
                 output(archives)
         return borg.status

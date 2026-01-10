@@ -70,6 +70,7 @@ from .preferences import (
     DATA_DIR,
     DATE_FILE,
     DEFAULT_ENCRYPTION,
+    DEFAULT_TIME_FORMAT,
     INITIAL_CACHE_CONFIG_FILE_CONTENTS,
     INITIAL_HOME_CONFIG_FILE_CONTENTS,
     INITIAL_ROOT_CONFIG_FILE_CONTENTS,
@@ -266,6 +267,9 @@ class Assimilate:
             set_shlib_prefs(encoding=self.encoding)
         self.hooks = Hooks(self, dry_run='dry-run' in assimilate_opts)
         self.borg_ran = False
+
+        # set time format
+        self.time_format = self.value('time_format', DEFAULT_TIME_FORMAT)
 
         # set colorscheme
         if self.colorscheme:

@@ -52,6 +52,7 @@ DEFAULT_ENCODING = "utf-8"
 DEFAULT_COMMAND = "create"
 DEFAULT_ENCRYPTION = "none"
 DEFAULT_AGE_BAR_WIDTH = 20
+DEFAULT_TIME_FORMAT = 'YYYY-MM-DD h:mm A'
 
 # Initial contents of files {{{2
 # Shared settings {{{3
@@ -106,7 +107,7 @@ INITIAL_SHARED_SETTINGS_FILE_CONTENTS = dedent("""
     list formats:
         name: {path}
         short: {path}{Type}
-        date: {MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
+        date: {mTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
         size: {size:8} {path}{Type}
         si: {Size:7.2b} {path}{Type}
         owner: {user:8} {path}{Type}

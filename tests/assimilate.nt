@@ -47,7 +47,7 @@ assimilate:
                             - list formats:
                             -     name: ⟪path⟫
                             -     short: ⟪path⟫⟪Type⟫
-                            -     date: ⟪MTime:ddd YYYY-MM-DD HH:mm:ss⟫ ⟪path⟫⟪Type⟫
+                            -     date: ⟪mTime:ddd YYYY-MM-DD HH:mm:ss⟫ ⟪path⟫⟪Type⟫
                             -     size: ⟪size:8⟫ ⟪path⟫⟪Type⟫
                             -     si: ⟪Size:7.2b⟫ ⟪path⟫⟪Type⟫
                             -     owner: ⟪user:8⟫ ⟪path⟫⟪Type⟫
@@ -132,6 +132,7 @@ assimilate:
                     contents:
                         > encryption: none
                         > archive: ⟪host_name⟫-⟪⟪now:%y%m%d@%H:%M:%S.%f⟫⟫
+                        > repo list default format: long
                         >
                         > # user defined placeholders
                         > nutz: peanuts
@@ -672,6 +673,7 @@ assimilate:
                             >                             - - ~/REPO
                             >                             - - ~/.config
                             >                  prog_name: assimilate
+                            >   repo_list_default_format: long
                             >                 repository: ~/REPO/⟪config_name⟫
                             >            ❬when resolved❭: ~/REPO/test
                             >             squirrels_love: ⟪nutz⟫
@@ -707,8 +709,6 @@ assimilate:
                             >                             occur
                             >         create_retry_sleep: time to sleep between retries [s]
                             >             default_config: default Assimilate configuration
-                            >        default_list_format: the format that the list command should use if
-                            >                             none is specified
                             >        default_mount_point: directory to use as mount point if one is not
                             >                             specified
                             >              do_not_expand: names of settings that must not undergo
@@ -721,6 +721,8 @@ assimilate:
                             >              get_repo_size: record the amount of disk space need to hold
                             >                             the repository
                             >                    include: include the contents of another file
+                            >        list_default_format: the format that the list command should use if
+                            >                             none are specified
                             >               list_formats: named format strings available to list command
                             >                    logging: logging options
                             >           manage_diffs_cmd: command to use to manage differences in files
@@ -742,6 +744,10 @@ assimilate:
                             >                             be included or excluded
                             >              patterns_from: file that contains patterns
                             >         prune_after_create: run prune after creating an archive
+                            >   repo_list_default_format: the format that the repo-list command should
+                            >                             use if none are specified
+                            >          repo_list_formats: named format strings available to repo-list
+                            >                             command
                             >           report_diffs_cmd: shell command to use to report differences in
                             >                             files and directories
                             >                 repository: path to remote directory that contains
@@ -763,6 +769,7 @@ assimilate:
                             >                   src_dirs: the directories to archive
                             >                ssh_command: command to use for SSH, can be used to specify
                             >                             SSH options
+                            >                time_format: default time format
                             >                    verbose: make Borg more verbose
                             >                working_dir: working directory
                             >
@@ -862,6 +869,7 @@ assimilate:
                         >
                         > command aliases:
                         >     repo-list: archives
+                        > repo list default format: long
 
                 ~/REPO/:
 
@@ -973,6 +981,8 @@ assimilate:
                             >     -e, --include-external  list all archives in repository, not just
                             >                             those associated with chosen configuration
                             >     -d, --deleted           only consider archives marked for deletion
+                            >     -F, --format <fmt>      use <fmt> listing format
+                            >     --show-formats          show available formats and exit
                             >
                             > By default all archives are listed, however you can limit the
                             > number shown using various command line options.
@@ -1675,6 +1685,7 @@ assimilate:
                         > command aliases:
                         >     repo-list:
                         >         - recent --last=20
+                        > repo list default format: long
                     mode: 0o777
 
                 ~/.config/assimilate/test.conf.nt:
@@ -1818,6 +1829,8 @@ assimilate:
                             >     -e, --include-external  list all archives in repository, not just
                             >                             those associated with chosen configuration
                             >     -d, --deleted           only consider archives marked for deletion
+                            >     -F, --format <fmt>      use <fmt> listing format
+                            >     --show-formats          show available formats and exit
                             >
                             > By default all archives are listed, however you can limit the
                             > number shown using various command line options.
@@ -2505,6 +2518,7 @@ assimilate:
                         > compression: zstd,1
                         > passcommand: echo "roadhouse pause govern parry"
                         > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
+                        > repo_list_default_format: long
                         >
                         > prune_after_create: 'yes
                         > check_after_create: 'latest
@@ -3403,6 +3417,7 @@ assimilate:
                     contents:
                         > default config: test
                         > encryption: none
+                        > repo list default format: long
 
                 ~/REPO/:
 
@@ -4033,6 +4048,7 @@ assimilate:
                         >     repositories:
                         >         test:
                         >             config: test
+                        > repo list default format: long
 
                 ~/REPO/:
 
@@ -4954,6 +4970,7 @@ assimilate:
                     contents:
                         > default config: test1
                         > encryption: none
+                        > repo list default format: long
                     mtime: 2024-11-23T00:00:00
 
                 ~/REPO/:

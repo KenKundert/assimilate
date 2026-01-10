@@ -1054,8 +1054,9 @@ will have to close the editor and manually un-mount the archive.
 list_default_format
 ~~~~~~~~~~~~~~~~~~~
 
-A string that specifies the name of the default format.  The name must be a key 
-in :ref:`list_formats`.  If not specified, ``short`` is used.
+A string that specifies the name of the default format for the :ref:`list 
+command <list>`.  The name must be a key in :ref:`list_formats`.  If not 
+specified, ``short`` is used.
 
 
 .. _list_formats:
@@ -1097,20 +1098,24 @@ need to specify them again.  Anything you specify will override the predefined
 versions, and you can add additional formats.
 
 The formats may contain the fields supported by the `Borg list command 
-<https://borgbackup.readthedocs.io/en/stable/usage/list.html#borg-list>`_.  In 
-addition, Assimilate provides some variants:
+<https://borgbackup.readthedocs.io/en/stable/usage/list.html#the-format-specifier-syntax>`_.  
+In addition, Assimilate provides some variants:
 
-*MTime*, *CTime*, *ATime*:
+*mTime*, *cTime*, *aTime*:
    The *Borg* *mtime*, *ctime*, and *atime* fields are simple strings, these 
    variants are `Arrow objects 
-   <https://arrow.readthedocs.io/en/latest/#supported-tokens>`_ that support 
-   formatting options.  For example:
+   <https://arrow.readthedocs.io/en/latest/guide.html#supported-tokens>`_
+   that support formatting options.  For example:
 
    .. code-block:: nestedtext
 
-        date: {MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
+        date: {mTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
 
-*Size*, *CSize*, *DSize*, *DCSize*:
+*mAgo*, *cAgo*, *aAgo*:
+   The *Borg* *mtime*, *ctime*, and *atime* fields converted into a string that 
+   describes how long ago the time was.
+
+*Size*, *cSize*, *dSize*, *dcSize*:
    The *Borg* *size*, *csize*, *dsize* and *dctime* fields are simple integers, 
    these variants are `QuantiPhy objects 
    <https://quantiphy.readthedocs.io/en/stable/user.html#string-formatting>`_ 
@@ -1298,6 +1303,78 @@ prune_after_create
 
 A Boolean. If true the :ref:`prune command <prune>` is run after creating an 
 archive.  Specify ``'yes`` for true and ``'no`` for false.
+
+
+.. _repo_list_default_format:
+
+repo_list_default_format
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+A string that specifies the name of the default format for the :ref:`repo-list 
+command <repo-list>`.  The name must be a key in :ref:`repo_list_formats`.  If 
+not specified, ``short`` is used.
+
+
+.. _repo_list_formats:
+
+repo_list_formats
+~~~~~~~~~~~~~~~~~
+
+A dictionary that defines how the output of the :ref:`repo-list command 
+<repo-list>` is to be formatted.  The default value for *repo_list_formats* is:
+
+.. code-block:: nestedtext
+
+        repo_list_formats:
+            short: {index:% //<3}aid:{id:.8} {ago}{comment: (%)/}
+            date: {index:% //<3}aid:{id:.8} {date} ({ago}){comment: (%)/}
+            name: {index:% //<3}aid:{id:.8} {name} {date} ({ago}){comment: (%)/}
+            long: {index:% //<3}aid:{id:.8}  {archive}  {date} ({ago}){comment: (%)/}
+
+        repo_list_default_format: short
+
+This example shows the formats that are predefined in *Assimilate*.  Your 
+*repo_list_formats* need not define even any of these formats, but it may 
+redefine them.
+
+The formats may contain the fields supported by the `Borg repo-list command 
+<https://borgbackup.readthedocs.io/en/stable/usage/repo-list.html#the-format-specifier-syntax>`_.  
+In addition, Assimilate provides some variants:
+
+*index*:
+   The archive index number.  A *Inform* `truth object 
+   <https://inform.readthedocs.io/en/stable/user.html#truth>`_ that accepts 
+   a format specifier that consists of up to 3 parts separated by slashes.  The 
+   first part defines what should be output if the index is available.  If it 
+   contains a ``%``, that character is replaced by the index.  The second 
+   defines what should be output if the index is not available.  The third, if 
+   given, specifies the format of the index itself.  It is a string formatting 
+   specification that often takes the form of ``>3``, where ``>`` indicates the 
+   value should be right justified, and the ``3`` indicates the width of the 
+   string.
+
+*time*:
+    The date and time when the archive was created.  This is an *Arrow* 
+    date/time object and so accepts `Arrow formats
+    <https://arrow.readthedocs.io/en/latest/guide.html#supported-tokens>`_.  For 
+    example::
+
+        {time:YYYY-MM-DD HH:mm:ss}
+
+*date*:
+   A string that gives the date and time using :ref:`time_format`'.
+
+*ago*:
+   A string that that gives the time that has passed since the archive was 
+   created.
+
+*comment*:
+   The archive comment.  Like *index*, this is a *Inform* truth object.
+
+Most fields support `Python format strings 
+<https://docs.python.org/3/library/string.html#formatstrings>`_, which allows 
+you to specify how they are to be formatted.  Anything outside a field is copied 
+literally.
 
 
 .. _report_diffs_cmd:
@@ -1503,6 +1580,21 @@ ssh_command
 
 A string that contains the command to be used for SSH. The default is ``ssh``.  
 This can be used to specify SSH options.
+
+
+.. _time_format:
+
+time_format
+~~~~~~~~~~~
+
+A string specifies the default time format using the
+`Arrow formatting style 
+<https://arrow.readthedocs.io/en/latest/guide.html#supported-tokens>`_.  For 
+example:
+
+.. code-block:: nestedtext
+
+         time format: YYYY-MM-DD HH:mm:ss
 
 
 .. _verbose:

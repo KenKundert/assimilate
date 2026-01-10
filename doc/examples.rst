@@ -61,7 +61,7 @@ Here is the contents of the settings file:
     list formats:
         name: {path}
         short: {path}{Type}
-        date: {MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
+        date: {mTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
         size: {size:8} {path}{Type}
         si: {Size:7.2b} {path}{Type}
         owner: {user:8} {path}{Type}
@@ -201,7 +201,7 @@ Here is the contents of the shared settings file: ~/.config/assimilate/settings.
     list formats:
         name: {path}
         short: {path}{Type}
-        date: {MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
+        date: {mTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
         size: {size:8} {path}{Type}
         si: {Size:7.2b} {path}{Type}
         owner: {user:8} {path}{Type}

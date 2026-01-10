@@ -186,10 +186,9 @@ all configurations. This is a NestedText_ file located at
         max entries: 20
 
 There also must be individual settings files for each backup configuration.  
-They are also NestedText files.  The above file defines the *root* 
-configuration.  The configuration is described in 
-``~/.config/assimilate/root.conf.nt``, an example of which is given below.  It 
-is designed to back up the whole machine:
+They are also NestedText files.  The next file defines the *root* configuration.  
+The configuration is described in ``~/.config/assimilate/root.conf.nt``, an 
+example of which is given below.  It is designed to back up the whole machine:
 
 .. code-block:: nestedtext
 

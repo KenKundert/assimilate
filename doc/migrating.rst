@@ -144,7 +144,7 @@ Here are a few things to notice about this specification:
         list formats:
             name: {path}
             short: {path}{Type}
-            date: {MTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
+            date: {mTime:ddd YYYY-MM-DD HH:mm:ss} {path}{Type}
             size: {size:8} {path}{Type}
             si: {Size:7.2b} {path}{Type}
             owner: {user:8} {path}{Type}
