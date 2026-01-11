@@ -19,6 +19,7 @@ Latest development release
 | Version: 0.0b14
 | Released: 2026-01-10
 
-0.0.0 (2025-??-??)
-------------------
+0.1 (2026-01-11)
+----------------
+
 - Initial release

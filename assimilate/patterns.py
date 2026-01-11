@@ -29,20 +29,8 @@ known_styles = "fm sh re pp pf".split()
 
 # check_root() {{{1
 def check_root(root, working_dir):
-    # if str(root) == '.':
-    #     log(
-    #         "Unable to determine whether paths are contained in a root,",
-    #         "because '.' is a root."
-    #     )
     abs_root = working_dir / root
-    if not abs_root.exists():
-        raise Error("not found.", culprit=root)
-    # the following is a bit cleaner, but not available until python 3.9
-    # if not abs_root.is_relative_to(working_dir):
-    #     raise Error("not in working directory:", working_dir, culprit=root)
-    try:
-        abs_root.relative_to(working_dir)
-    except ValueError:
+    if not abs_root.is_relative_to(working_dir):
         raise Error("not in working directory:", working_dir, culprit=root)
     return to_path(root).is_absolute()
 

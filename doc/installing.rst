@@ -38,7 +38,7 @@ Finally, you can install it using `pip
 
     $ pip install borgbackup[pyfuse3]==2.0.0b15
 
-Download and install *Assimilate* as follows (requires Python3.6 or better):
+Download and install *Assimilate* as follows (requires Python3.9 or better):
 
 .. code-block:: bash
 
