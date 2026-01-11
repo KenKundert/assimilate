@@ -5,8 +5,8 @@
 Assimilate — Front-End to Borg Backup
 =====================================
 
-| Version: 0.0b14
-| Released: 2026-01-10
+| Version: 0.1
+| Released: 2026-01-11
 | Please report all bugs and suggestions on GitHub_.
 
 

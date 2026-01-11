@@ -1,6 +1,6 @@
 [project]
 name = "assimilate"
-version = "0.0b14"
+version = "0.1"
 description = "Front end for BorgBackup version 2."
 readme = "README.rst"
 keywords = [

@@ -1,8 +1,8 @@
 major: 0
-minor: 0
+minor: 1
 patch: 0
-revision: 14
-type: beta
+revision: 0
+type: release
 files:
     pyproject.toml:
         version: version
