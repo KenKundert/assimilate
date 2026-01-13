@@ -1,3 +1,6 @@
+Tests
+-----
+
 The generic test code is held in test_assimilate.py.  These are pytest based 
 tests.  The actual test cases are held in assimilate.nt.  This is a NestedText 
 file that has the following basic structure:
@@ -186,3 +189,14 @@ you will need to double up the braces to escape them.  For example:
                         matches regex:
                             >                    archive: ⟪host_name⟫-⟪user_name⟫-⟪config_name⟫-⟪⟪now⟫⟫
                             >            ❬when resolved❭: .*-test-⟪now⟫
+
+
+Coverage
+--------
+
+The tests run *assimilate* as a subprocess, which interferes with coverage data 
+collection.  To work around this, a site-customize.py file is placed on the 
+PYTHONPATH that initiates *coverage* within the *assimilate* process.  Then, 
+environment variables are specified in tox.ini to tell *coverage* where it can 
+find it rc file and where it should place the collected data.  Finally, call 
+*coverage combine* before generating the coverage report.

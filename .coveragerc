@@ -5,7 +5,4 @@ exclude_lines =
 
 [run]
 source = assimilate
-
-[paths]
-source = assimilate
-    */.tox/*/lib/python*/site-packages/assimilate
+parallel = true
