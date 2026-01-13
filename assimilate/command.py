@@ -1835,7 +1835,7 @@ class ListCommand(Command):
 
         # process sort options
         fmt = default_format
-        sort_key = None
+        sort_key = 'path'
         if cmdline["--sort-by-name"]:
             fmt = "short"
             sort_key = 'path'
