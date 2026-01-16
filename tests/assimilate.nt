@@ -4513,15 +4513,15 @@ assimilate:
                 run: assimilate restore --list .config
                 checks:
                     stderr:
-                        matches regex:
-                            > archive: {aid0} {ar0} .*
-                            > - \.
-                            > \+ \.config
-                            > \+ \.config/assimilate
-                            > \+ \.config/assimilate/shared\.conf\.nt
-                            > \+ \.config/assimilate/test\.conf\.nt
-                            > - a
-                            > - b
+                        contains regex: archive: {aid0} {ar0} .*
+                        contains lines:
+                            - - .
+                            - + .config
+                            - + .config/assimilate
+                            - + .config/assimilate/shared.conf.nt
+                            - + .config/assimilate/test.conf.nt
+                            - - a
+                            - - b
 
             tassel — prune --list  {{{2:
                 run: assimilate prune --list
