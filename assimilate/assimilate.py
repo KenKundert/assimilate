@@ -150,14 +150,14 @@ class ConfigQueue:
             if not name:
                 raise Error(
                     "you must specify a config.",
-                    codicil=f"Choose from: {conjoin(sorted(known_configs), ', or ')}."
+                    codicil=f"Choose from: {conjoin(sorted(known_configs), ' or ')}."
                 )
 
         # check that name is known
         if name not in known_configs:
             raise Error(
                 'unknown config.',
-                codicil=f"Choose from: {conjoin(sorted(known_configs), ', or ')}.",
+                codicil=f"Choose from: {conjoin(sorted(known_configs), ' or ')}.",
                 culprit=name
             )
 

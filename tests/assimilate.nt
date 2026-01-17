@@ -2558,6 +2558,9 @@ assimilate:
                         >     - - ~/bu
                         >     - - ~/REPO
 
+                ~/.config/assimilate/unused.conf.nt:
+                    contents:
+
                 ~/REPO/:
 
                 ~/a:
@@ -3259,6 +3262,7 @@ assimilate:
                             >     test = test1, test2
                             >     test1
                             >     test2
+                            >     unused
                             >
                             > Default Configuration:
                             >     test
@@ -5203,7 +5207,7 @@ assimilate:
                     stderr:
                         matches text:
                             > assimilate error: you must specify a config.
-                            >     Choose from: test, test1, or test2.
+                            >     Choose from: test, test1 or test2.
                     status: 2
 
             destiny — create -ctest3 {{{2:
@@ -5212,7 +5216,7 @@ assimilate:
                     stderr:
                         matches text:
                             > assimilate error: test3: unknown config.
-                            >     Choose from: test, test1, or test2.
+                            >     Choose from: test, test1 or test2.
                     status: 2
 
             pervert — create -ctest1 {{{2:
@@ -5242,7 +5246,7 @@ assimilate:
                     stderr:
                         matches text:
                             > assimilate error: you must specify a config.
-                            >     Choose from: test, test1, or test2.
+                            >     Choose from: test, test1 or test2.
                     status: 2
 
             ebony — repo-create -ctest {{{2:

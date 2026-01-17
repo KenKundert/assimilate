@@ -48,7 +48,10 @@ from inform import (
 )
 from time import sleep
 from .assimilate import borg_commands_with_dryrun
-from .configs import ASSIMILATE_SETTINGS, BORG_SETTINGS, READ_ONLY_SETTINGS
+from .configs import (
+    ASSIMILATE_SETTINGS, BORG_SETTINGS, READ_ONLY_SETTINGS,
+    get_available_configs
+)
 from .overdue import overdue, OVERDUE_USAGE
 from .preferences import DEFAULT_COMMAND, PROGRAM_NAME
 from .utilities import (
@@ -876,7 +879,7 @@ class ConfigsCommand(Command):
         # check command line for errors
         process_cmdline(cls.USAGE, argv=[command] + args)
 
-        configs = list(settings.configs)
+        configs = list(get_available_configs())
         if settings.composite_configs:
             composite_configs = [
                 f"{k} = {', '.join(v.split())}"
