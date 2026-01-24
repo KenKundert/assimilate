@@ -875,12 +875,12 @@ def read_settings(name, config_dir=None, shared_settings=None):
 
     # log the user-defined settings
     unknown = (
-        settings.keys()
+        new_settings.keys()
         - ASSIMILATE_SETTINGS.keys()
         - BORG_SETTINGS.keys()
     )
     if unknown:
-        narrate("The following user-defined settings were specified:")
+        narrate(f"The following user-defined settings were specified in {name}:")
         for each in unknown:
             narrate("   ", each)
 

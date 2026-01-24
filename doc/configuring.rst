@@ -718,7 +718,7 @@ compact_after_delete
 ~~~~~~~~~~~~~~~~~~~~
 
 If ``'yes``, the :ref:`compact command <compact>` is run after deleting an 
-archive or pruning a repository.
+archive or pruning or recreating a repository.
 
 If you set this to yes, your cannot use the :ref:`undelete command <undelete>`.
 

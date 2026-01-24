@@ -26,6 +26,7 @@ or:
 
 The available commands are:
 
+    :analyze:     :ref:`analyze archives to find ‘hot spots’ <analyze>`
     :borg:        :ref:`run a raw borg command <borg>`
     :break-lock:  :ref:`breaks the repository and cache locks <break-lock>`
     :check:       :ref:`checks the repository and its archives <check>`
@@ -234,6 +235,29 @@ The following global options are supported::
     -r, --relocated                   Acknowledge that repository was relocated.
     -v, --verbose                     Make Borg more verbose.
     --no-log                          Do not create log file.
+
+
+.. _analyze:
+
+Analyze
+--------
+
+Iterates over all contained files in selected archives and collects information 
+about chunks stored in all directories it encounters.
+
+It considers chunk IDs and their plaintext sizes (Borg does not have the
+compressed size in the repository easily available) and adds up the
+sizes of added and removed chunks per direct parent directory, and
+outputs a list of “directory: activity”.
+
+You can use that list to find directories with a lot of activity —
+maybe some of these are temporary or cache directories you forgot to
+exclude.
+
+To avoid including these unwanted directories in your backups, you can
+carefully exclude them and use the :ref:`recreate <recreate>` command to 
+regenerate existing archives without them.
+
 
 .. _borg:
 

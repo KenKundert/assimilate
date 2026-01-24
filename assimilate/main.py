@@ -100,6 +100,7 @@ def main():
                 {
                     "verbose": cmdline["--verbose"],
                     "narrate": cmdline["--narrate"],
+                    "quiet": cmdline["--quiet"],
                     "dry-run": cmdline["--dry-run"],
                     "no-log": cmdline["--no-log"],
                     "config": cmdline["--config"],

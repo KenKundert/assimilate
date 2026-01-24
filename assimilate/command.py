@@ -425,6 +425,71 @@ class Command:
         return text.format(title=title(cls.DESCRIPTION), usage=cls.USAGE,)
 
 
+# AnalyzeCommand command {{{1
+class AnalyzeCommand(Command):
+    NAMES = "analyze".split()
+    DESCRIPTION = "analyze archives to find ‘hot spots’"
+    USAGE = dedent(
+        """
+        Usage:
+            assimilate analyze [options]
+
+        Options:
+            -f, --first <N>             consider first N archives that remain
+            -l, --last <N>              consider last N archives that remain
+            -n, --newer <age>           only consider archives newer than age
+            -o, --older <age>           only consider archives older than age
+            -N, --newest <range>        only consider archives between newest and
+                                        newest-range
+            -O, --oldest <range>        only consider archives between oldest and
+                                        oldest+range
+            -E, --include-external      analyze all archives in repository, not just
+                                        those associated with chosen configuration
+
+        Iterates over all contained files in selected archives and collects
+        information about chunks stored in all directories it encounters.
+
+        It considers chunk IDs and their plaintext sizes (Borg does not have the
+        compressed size in the repository easily available) and adds up the
+        sizes of added and removed chunks per direct parent directory, and
+        outputs a list of “directory: activity”.
+
+        You can use that list to find directories with a lot of activity —
+        maybe some of these are temporary or cache directories you forgot to
+        exclude.
+
+        To avoid including these unwanted directories in your backups, you can
+        carefully exclude them and use the recreate command to regenerate
+        existing archives without them.
+        """
+    ).strip()
+    REQUIRES_EXCLUSIVITY = True
+    COMPOSITE_CONFIGS = "error"
+    LOG_COMMAND = True
+
+    @classmethod
+    def run(cls, command, args, settings, options):
+        # read command line
+        cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
+        strip_archive_matcher = cmdline["--include-external"]
+        # identify archive or archives to analyze
+        borg_opts = archive_filter_options(settings, cmdline, default='all')
+
+        # run borg
+        borg = settings.run_borg(
+            cmd = "analyze",
+            args = args,
+            assimilate_opts = options,
+            borg_opts = borg_opts,
+            strip_archive_matcher = strip_archive_matcher,
+        )
+        out = borg.stderr or borg.stdout
+        if out:
+            output(out.rstrip())
+
+        return borg.status
+
+
 # BorgCommand command {{{1
 class BorgCommand(Command):
     NAMES = "borg".split()
@@ -509,16 +574,16 @@ class CheckCommand(Command):
             assimilate check [options]
 
         Options:
-            -a, --archive <archive>     name of the archive to mount
-            -A, --after <date_or_age>   use first archive younger than given
-            -B, --before <date_or_age>  use first archive older than given
-            -f, --first <N>             consider first N archives that remain
-            -l, --last <N>              consider last N archives that remain
-            -n, --newer <age>           only consider archives newer than age
-            -o, --older <age>           only consider archives older than age
-            -N, --newest <range>        only consider archives between newest and
+            -a, --archive <archive>     name of the archive to check
+            -A, --after <date_or_age>   check first archive younger than given
+            -B, --before <date_or_age>  check first archive older than given
+            -f, --first <N>             check first N archives that remain
+            -l, --last <N>              check last N archives that remain
+            -n, --newer <age>           consider check archives newer than age
+            -o, --older <age>           consider check archives older than age
+            -N, --newest <range>        consider check archives between newest and
                                         newest-range
-            -O, --oldest <range>        only consider archives between oldest and
+            -O, --oldest <range>        consider check archives between oldest and
                                         oldest+range
             -e, --all                   check all available archives
             -E, --include-external      check all archives in repository, not just
@@ -2131,10 +2196,18 @@ class PruneCommand(Command):
             assimilate prune [options]
 
         Options:
-            -e, --include-external   prune all archives in repository, not just
-                                     those associated with chosen configuration
-            -f, --fast               skip compacting
-            -l, --list               show fate of each archive
+            -f, --first <N>         consider first N archives that remain
+            -l, --last <N>          consider last N archives that remain
+            -n, --newer <age>       only consider archives newer than age
+            -o, --older <age>       only consider archives older than age
+            -N, --newest <range>    only consider archives between newest and
+                                    newest-range
+            -O, --oldest <range>    only consider archives between oldest and
+                                    oldest+range
+            -e, --include-external  prune all archives in repository, not just
+                                    those associated with chosen configuration
+            -f, --fast              skip compacting
+            -l, --list              show fate of each archive
 
         The prune command deletes archives that are no longer needed as
         determined by the prune rules.  However, the disk space is not reclaimed
@@ -2154,6 +2227,7 @@ class PruneCommand(Command):
         cmdline = process_cmdline(cls.USAGE, argv=[command] + args)
         include_external_archives = cmdline["--include-external"]
         borg_opts = []
+        borg_opts = archive_filter_options(settings, cmdline, default='all')
         if cmdline["--list"]:
             borg_opts.append("--list")
         fast = cmdline["--fast"]
@@ -2253,12 +2327,32 @@ class RecreateCommand(Command):
             borg_opts = borg_opts,
             args = paths,
             assimilate_opts = options,
+            show_borg_output = 'quiet' not in options,
             strip_archive_matcher = cmdline["--include-external"]
         )
-        out = (borg.stderr or borg.stdout).rstrip()
+        out = borg.stderr
         if out:
-            output(out)
-        return borg.status
+            output(out.rstrip())
+        recreate_status = borg.status
+
+        try:
+            # compact the repository if requested
+            if settings.compact_after_delete and 'dry-run' not in options:
+                narrate("Compacting repository ...")
+                compact = CompactCommand()
+                compact_status = compact.run("compact", [], settings, options)
+            else:
+                compact_status = 0
+
+        except Error as e:
+            e.reraise(
+                codicil = (
+                    "This error occurred while compacting the repository.",
+                    "No error was reported while deleting the archive.",
+                )
+            )
+
+        return max([recreate_status, compact_status])
 
 # RepoCreateCommand command {{{1
 class RepoCreateCommand(Command):
@@ -2293,11 +2387,11 @@ class RepoCreateCommand(Command):
             cmd="repo-create",
             assimilate_opts = cmdline
         )
-        out = (borg.stderr or borg.stdout).rstrip()
+        out = borg.stderr or borg.stdout
         if out:
             out = out.replace('borg repo-space', 'assimilate repo-space')
             out = out.replace('borg key export -r REPOSITORY', 'assimilate borg key export -r @repo')
-            output(out)
+            output(out.rstrip())
         if borg.status:
             return borg.status
 

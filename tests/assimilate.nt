@@ -200,6 +200,7 @@ assimilate:
                             >     --no-log                          Do not create log file.
                             >
                             > Available commands:
+                            >     analyze           analyze archives to find ‘hot spots’
                             >     borg              run a raw borg command
                             >     break-lock        breaks the repository and cache locks
                             >     check             checks the repository and its archives
@@ -359,6 +360,13 @@ assimilate:
 
                     ~/.local/share/assimilate/test.latest.nt:
                         contains regex: ^create last run: \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.*$
+
+            raken — analyze {{{2:
+                run: assimilate analyze
+                checks:
+                    stdout:
+                        contains text:
+                            > chunks added or removed by directory path
 
             expiate — repo-list with --relocated {{{2:
                 run: assimilate --relocated repo-list
@@ -924,6 +932,7 @@ assimilate:
                             >     --no-log                          Do not create log file.
                             >
                             > Available commands:
+                            >     analyze           analyze archives to find ‘hot spots’
                             >     borg              run a raw borg command
                             >     break-lock        breaks the repository and cache locks
                             >     check             checks the repository and its archives
@@ -1772,6 +1781,7 @@ assimilate:
                             >     --no-log                          Do not create log file.
                             >
                             > Available commands:
+                            >     analyze           analyze archives to find ‘hot spots’
                             >     borg              run a raw borg command
                             >     break-lock        breaks the repository and cache locks
                             >     check             checks the repository and its archives
