@@ -592,7 +592,7 @@ class Assimilate:
         if assimilate_opts.get("dry-run") and cmd in borg_commands_with_dryrun:
             borg_opts.append("--dry-run")
 
-        if cmd == "create":
+        if cmd in ["create", "recreate"]:
             if assimilate_opts.get("verbose") and "--list" not in borg_opts:
                 borg_opts.append("--list")
             self.resolve_patterns(borg_opts)
