@@ -593,7 +593,8 @@ assimilate:
 
                     stderr:
                         matches regex:
-                            > archive: {aid0} {ar0} .*
+                            > archive: [a-z0-9]{{8}} {ar0} .*
+                            # the recreate executed above changes the aid
 
 
             pullet — check {{{2:
