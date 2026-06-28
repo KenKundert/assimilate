@@ -7,8 +7,8 @@ Assimilate — Front-End to Borg Backup
 |downloads| |build status| |coverage| |rtd status| |pypi version| |python version|
 
 :Author: Ken Kundert
-:Version: 0.1
-:Released: 2026-01-11
+:Version: 0.2
+:Released: 2026-06-28
 
 *Assimilate* is a simple command line utility to orchestrate backups. It is 
 designed to make common tasks simple and efficient.  With *Assimilate*, you 
