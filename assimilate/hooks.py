@@ -18,10 +18,10 @@
 
 
 # Imports {{{1
-from inform import Error, conjoin, full_stop, is_str, log, os_error, truth, warn
 from .configs import add_setting, as_integer, as_string, as_dict, report_setting_error
+from .fetch_url import fetch_url
+from inform import Error, conjoin, is_str, log, os_error, truth, warn
 from voluptuous import Any, Invalid, Schema
-import requests
 
 # Schema {{{1
 # as_url() {{{2
@@ -97,10 +97,7 @@ class Hooks:
     def signal_start(self):
         url = self.START_URL.format(url=self.url, uuid=self.uuid)
         log(f'signaling start of backups to {self.NAME}: {url}.')
-        try:
-            requests.get(url, timeout=self.timeout)
-        except requests.exceptions.RequestException as e:
-            raise Error(f'{self.NAME} connection error.', codicil=full_stop(e))
+        fetch_url(url, 'get', timeout=self.timeout)
 
     def signal_end(self, exception):
         if exception:
@@ -110,10 +107,7 @@ class Hooks:
             url = self.SUCCESS_URL.format(url=self.url, uuid=self.uuid)
             result = 'success'
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
-        try:
-            requests.get(url, timeout=self.timeout)
-        except requests.exceptions.RequestException as e:
-            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
+        fetch_url(url, 'get', timeout=self.timeout)
 
 
 # Custom class {{{1
@@ -204,6 +198,7 @@ class Custom(Hooks):
         if is_str(reporter):
             url = self.expand_value((name,), placeholders)
             params = {}
+            data = {}
         else:
             url = self.expand_value((name, 'url'), placeholders)
             params = self.expand_value((name, 'params'), placeholders)
@@ -221,13 +216,7 @@ class Custom(Hooks):
             self.report_error((), 'invalid url.')
 
         log(f'signaling {name} of backups to {self.NAME}: {url} via {method}.')
-        try:
-            if method == 'get':
-                requests.get(url, params=params, timeout=self.timeout)
-            else:
-                requests.post(url, params=params, data=data, timeout=self.timeout)
-        except requests.exceptions.RequestException as e:
-            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
+        fetch_url(url, method, params=params, data=data, timeout=self.timeout)
 
     def signal_start(self):
         self.report('start', self.placeholders)
@@ -286,10 +275,7 @@ class HealthChecks(Hooks):
     def signal_start(self):
         url = f'{self.url}/{self.uuid}/start'
         log(f'signaling start of backups to {self.NAME}: {url}.')
-        try:
-            requests.post(url, timeout=self.timeout)
-        except requests.exceptions.RequestException as e:
-            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
+        fetch_url(url, 'post', timeout=self.timeout)
 
     def signal_end(self, exception):
         if exception:
@@ -315,13 +301,10 @@ class HealthChecks(Hooks):
 
         url = f'{self.url}/{self.uuid}/{status}'
         log(f'signaling {result} of backups to {self.NAME}: {url}.')
-        try:
-            if payload:
-                requests.post(url, data=payload.encode('utf-8'), timeout=self.timeout)
-            else:
-                requests.post(url, timeout=self.timeout)
-        except requests.exceptions.RequestException as e:
-            raise Error('{self.NAME} connection error.', codicil=full_stop(e))
+        if payload:
+            fetch_url(url, 'post', data=payload.encode('utf-8'), timeout=self.timeout)
+        else:
+            fetch_url(url, 'post', timeout=self.timeout)
 
 
 # CronHub class {{{1

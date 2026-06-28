@@ -25,8 +25,9 @@ import sys
 import nestedtext as nt
 from docopt import docopt, DocoptExit
 from inform import (
-    Error, conjoin, cull, full_stop, is_str, join, os_error,
-    error, narrate, output as output_raw, terminate, warn
+    Error, conjoin, cull, errors_accrued, full_stop, is_array, is_mapping,
+    is_str, join, os_error, error, narrate, output as output_raw, terminate,
+    warn
 )
 from quantiphy import (
     Quantity, UnitConversion, QuantiPhyError, InvalidNumber, UnknownConversion
@@ -239,18 +240,45 @@ def read_latest(path):
     except nt.NestedTextError as e:
         raise Error(e)
 
-# voluptuous_error {{{1
+# voluptuous_errors {{{1
 # A convenience function used for reporting voluptuous errors.  Uses Inform's
 # error() function when reporting the errors as it allows for multiple errors to
 # be reported.
 
 voluptuous_error_msg_mappings = {
     "extra keys not allowed": ("unknown key", "key"),
+    "expected a dict": ("expected a key-value pair", "value"),
     "expected a dictionary": ("expected a key-value pair", "value"),
     "required key not provided": ("required key is missing", "value"),
 }
 
-def report_voluptuous_errors(multiple_invalid, keymap, source=None, sep="›", path_fmt="{path}@{lines}"):
+# _nested_getvalue() {{{2
+def _nested_getvalue(data, path):
+    for item_index in path:
+        try:
+            data = data[item_index]
+        except (KeyError, IndexError, TypeError):
+            # The index is not present in the dictionary, list or other
+            # indexable or data is not subscriptable
+            return None
+    return data
+
+# _summarize_value() {{{1
+def _summarize_value(value):
+    if is_array(value):
+        return 'list'
+    if is_mapping(value):
+        return 'key-value pair'
+    value = repr(value)
+    if len(value) > 20:
+        return value[:20] + ' ...'
+    return value
+
+# report_voluptuous_errors() {{{2
+def report_voluptuous_errors(
+    multiple_invalid, data=None, *,
+    keymap=None, source=None, sep="›", path_fmt="{path}@{lines}"
+):
     source = str(source) if source else ""
 
     for err in multiple_invalid.errors:
@@ -261,25 +289,41 @@ def report_voluptuous_errors(multiple_invalid, keymap, source=None, sep="›", p
         )
 
         # get metadata about error
+        codicil = ()
         if keymap:
+            # build culprit
             culprit = nt.get_keys(err.path, keymap=keymap, strict="found", sep=sep)
             line_nums = nt.get_line_numbers(err.path, keymap, kind=kind, sep="-", strict=False)
-            loc = nt.get_location(err.path, keymap)
-            if loc:
-                codicil = loc.as_line(kind)
-            else:  # required key is missing
-                missing = nt.get_keys(err.path, keymap, strict="missing", sep=sep)
-                codicil = f"‘{missing}’ was not found."
-
             file_and_lineno = path_fmt.format(path=str(source), lines=line_nums)
             culprit = cull((file_and_lineno, culprit))
+
+            # build codicil
+            loc = nt.get_location(err.path, keymap)
+            if data and kind == 'value':
+                try:
+                    value = nt.get_value(data, err.path)
+                    if value is not None:
+                        codicil = (f"Found {_summarize_value(value)}.",)
+                except KeyError:
+                    pass
+            if loc:
+                codicil += (loc.as_line(kind),)
+            else:  # required key is missing
+                missing = nt.get_keys(err.path, keymap, strict="missing", sep=sep)
+                codicil += (f"‘{missing}’ was not found.",)
         else:
             keys = sep.join(str(c) for c in err.path)
             culprit = cull([source, keys])
-            codicil = None
+            if data and kind == 'value':
+                value = _nested_getvalue(data, err.path)
+                if value is not None:
+                    codicil = (f"Found {_summarize_value(value)}.",)
 
         # report error
         error(full_stop(msg), culprit=culprit, codicil=codicil)
+
+    return errors_accrued()
+
 
 # process_cmdline {{{1
 def process_cmdline(*args, **kwargs):

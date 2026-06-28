@@ -1280,6 +1280,7 @@ assimilate:
                             > Hostname: .+
                             > Username: .+
                             > Tags: 
+                            > Time \(nominal\): .+
                             > Time \(start\): .+
                             > Time \(end\): .+
                             > Duration: .+
@@ -1299,6 +1300,7 @@ assimilate:
                             > Hostname: .+
                             > Username: .+
                             > Tags: 
+                            > Time \(nominal\): .+
                             > Time \(start\): .+
                             > Time \(end\): .+
                             > Duration: .+
@@ -1538,6 +1540,9 @@ assimilate:
             persevere — mount {{{2:
                 run: assimilate mount
                 checks:
+                    stdout:
+                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
+
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -2352,6 +2357,9 @@ assimilate:
             voter — mount {{{2:
                 run: assimilate mount
                 checks:
+                    stdout:
+                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
+
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -3281,6 +3289,9 @@ assimilate:
             economize — mount {{{2:
                 run: assimilate mount
                 checks:
+                    stdout:
+                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
+
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -4005,6 +4016,9 @@ assimilate:
             outlet — mount ASSIMILATE {{{2:
                 run: assimilate mount /{run_dir}/ASSIMILATE
                 checks:
+                    stdout:
+                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
+
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -4521,6 +4535,7 @@ assimilate:
                             > \+ \.config/assimilate
                             > \+ \.config/assimilate/shared\.conf\.nt
                             > \+ \.config/assimilate/test\.conf\.nt
+                            > \+ \.config/borg
                             > - a
                             > - b
 
@@ -4565,6 +4580,9 @@ assimilate:
             chest — prune --fast  {{{2:
                 run: assimilate prune --fast
                 checks:
+                    stderr:
+                        matches text: Run "assimilate compact" to free space.
+
                     ~/.local/share/assimilate/test.log:
                         contains text:
                             > running:
@@ -4574,7 +4592,10 @@ assimilate:
                             >         --keep-within=1d \
                             >         --match-archives=sh:test
 
-                        excludes text: compact
+                        excludes text:
+                            > running:
+                            >     borg \
+                            >         compact \
 
             takeover — compact  {{{2:
                 run: assimilate compact
@@ -4663,6 +4684,7 @@ assimilate:
                         > patterns:
                         >     - R ~
                         >     - - ~/.cache
+                        >     - - ~/.config/borg
                         >     - - ~/.local
                         >     - - ~/bu
                         >     - - ~/REPO
@@ -4763,7 +4785,7 @@ assimilate:
                             - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config
                             - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate
                             - -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/shared.conf.nt
-                            - -rw------- .+ 114 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/test.conf.nt
+                            - -rw------- .+ 137 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/test.conf.nt
                             - -rw------- .+ 3999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
                             - -rw------- .+ 399999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
                             - -rw------- .+ 39999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/c
@@ -4832,7 +4854,7 @@ assimilate:
                             >      0B {run_dir}/.config/
                             >      0B {run_dir}/.config/assimilate/
                             >     37B {run_dir}/.config/assimilate/shared.conf.nt
-                            >    114B {run_dir}/.config/assimilate/test.conf.nt
+                            >    137B {run_dir}/.config/assimilate/test.conf.nt
                             > 3.91KiB {run_dir}/a
                             > 39.1KiB {run_dir}/c
                             >  391KiB {run_dir}/b
@@ -4849,7 +4871,7 @@ assimilate:
                             >  391KiB {run_dir}/b
                             > 39.1KiB {run_dir}/c
                             > 3.91KiB {run_dir}/a
-                            >    114B {run_dir}/.config/assimilate/test.conf.nt
+                            >    137B {run_dir}/.config/assimilate/test.conf.nt
                             >     37B {run_dir}/.config/assimilate/shared.conf.nt
                             >      0B {run_dir}/.config/assimilate/
                             >      0B {run_dir}/.config/
@@ -4921,7 +4943,7 @@ assimilate:
                             -        0 {run_dir}/.config/
                             -        0 {run_dir}/.config/assimilate/
                             -       37 {run_dir}/.config/assimilate/shared.conf.nt
-                            -      114 {run_dir}/.config/assimilate/test.conf.nt
+                            -      137 {run_dir}/.config/assimilate/test.conf.nt
                             -     3999 {run_dir}/a
                             -   399999 {run_dir}/b
                             -    39999 {run_dir}/c
@@ -5608,8 +5630,10 @@ assimilate:
                     stderr:
                         matches text:
                             > === test1 ===
+                            > Run "assimilate compact" to free space.
                             >
                             > === test2 ===
+                            > Run "assimilate compact" to free space.
                     stdout:
                         matches text:
                             > test1 run_before_borg 1: home directory = /{run_dir}
@@ -5626,6 +5650,9 @@ assimilate:
             idiocracy — prune using only first configs {{{2:
                 run: assimilate -c test1 prune
                 checks:
+                    stderr:
+                        matches text: Run "assimilate compact" to free space.
+
                     stdout:
                         matches text:
                             > test1 run_before_borg 1: home directory = /{run_dir}
@@ -5637,6 +5664,9 @@ assimilate:
             hailstone — prune using only second configs {{{2:
                 run: assimilate -c test2 prune
                 checks:
+                    stderr:
+                        matches text: Run "assimilate compact" to free space.
+
                     stdout:
                         matches text:
                             > test2 run_before_borg 1: home directory = /{run_dir}

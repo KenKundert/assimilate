@@ -827,7 +827,7 @@ def read_config(path, validate_settings):
         )
         settings = validate_settings(settings)
     except MultipleInvalid as e:  # report schema violations
-        report_voluptuous_errors(e, keymap, path)
+        report_voluptuous_errors(e, keymap=keymap, source=path)
         terminate(2)
 
     # check file permissions

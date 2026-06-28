@@ -2206,8 +2206,8 @@ class PruneCommand(Command):
                                     oldest+range
             -e, --include-external  prune all archives in repository, not just
                                     those associated with chosen configuration
-            -f, --fast              skip compacting
-            -l, --list              show fate of each archive
+            -F, --fast              skip compacting
+            -L, --list              show fate of each archive
 
         The prune command deletes archives that are no longer needed as
         determined by the prune rules.  However, the disk space is not reclaimed
@@ -2250,23 +2250,21 @@ class PruneCommand(Command):
             strip_archive_matcher = include_external_archives,
         )
         out = borg.stderr or borg.stdout
-        if out:
+        if out and (out == 'Done. Run "borg compact" to free space.'):
             output(out.rstrip())
         prune_status = borg.status
 
         # update the date file
         update_latest('prune', settings.date_file, options)
 
-        if fast:
-            return prune_status
-
         try:
             # compact the repository if requested
-            if settings.compact_after_delete:
+            if settings.compact_after_delete and not fast:
                 narrate("Compacting repository ...")
                 compact = CompactCommand()
                 compact_status = compact.run("compact", [], settings, options)
             else:
+                display('Run "assimilate compact" to free space.')
                 compact_status = 0
 
         except Error as e:
