@@ -167,7 +167,7 @@ INITIAL_ROOT_CONFIG_FILE_CONTENTS = dedent("""
         - - /home/*/.cache
 
     # prune settings
-    keep within: 1d
+    keep: 1d
     keep daily: 7
     keep weekly: 4
     keep monthly: 6
@@ -204,7 +204,7 @@ INITIAL_HOME_CONFIG_FILE_CONTENTS = dedent("""
         - - .cache
 
     # prune settings
-    keep within: 1d
+    keep: 1d
     keep daily: 7
     keep weekly: 4
     keep monthly: 6
@@ -246,6 +246,6 @@ INITIAL_CACHE_CONFIG_FILE_CONTENTS = dedent("""
         - - .cache
 
     # prune settings
-    keep within: 1d
+    keep: 1d
     keep hourly: 48
 """, strip_nl='l')

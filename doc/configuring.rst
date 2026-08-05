@@ -93,7 +93,9 @@ It might look like the following:
     notifier: notify-send -u normal {prog_name} "{msg}"
 
     # encryption
-    encryption: keyfile-blake2-chacha20-poly1305
+    encryption: blake2-chacha20-poly1305
+    id hash: blake3
+    key location: keyfile
     passphrase: watershed valuation gibbet washday
 
     # composite commands
@@ -236,6 +238,107 @@ Paths specified directly to *Assimilate* are processed and any leading tildes
 (``~``) are expanded to the appropriate user's home directory. However, paths 
 specified in :ref:`exclude_from` and :ref:`patterns_from` files are processed 
 directly by *Borg*, which does not expand tildes to a user's home directory.
+
+
+.. _encryption settings:
+
+Encryption Settings
+~~~~~~~~~~~~~~~~~~~
+
+The various aspects are controlled by three *Borg* settings: :ref:`encryption`, 
+:ref:`id_hash` and :ref:`key_location`.
+
+
+The encryption mode used when first creating the repository.  The available 
+encryption modes are documented in the `repo-create documentation <Borg repo 
+create command usage>`_.  You can also run ``borg benchmark cpu`` to understand 
+the cost of the available choices.
+
+One thing that is important to understand are the roles of the encryption key 
+and the pass phrase.  When you specify encryption *Borg* creates a long random 
+encryption key and uses that key to encrypt the repository.  Before saving the 
+encryption key, *Borg* encrypts it using the pass phrase.  Thus, anyone that 
+does not know the pass phrase can not open the encryption key and so cannot 
+decrypt the repository.  Borg stores the encryption key locally, and if you 
+specify the key location as ``repokey`` it also copies it into the repository.  
+If instead the you specify the key location as ``keyfile``, the encryption key 
+is not copied to the repository.
+
+There are important trade-offs between these two modes that are important to 
+understand.  If you use the ``repokey`` prefix you must choose a secure (long, 
+random) pass phrase and keep it secure.  If someone with access to the machine 
+that holds your repository were to find or guess you pass phrase they could 
+access your files.  This is not possible if ``keyfile`` is used because the 
+encryption key is not copied to the repository, but there is another, perhaps 
+more serious, risk.  If the disk that holds your source files becomes unreadable 
+and you have not manually copied the key file to secure backup location, your 
+files become unrecoverable.  If you choose to use a ``keyfile`` encryption mode 
+you must remember to export your key file and save it to a safe place that is 
+not on the same disk you are backing up.  Use the following command to export 
+your key file:
+
+.. code-block:: bash
+
+    $ assimilate borg key export @repo key.borg
+
+Then move ``key.borg`` to a safe location.
+
+Once encrypted, a passphrase is needed to access the repository.  There are 
+a variety of ways to provide it.  *Borg* itself uses the *BORG_PASSPHRASE*, 
+*BORG_PASSPHRASE_FD*, and *BORG_COMMAND* environment variables if set.  
+*BORG_PASSPHRASE* contains the passphrase, or *BORG_PASSPHRASE_FD* is a file 
+descriptor that provides the passphrase, or *BORG_COMMAND* contains a command 
+that generates the passphrase.  If none of those are set, *Assimilate* looks to 
+its own settings.  If either :ref:`passphrase` or :ref:`passcommand` are set, 
+they are used.  If neither are set, *Assimilate* uses :ref:`avendesora_account` 
+if set.  Otherwise no passphrase is available and the command fails if the 
+repository is encrypted.
+
+
+.. _retention settings:
+
+Retention Settings
+------------------
+
+Borg provides a flexible collection of settings to specify how many archives to 
+retain and how they should be distributed in time.  These settings all start 
+with *keep* and may be a count or an interval.  With a count it keeps at most 
+that many recent archives; with an interval it keeps all archives created within
+that time window.  For example,
+
+.. code-block:: nestedtext
+
+    keep: 5
+    keep weekly: 4
+
+This example uses counts.  The default count is 0, meaning none of the specified 
+archives are kept.  You can also specify *all* to indicate all should be kept 
+with no limit.
+
+Specify intervals by giving a number along with a suffix of *y*, *m*, *w*, *d*, 
+*H*, *M*, and *S* (years, months, weeks, days, hours, minutes, and seconds).  
+For example:
+
+.. code-block:: nestedtext
+
+    keep: 1d
+    keep weekly: 1m
+
+In this case all archives that are less than one day old are kept, and weekly 
+archives are kept for one month.
+
+Be aware that the *keep* settings are passed to *Borg* and so uses the *Borg* 
+time interval conventions, and that those conventions differ from the 
+*Assimilate* conventions that one would use on the command line.  *Borg* uses 
+lower case letters for the longer intervals whereas *Assimilate* uses upper case 
+letters.
+
+To enforce the archive retention rules you must first run the :ref:`prune 
+command <prune>` to mark the archives that it are no longer needed and then run 
+the :ref:`compact command <compact>` to actually purge them and reclaim the 
+space.
+
+See `Borg prune command usage`_ for more details on Borg's retention settings.
 
 
 .. _includes:
@@ -456,15 +559,13 @@ it is excluded.  This is a relatively simple example, additional features are
 described in BorgPatterns_.
 
 
-.. _retention:
+.. _archive retention:
 
 Archive Retention
 -----------------
 
-You use the retention limits (the *keep_X* settings) to specify how long to keep 
-archives after they have been created.  A good description of the use of these 
-settings can be found on the `Borg Prune Command 
-<https://borgbackup.readthedocs.io/en/stable/usage/prune.html>`_ page.
+You use the :ref:`retention settings <retention settings>` to specify how long 
+to keep archives after they have been created.
 
 Generally you want to thin the archives out more and more as they age.  When 
 choosing your retention limits you need to consider the nature of the files you 
@@ -856,52 +957,13 @@ generally suitable for Linux systems.
 encryption
 ~~~~~~~~~~
 
-The encryption mode used by first creating the repository.  The available 
-encryption modes are documented in the `repo-create 
-<https://borgbackup.readthedocs.io/en/master/usage/repo-create.html>`_ 
-documentation.
-Common values are ``none`` if the repository resides on a trusted machine or 
-``repokey-blake2-chacha20-poly1305`` or ``keyfile-blake2-chacha20-poly1305`` if 
-the repository lives on an untrusted machine.  There are many other choices, so 
-it is worth read the *Borg* documentation before choosing.  One thing that is 
-important to understand are the roles of the encryption key and the pass phrase.  
-When you specify encryption *Borg* creates a log random encryption key and uses 
-that key to encrypt the repository.  Before saving the encryption key, *Borg* 
-encrypts it using the pass phrase.  Thus, anyone that does not know the pass 
-phrase can not open the encryption key and so cannot decrypt the repository.  
-Borg stores the encryption key locally, and if you add the ``repokey`` prefix on 
-the encryption model it also copies it into the repository.  If instead the you 
-add the ``keyfile`` prefix, the encryption key is not copied to the repository.
+The method of encryption used to obscure the data files in the repository.  The 
+available methods tend to change over time, so you should check the latest
+`repo-create documentation <Borg repo create command usage>`_ before choosing.
 
-There are important trade-offs between these two modes that it is important to 
-understand.  If you use the ``repokey`` prefix you must choose a secure (long, 
-random) pass phrase and keep it secure.  If someone with access to the machine 
-that holds your repository were to find or guess you pass phrase they could 
-access your files.  This is not possible if ``keyfile`` is used because the 
-encryption key is not copied to the repository, but there is another, perhaps 
-more serious, risk.  If the disk that holds your source files becomes unreadable 
-and you have not manually copied the key file to secure backup location, your 
-files become unrecoverable.  If you choose to use a ``keyfile`` encryption mode 
-you must remember to export your key file and save it to a safe place that is 
-not on the same disk you are backing up.  Use the following command to export 
-your key file:
-
-.. code-block:: bash
-
-    $ assimilate borg key export @repo key.borg
-
-The more ``key.borg`` to a safe location.
-
-Once encrypted, a passphrase is needed to access the repository.  There are 
-a variety of ways to provide it.  *Borg* itself uses the *BORG_PASSPHRASE*, 
-*BORG_PASSPHRASE_FD*, and *BORG_COMMAND* environment variables if set.  
-*BORG_PASSPHRASE* contains the passphrase, or *BORG_PASSPHRASE_FD* is a file 
-descriptor that provides the passphrase, or *BORG_COMMAND* contains a command 
-that generates the passphrase.  If none of those are set, *Assimilate* looks to 
-its own settings.  If either :ref:`passphrase` or :ref:`passcommand` are set, 
-they are used.  If neither are set, *Assimilate* uses :ref:`avendesora_account` 
-if set.  Otherwise no passphrase is available and the command fails if the 
-repository is encrypted.
+Two methods that are unlikely to change are *none* and *authenticated*.  In both 
+of these no encryption is used, but *authenticated* still validates the data in 
+order to detect any corruption or tampering.
 
 
 .. _excludes:
@@ -998,6 +1060,14 @@ specified on an individual configuration.  For example:
     healthchecks_uuid: 51cb35d8-2975-110b-67a7-11b65d432027
 
 
+.. _id_hash:
+
+id_hash
+~~~~~~~
+
+*id_hash* selects the id hash function used for chunk ids and authentication.
+
+
 .. _include:
 
 include
@@ -1009,6 +1079,19 @@ it is relative to the file that includes it.
 
 The file being included should have a '.nt' suffix, but not a '.conf.nt' suffix.  
 
+
+.. _key_location:
+
+key_location
+~~~~~~~~~~~~
+
+*key_location* selects where the key is stored.  The choices are:
+
+- *repokey* (the default), where the key is stored in the repository (under 
+  keys/). Pick this if you want ease-of-use and “passphrase” security is good 
+  enough.
+- *keyfile*, the key is stored in your home directory (in ~/.config/borg/keys).  
+  Pick this if you want “passphrase and having-the-key” security.
 
 .. _manage_diffs_cmd:
 
@@ -1216,7 +1299,8 @@ Any of the following names may be embedded in braces and included in the string.
 They will be replaced by their value:
 
  |  *msg*: The message for the user.
- |  *hostname*: The host name of the system that *Assimilate* is running on.
+ |  *config_name*: The name of the active configuration.
+ |  *host_name*: The host name of the system that *Assimilate* is running on.
  |  *user_name*: The user name of the person that started *Assimilate*
  |  *prog_name*: The name of the *Assimilate* program.
 
@@ -1714,8 +1798,8 @@ the file changes while reading the file and so requires a re-read.
 
 .. note::
 
-    This option must be set to ``'yes`` on MacOS to avoid "file changed while we 
-    read it" messages.
+    This option must be set to ``mtime`` on MacOS to avoid "file changed while 
+    we read it" messages.
 
 .. _lock_wait:
 
@@ -1726,34 +1810,14 @@ Maximum time to wait for a repository or cache lock to be released [seconds].
 The default is 1.
 
 
-.. _keep_within:
+.. _keep:
 
-keep_within
-~~~~~~~~~~~
+keep
+~~~~
 
-Keep all archives created within this time interval.  Specify as a number and 
-a unit, where the available units are "y", "m", "w", "d", "H", "M", and "S"
-and they represent years, months, weeks, days, hours, minutes, and seconds.
+Keep the latest *N* archives or all archives in the specified interval.
 
-For example:
-
-
-.. code-block:: nestedtext
-
-    keep_within: 1d
-
-Be aware that *keep_within* is passed to *Borg* and so uses the *Borg* time 
-interval conventions, and that those conventions differ from the *Assimilate* 
-conventions.  *Borg* uses lower case letters for the longer intervals whereas 
-*Assimilate* uses upper case letters.
-
-
-.. _keep_last:
-
-keep_last
-~~~~~~~~~
-
-Number of the most recent archives to keep.
+See :ref:`retention settings <retention settings>` for more detail.
 
 
 .. _keep_minutely:
@@ -1761,7 +1825,10 @@ Number of the most recent archives to keep.
 keep_minutely
 ~~~~~~~~~~~~~
 
-Number of minutely archives to keep.
+Specifies that one archive should be retained from each minute until the count 
+or interval has been exceeded.
+
+See :ref:`retention settings <retention settings>` for more detail.
 
 
 .. _keep_hourly:
@@ -1769,7 +1836,9 @@ Number of minutely archives to keep.
 keep_hourly
 ~~~~~~~~~~~
 
-Number of hourly archives to keep.
+Specifies how many *per hour* archives to keep.
+
+See :ref:`retention settings <retention settings>` for more detail.
 
 
 .. _keep_daily:
@@ -1777,7 +1846,9 @@ Number of hourly archives to keep.
 keep_daily
 ~~~~~~~~~~
 
-Number of daily archives to keep.
+Specifies how many *per day* archives to keep.
+
+See :ref:`retention settings <retention settings>` for more detail.
 
 
 .. _keep_weekly:
@@ -1785,7 +1856,20 @@ Number of daily archives to keep.
 keep_weekly
 ~~~~~~~~~~~
 
-Number of weekly archives to keep.
+Specifies how many *per week* archives to keep.
+
+See :ref:`retention settings <retention settings>` for more detail.
+
+
+.. _keep_13weekly:
+
+keep_13weekly
+~~~~~~~~~~~~~
+
+Specifies how many *per quarter* archives to keep, where the length of a quarter 
+is 13 weeks.
+
+See :ref:`retention settings <retention settings>` for more detail.
 
 
 .. _keep_monthly:
@@ -1793,7 +1877,20 @@ Number of weekly archives to keep.
 keep_monthly
 ~~~~~~~~~~~~
 
-Number of monthly archives to keep.
+Specifies how many *per month* archives to keep.
+
+See :ref:`retention settings <retention settings>` for more detail.
+
+
+.. _keep_3monthly:
+
+keep_3monthly
+~~~~~~~~~~~~~
+
+Specifies how many *per quarter* archives to keep, where the length of a quarter 
+is 3 months.
+
+See :ref:`retention settings <retention settings>` for more detail.
 
 
 .. _keep_yearly:
@@ -1801,7 +1898,9 @@ Number of monthly archives to keep.
 keep_yearly
 ~~~~~~~~~~~
 
-Number of yearly archives to keep.
+Specifies how many *per year* archives to keep.
+
+See :ref:`retention settings <retention settings>` for more detail.
 
 
 .. _match_archives:

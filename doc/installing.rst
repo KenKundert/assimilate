@@ -213,7 +213,7 @@ The third file is the configuration file for *snapshots*:
         - **/.*.swp
     prune_after_create: 'yes
     compact_after_delete: 'yes
-    keep_within: 1d
+    keep: 1d
 
 In this case the repository is on the local machine and it is not encrypted. It 
 again backs up your home directory, but for this configuration the archives are 

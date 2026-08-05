@@ -91,6 +91,23 @@ def as_integer(arg):
         raise Invalid(f"expected integer, found ‘{arg}’")
     return arg
 
+# as_interval {{{2
+# raise error if value is a string that cannot be cast to an integer or a time
+# interval
+def as_interval(arg):
+    arg = as_string(arg).strip()
+    try:
+        int(arg)
+    except ValueError:
+        try:
+            number = arg[:-1]
+            unit = arg[-1]
+            int(number)
+            assert unit in 'ymwdHMS'
+        except Exception:
+            raise Invalid(f"expected integer or time interval, found ‘{arg}’")
+    return arg
+
 # as_quantity {{{2
 # raise error if value is a string that cannot be cast to an quantity
 def as_quantity(arg):
@@ -570,65 +587,72 @@ BORG_SETTINGS = dict(
         desc = "specify how to detect if a file has changed during backup (choose from: ctime, mtime, disabled; default: ctime)",
         validator = as_string,
     ),
-    keep_within = dict(
+    id_hash = dict(
+        cmds = ["repo-create"],
+        arg = "HASH",
+        desc = "selects the ID hash function (used for chunk IDs and authentication)",
+        validator = as_name,
+    ),
+    keep = dict(
         cmds = ["prune"],
         arg = "INTERVAL",
-        desc = "keep all archives within this time interval",
-        validator = as_string,
-    ),
-    keep_last = dict(
-        cmds = ["prune"],
-        arg = "NUM",
-        desc = "number of the most recent archives to keep",
-        validator = as_integer,
+        desc = "number or time interval of archives to keep ",
+        validator = as_interval,
     ),
     keep_minutely = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of minutely archives to keep",
-        validator = as_integer,
+        desc = "number or interval of minutely archives to keep",
+        validator = as_interval,
     ),
     keep_hourly = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of hourly archives to keep",
-        validator = as_integer,
+        desc = "number or interval of hourly archives to keep",
+        validator = as_interval,
     ),
     keep_daily = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of daily archives to keep",
-        validator = as_integer,
+        desc = "number or interval of daily archives to keep",
+        validator = as_interval,
     ),
     keep_weekly = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of weekly archives to keep",
-        validator = as_integer,
+        desc = "number or interval of weekly archives to keep",
+        validator = as_interval,
     ),
     keep_monthly = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of monthly archives to keep",
-        validator = as_integer,
+        desc = "number or interval of monthly archives to keep",
+        validator = as_interval,
     ),
     keep_3monthly = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of 3 month quarter archives to keep",
-        validator = as_integer,
+        desc = "number or interval of 3 month quarterly archives to keep",
+        validator = as_interval,
     ),
     keep_13weekly = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of 13 week quarter archives to keep",
-        validator = as_integer,
+        desc = "number or interval of 13 week quarterly archives to keep",
+        validator = as_interval,
     ),
     keep_yearly = dict(
         cmds = ["prune"],
         arg = "NUM",
-        desc = "number of yearly archives to keep",
-        validator = as_integer,
+        desc = "number or interval of yearly archives to keep",
+        validator = as_interval,
+    ),
+    key_location = dict(
+        cmds = ["repo-create"],
+        arg = "LOC",
+        desc = "selects where the key is stored",
+        # validator = as_string,
+        validator = as_name,
     ),
     lock_wait = dict(
         cmds = ["all"],

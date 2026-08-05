@@ -838,11 +838,11 @@ only reports on the active config or configs, whereas *overdue* can report any
 Prune
 -----
 
-Prune the repository of excess archives.  You can use the :ref:`keep_within`, 
-:ref:`keep_last`, :ref:`keep_minutely`, :ref:`keep_hourly`, :ref:`keep_daily`, 
-:ref:`keep_weekly`, :ref:`keep_monthly`, and :ref:`keep_yearly` settings to 
-control which archives should be kept. At least one of these settings must be 
-specified to use :ref:`prune <prune>`:
+Prune the repository of excess archives.  You can use the :ref:`keep`, 
+:ref:`keep_minutely`, :ref:`keep_hourly`, :ref:`keep_daily`, :ref:`keep_weekly`, 
+:ref:`keep_13weekly`, :ref:`keep_monthly`, :ref:`keep_3monthly`, and 
+:ref:`keep_yearly` settings to control which archives should be kept. At least 
+one of these settings must be specified to use :ref:`prune <prune>`:
 
 .. code-block:: bash
 

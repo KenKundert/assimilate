@@ -85,7 +85,7 @@ assimilate:
                             >     - - /var/tmp
                             >     - - /root/.cache
                             >     - - /home/*/.cache
-                            > keep within: 1d
+                            > keep: 1d
                             > keep daily: 7
                             > keep weekly: 4
                             > keep monthly: 6
@@ -103,7 +103,7 @@ assimilate:
                             >     - - **/__pycache__
                             >     - - **/.*.sw[ponml]
                             >     - - .cache
-                            > keep within: 1d
+                            > keep: 1d
                             > keep daily: 7
                             > keep weekly: 4
                             > keep monthly: 6
@@ -122,7 +122,7 @@ assimilate:
                             >     - - Music
                             >     - - Videos
                             >     - - Pictures
-                            > keep within: 1d
+                            > keep: 1d
                             > keep hourly: 48
 
     druid — single config that uses patterns, explicit archive, and basic settings {{{1:
@@ -513,10 +513,10 @@ assimilate:
                 checks:
                     stderr:
                         matches text:
-                            > assimilate error: no prune settings available.
-                            >     At least one of keep_within, keep_last, keep_minutely, keep_hourly,
-                            >     keep_daily, keep_weekly, keep_monthly, keep_3monthly, keep_13weekly,
-                            >     or keep_yearly must be specified.
+                            > assimilate error: no retention settings available.
+                            >     At least one of keep, keep_minutely, keep_hourly, keep_daily,
+                            >     keep_weekly, keep_monthly, keep_3monthly, keep_13weekly, or
+                            >     keep_yearly must be specified.
                     status: 2
 
             felony — compact {{{2:
@@ -797,16 +797,21 @@ assimilate:
                             >              files_changed: specify how to detect if a file has changed
                             >                             during backup (choose from: ctime, mtime,
                             >                             disabled; default: ctime)
-                            >              keep_13weekly: number of 13 week quarter archives to keep
-                            >              keep_3monthly: number of 3 month quarter archives to keep
-                            >                 keep_daily: number of daily archives to keep
-                            >                keep_hourly: number of hourly archives to keep
-                            >                  keep_last: number of the most recent archives to keep
-                            >              keep_minutely: number of minutely archives to keep
-                            >               keep_monthly: number of monthly archives to keep
-                            >                keep_weekly: number of weekly archives to keep
-                            >                keep_within: keep all archives within this time interval
-                            >                keep_yearly: number of yearly archives to keep
+                            >                    id_hash: selects the ID hash function (used for chunk
+                            >                             IDs and authentication)
+                            >                       keep: number or time interval of archives to keep
+                            >              keep_13weekly: number or interval of 13 week quarterly
+                            >                             archives to keep
+                            >              keep_3monthly: number or interval of 3 month quarterly
+                            >                             archives to keep
+                            >                 keep_daily: number or interval of daily archives to keep
+                            >                keep_hourly: number or interval of hourly archives to keep
+                            >              keep_minutely: number or interval of minutely archives to
+                            >                             keep
+                            >               keep_monthly: number or interval of monthly archives to keep
+                            >                keep_weekly: number or interval of weekly archives to keep
+                            >                keep_yearly: number or interval of yearly archives to keep
+                            >               key_location: selects where the key is stored
                             >                  lock_wait: wait at most SECONDS for acquiring a
                             >                             repository/cache lock (default: 1)
                             >             match_archives: only consider archive names that match the
@@ -869,7 +874,7 @@ assimilate:
                         > exclude if present: .nobackup
                         > exclude caches: 'yes
                         >
-                        > keep within: 1d
+                        > keep: 4
                         > keep hourly: 0
                         > keep daily: 7
                         > keep weekly: 4
@@ -1164,10 +1169,12 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
+                            >         --keep=4 \
+                            >         --keep-hourly=0 \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
+                            >         --keep-yearly=0 \
                             >         '--match-archives=sh:{hostname}-{username}-test-*'
                         contains text:
                             > running:
@@ -1264,7 +1271,7 @@ assimilate:
                         contains regex:
                             > Repository ID: [a-f0-9]+
                             > Location: /{run_dir}/REPO/test
-                            > Repository version: 3
+                            > Repository version: 4
                             > Encrypted: No
                             > Security directory: /{run_dir}/.local/share/borg/security/[a-f0-9]+
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
@@ -1416,10 +1423,12 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
+                            >         --keep=4 \
+                            >         --keep-hourly=0 \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
+                            >         --keep-yearly=0 \
                             >         '--match-archives=sh:{hostname}-{username}-test-*'
                         contains text:
                             > running:
@@ -1433,10 +1442,12 @@ assimilate:
                             >     >     borg \
                             >     >         prune \
                             >     >         --repo=/{run_dir}/REPO/test \
-                            >     >         --keep-within=1d \
+                            >     >         --keep=4 \
+                            >     >         --keep-hourly=0 \
                             >     >         --keep-daily=7 \
                             >     >         --keep-weekly=4 \
                             >     >         --keep-monthly=6 \
+                            >     >         --keep-yearly=0 \
                             >     >         '--match-archives=sh:{hostname}-{username}-test-*'
                         contains text:
                             >     > running:
@@ -1540,9 +1551,6 @@ assimilate:
             persevere — mount {{{2:
                 run: assimilate mount
                 checks:
-                    stdout:
-                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
-
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -1678,7 +1686,9 @@ assimilate:
                     contents:
                         > default config: test
                         > default mount point: ~/ASSIMILATE
-                        > encryption: repokey-blake2-chacha20-poly1305
+                        > encryption: chacha20-poly1305
+                        > id hash: blake3
+                        > key location: repokey
                         > compression: zstd,1
                         > passphrase: roadhouse pause govern parry
                         > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
@@ -1690,12 +1700,12 @@ assimilate:
                         > exclude if present: .nobackup
                         > exclude caches: 'yes
                         >
-                        > keep within: 1d
-                        > keep hourly: 0
-                        > keep daily: 7
-                        > keep weekly: 4
-                        > keep monthly: 6
-                        > keep yearly: 0
+                        > keep: 3H
+                        > keep hourly: 1d
+                        > keep daily: 1w
+                        > keep weekly: 1m
+                        > keep monthly: 1y
+                        > keep yearly: 5y
                         >
                         > command aliases:
                         >     repo-list:
@@ -1887,7 +1897,9 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --encryption=repokey-blake2-chacha20-poly1305
+                            >         --encryption=chacha20-poly1305 \
+                            >         --id-hash=blake3 \
+                            >         --key-location=repokey
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1945,10 +1957,12 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
-                            >         --keep-daily=7 \
-                            >         --keep-weekly=4 \
-                            >         --keep-monthly=6 \
+                            >         --keep=3H \
+                            >         --keep-hourly=1d \
+                            >         --keep-daily=1w \
+                            >         --keep-weekly=1m \
+                            >         --keep-monthly=1y \
+                            >         --keep-yearly=5y \
                             >         --match-archives=id:test \
                             >         --match-archives=user:{username} \
                             >         --match-archives=host:{hostname}
@@ -2011,10 +2025,12 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
-                            >         --keep-daily=7 \
-                            >         --keep-weekly=4 \
-                            >         --keep-monthly=6 \
+                            >         --keep=3H \
+                            >         --keep-hourly=1d \
+                            >         --keep-daily=1w \
+                            >         --keep-weekly=1m \
+                            >         --keep-monthly=1y \
+                            >         --keep-yearly=5y \
                             >         --match-archives=id:test \
                             >         --match-archives=user:{username} \
                             >         --match-archives=host:{hostname}
@@ -2079,8 +2095,8 @@ assimilate:
                         contains regex:
                             > Repository ID: [a-f0-9]+
                             > Location: /{run_dir}/REPO/test
-                            > Repository version: 3
-                            > Encrypted: Yes \(repokey BLAKE2b ChaCha20-Poly1305\)
+                            > Repository version: 4
+                            > Encrypted: Yes \(repokey, chacha20-poly1305, blake3\)
                             > Security directory: /{run_dir}/.local/share/borg/security/[a-f0-9]+
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
@@ -2215,10 +2231,12 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
-                            >         --keep-daily=7 \
-                            >         --keep-weekly=4 \
-                            >         --keep-monthly=6 \
+                            >         --keep=3H \
+                            >         --keep-hourly=1d \
+                            >         --keep-daily=1w \
+                            >         --keep-weekly=1m \
+                            >         --keep-monthly=1y \
+                            >         --keep-yearly=5y \
                             >         --match-archives=id:test \
                             >         --match-archives=user:{username} \
                             >         --match-archives=host:{hostname}
@@ -2357,9 +2375,6 @@ assimilate:
             voter — mount {{{2:
                 run: assimilate mount
                 checks:
-                    stdout:
-                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
-
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -2533,7 +2548,9 @@ assimilate:
                         > composite configs:
                         >     test: test1 test2
                         > default mount point: ~/ASSIMILATE
-                        > encryption: repokey-blake2-chacha20-poly1305
+                        > encryption: chacha20-poly1305
+                        > id hash: blake3
+                        > key location: repokey
                         > compression: zstd,1
                         > passcommand: echo "roadhouse pause govern parry"
                         > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
@@ -2546,12 +2563,10 @@ assimilate:
                         > exclude if present: .nobackup
                         > exclude caches: 'yes
                         >
-                        > keep within: 1d
-                        > keep hourly: 0
+                        > keep: 1d
                         > keep daily: 7
                         > keep weekly: 4
                         > keep monthly: 6
-                        > keep yearly: 0
 
                 ~/.config/assimilate/test1.conf.nt:
                     contents:
@@ -2609,7 +2624,9 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --encryption=repokey-blake2-chacha20-poly1305
+                            >         --encryption=chacha20-poly1305 \
+                            >         --id-hash=blake3 \
+                            >         --key-location=repokey
 
                     ~/.local/share/assimilate/test1.log.nt:
                         contains lines in order:
@@ -2622,7 +2639,9 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --encryption=repokey-blake2-chacha20-poly1305
+                            >         --encryption=chacha20-poly1305 \
+                            >         --id-hash=blake3 \
+                            >         --key-location=repokey
 
                     ~/.local/share/assimilate/test2.log.nt:
                         contains lines in order:
@@ -2689,7 +2708,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
@@ -2740,7 +2759,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
@@ -2796,7 +2815,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
@@ -2843,7 +2862,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
@@ -2984,8 +3003,8 @@ assimilate:
                         contains regex:
                             > Repository ID: [a-f0-9]+
                             > Location: /{run_dir}/REPO/test1
-                            > Repository version: 3
-                            > Encrypted: Yes \(repokey BLAKE2b ChaCha20-Poly1305\)
+                            > Repository version: 4
+                            > Encrypted: Yes \(repokey, chacha20-poly1305, blake3\)
                             > Security directory: /{run_dir}/.local/share/borg/security/[a-f0-9]+
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
@@ -3101,7 +3120,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
@@ -3126,7 +3145,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --keep-daily=7 \
                             >         --keep-weekly=4 \
                             >         --keep-monthly=6 \
@@ -3289,9 +3308,6 @@ assimilate:
             economize — mount {{{2:
                 run: assimilate mount
                 checks:
-                    stdout:
-                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
-
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -4016,9 +4032,6 @@ assimilate:
             outlet — mount ASSIMILATE {{{2:
                 run: assimilate mount /{run_dir}/ASSIMILATE
                 checks:
-                    stdout:
-                        matches regex: Warning: The mounted archive is capable of containing symlinks.*
-
                     stderr:
                         matches regex: mount point is: /{run_dir}/ASSIMILATE
 
@@ -4072,7 +4085,7 @@ assimilate:
                         > check after create: 'all
                         > prune after create: 'yes
                         > compact after delete: 'yes
-                        > keep_within: 1d
+                        > keep: 1d
                         > overdue:
                         >     repositories:
                         >         test:
@@ -4201,7 +4214,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --match-archives=sh:test
                         contains text:
                             > running:
@@ -4215,7 +4228,7 @@ assimilate:
                     stderr:
                         contains lines in order:
                             - Saving files cache
-                            - Saving chunks cache
+                            - Saving index
                             - Saving cache config
 
                     ~/.local/share/assimilate/test.log:
@@ -4242,7 +4255,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --match-archives=sh:test
                         contains text:
                             > running:
@@ -4284,7 +4297,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --match-archives=sh:test
 
                         contains text:
@@ -4568,7 +4581,7 @@ assimilate:
                             >         prune \
                             >         --list \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --match-archives=sh:test
 
                         contains text:
@@ -4589,7 +4602,7 @@ assimilate:
                             >     borg \
                             >         prune \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --keep-within=1d \
+                            >         --keep=1d \
                             >         --match-archives=sh:test
 
                         excludes text:
@@ -5477,7 +5490,7 @@ assimilate:
                         > composite configs:
                         >     test: test1 test2
                         > encryption: none
-                        > keep within: 1d
+                        > keep: 1d
                         >
                         > # user defined placeholders
                         > nutz: peanuts

@@ -64,8 +64,9 @@ from .utilities import (
 
 # Globals {{{1
 hostname = gethostname()
-prune_intervals = """
-    within last minutely hourly daily weekly monthly 3monthly 13weekly yearly
+retention_settings = """
+    keep keep_minutely keep_hourly keep_daily keep_weekly keep_monthly
+    keep_3monthly keep_13weekly keep_yearly
 """.split()
 
 # Utilities {{{1
@@ -1429,8 +1430,7 @@ class DueCommand(Command):
             squeeze_cmd = 'compact'
 
         # disable squeeze check if there are no prune settings
-        prune_settings = [("keep_" + s) for s in prune_intervals]
-        if not any(settings.value(s) for s in prune_settings):
+        if not any(settings.value(s) for s in retention_settings):
             last_run['squeeze'] = None
 
         # Record the name of the oldest config
@@ -2233,12 +2233,11 @@ class PruneCommand(Command):
         fast = cmdline["--fast"]
 
         # checking the settings
-        prune_settings = [("keep_" + s) for s in prune_intervals]
-        if not any(settings.value(s) for s in prune_settings):
-            prune_settings = conjoin(prune_settings, ", or ")
+        if not any(settings.value(s) for s in retention_settings):
+            available = conjoin(retention_settings, ", or ")
             raise Error(
-                "no prune settings available.",
-                codicil = f"At least one of {prune_settings} must be specified.",
+                "no retention settings available.",
+                codicil = f"At least one of {available} must be specified.",
                 wrap = True,
             )
 

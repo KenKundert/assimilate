@@ -43,6 +43,7 @@ from inform import (
     narrate,
     plural,
     render,
+    terminate,
     warn,
 )
 from ntlog import NTlog
@@ -420,7 +421,7 @@ class Assimilate:
                     self.notifier.format(
                         cmd=cmd,
                         msg=msg,
-                        hostname = hostname,
+                        host_name = hostname,
                         user_name = username,
                         prog_name = PROGRAM_NAME,
                     ),
@@ -996,17 +997,20 @@ class Assimilate:
                 try:
                     # check to see if the process is still running
                     lock_contents = nt.load(lockfile, dict)
-                    pid = lock_contents.get('pid')
+                    pid = int(lock_contents.get('pid'))
                     assert pid > 0
                     os.kill(pid, 0)     # does not actually kill the process
                 except ProcessLookupError as e:
                     if e.errno == errno.ESRCH:
                         report = False  # process no longer exists
+                        lockfile.unlink()
                 except Exception as e:
                     log("garbled lock file:", e)
 
                 if report:
-                    raise Error(f"currently running (see {lockfile} for details).")
+                    self.fail(f"currently running (see {lockfile} for details).")
+                    lockfile.unlink()
+                    terminate(2)
 
             # create lockfile
             now = arrow.now()

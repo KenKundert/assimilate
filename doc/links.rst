@@ -3,6 +3,8 @@
 .. _Arrow: https://arrow.readthedocs.io/en/latest/guide.html#supported-tokens
 .. _Avendesora: https://avendesora.readthedocs.io
 .. _BorgBackup: https://borgbackup.readthedocs.io
+.. _Borg prune command usage: https://borgbackup.readthedocs.io/en/stable/usage/prune.html
+.. _Borg repo create command usage: https://borgbackup.readthedocs.io/en/stable/usage/repo-create.html
 .. _BorgBase: https://www.borgbase.com
 .. _BorgMatic: https://torsion.org/borgmatic
 .. _BorgPatterns: https://borgbackup.readthedocs.io/en/master/usage/help.html#borg-help-patterns

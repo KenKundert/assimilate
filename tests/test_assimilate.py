@@ -34,6 +34,7 @@ SCRIPT = dedent("""
 
     export HOME={home_dir}
     export XDG_DATA_HOME={home_dir}/.local/share
+    {path}
     assimilate $*
 """, strip_nl='l')
 TEST_DIR = to_path(__file__).parent
@@ -544,7 +545,9 @@ def file_ops(operations):
 # add_script() {{{2
 def add_script(home_dir):
     path = to_path(home_dir, SCRIPT_NAME)
-    path.write_text(SCRIPT.format(home_dir=home_dir))
+    bin_dir = os.environ.get('BIN_DIR')
+    path_var = f"export PATH={bin_dir}:$PATH" if bin_dir else ""
+    path.write_text(SCRIPT.format(home_dir=home_dir, path=path_var))
     path.chmod(0o755)
 
 # gethostname {{{2
