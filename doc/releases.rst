@@ -11,13 +11,19 @@ earlier versions of *Borg* you should use Emborg_.
     *Assimilate* is designed to work with *Borg Backup v2.0*.  *Borg 2.0* is 
     currently in beta release, so neither *Borg* nor *Assimilate* should be used 
     in a production setting.  *Assimilate* is currently being tested against 
-    *Borg v2.0.0b22*.
+    *Borg v2.0.0b24*.
 
 
 Latest development release
 --------------------------
 | Version: 0.3
 | Released: 2026-08-04
+
+0.4 (2026-09-06)
+----------------
+
+- Support *Borg v2.0.0b24*.
+
 
 0.3 (2026-08-04)
 ----------------

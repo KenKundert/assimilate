@@ -708,25 +708,31 @@ class CompactCommand(Command):
             repo_size = None
             stats = []
             informant = display if Color.isTTY() else None
+            output_all_lines = False
             with ProgressBar(666, width=-1, informant=informant) as progress:
                 initialize = True
                 for line in stream:
-                    match = re.search(rb'\((\d+)/(\d+)\)', line)
+                    line = line.rstrip().decode('utf8')
+                    match = re.search(r'\((\d+)/(\d+)\)', line)
                     if match:
                         if initialize:
                             progress.override_limits(float(match[2]), 0, False)
                             initialize = False
                         progress.draw(float(match[1]))
-
-                    if line.startswith(b'Source data size'):
-                        stats.append(line.decode('utf8'))
-                    if line.startswith(b'Repository size'):
-                        stats.append(line.decode('utf8'))
-                        matched = re.search(rb' (\d+ \wB) ', line)
+                    elif line.startswith('Source data size'):
+                        stats.append(line)
+                    elif line.startswith('Repository size'):
+                        stats.append(line)
+                        matched = re.search(r' (\d+ \wB) ', line)
                         if matched:
-                            repo_size = Quantity(matched[1].decode('utf8'))
-                    if line.startswith(b'Compaction saved'):
-                        stats.append(line.decode('utf8'))
+                            repo_size = Quantity(matched[1])
+                    elif line.startswith('Compaction saved'):
+                        stats.append(line)
+                    else:
+                        if line == 'Error:':
+                            output_all_lines = True
+                        if output_all_lines:
+                            display(line)
 
             return dict(repo_size=repo_size, stats=stats)
 

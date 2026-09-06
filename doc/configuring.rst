@@ -1312,6 +1312,13 @@ Use of *notifier* requires that you have a notification daemon installed (ex:
 provides the *notify-send* command.  If you do not have the *notify-send* 
 command, do not set *notifier*.
 
+MacOS does not provide *notify-send*.  Here is an example of how to configure 
+the *notifier* setting for MacOS:
+
+.. code-block:: nestedtext
+
+    notifier: osascript -e 'tell application "System Events" to display dialog "{config_name}: {msg}" buttons {{"OK"}} default button "OK" with title "{prog_name} error" with icon caution'
+
 The *notify* and *notifier* settings operate independently.  You may specify 
 none, one, or both.  Generally, one uses just one: *notifier* if you primarily 
 use *Assimilate* interactively and *notify* if used from cron or anacron.

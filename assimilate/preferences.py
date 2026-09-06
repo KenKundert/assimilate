@@ -50,7 +50,7 @@ DATE_FILE = "{config_name}.latest.nt"
 INCLUDE_SETTING = "include"
 DEFAULT_ENCODING = "utf-8"
 DEFAULT_COMMAND = "create"
-DEFAULT_ENCRYPTION = "none"
+DEFAULT_ENCRYPTION = "none-blake3"
 DEFAULT_AGE_BAR_WIDTH = 20
 DEFAULT_TIME_FORMAT = 'YYYY-MM-DD h:mm A'
 
@@ -225,7 +225,7 @@ INITIAL_CACHE_CONFIG_FILE_CONTENTS = dedent("""
     # repository
     repository: ~/.cache/backups
     archive: {config_name}-{{now}}
-    encryption: none
+    encryption: none-blake3
 
     patterns:
         # directories to be backed up

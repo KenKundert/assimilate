@@ -112,7 +112,7 @@ assimilate:
                         contains lines in order:
                             > repository: ~/.cache/backups
                             > archive: ⟪config_name⟫-⟪⟪now⟫⟫
-                            > encryption: none
+                            > encryption: none-blake3
                             > patterns:
                             >     - R ~
                             >     - - **/*~
@@ -130,7 +130,7 @@ assimilate:
             create:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
-                        > encryption: none
+                        > encryption: none-blake3
                         > archive: ⟪host_name⟫-⟪⟪now:%y%m%d@%H:%M:%S.%f⟫⟫
                         > repo list default format: long
                         >
@@ -267,7 +267,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --encryption=none
+                            >         --encryption=none-blake3
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -275,7 +275,7 @@ assimilate:
                             -     >     borg \
                             -     >         repo-create \
                             -     >         --repo=/{run_dir}/REPO/test \
-                            -     >         --encryption=none
+                            -     >         --encryption=none-blake3
 
             putter — create {{{2:
                 run: assimilate create
@@ -656,7 +656,7 @@ assimilate:
                             >                   cmd_name: settings
                             >                 config_dir: /{run_dir}/.config/assimilate
                             >                config_name: test
-                            >                 encryption: none
+                            >                 encryption: none-blake3
                             >                   home_dir: /{run_dir}
                             >                  host_name: {hostname}
                             >                    log_dir: /{run_dir}/.local/share/assimilate
@@ -864,7 +864,7 @@ assimilate:
                     contents:
                         > default config: test
                         > default mount point: ~/ASSIMILATE
-                        > encryption: none
+                        > encryption: none-sha256
                         > report_diffs_cmd: diff -r --suppress-common-lines -x '.local'
                         >
                         > prune_after_create: 'yes
@@ -1035,7 +1035,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --encryption=none
+                            >         --encryption=none-sha256
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -1272,7 +1272,7 @@ assimilate:
                             > Repository ID: [a-f0-9]+
                             > Location: /{run_dir}/REPO/test
                             > Repository version: 4
-                            > Encrypted: No
+                            > Encrypted: No \(none-sha256\)
                             > Security directory: /{run_dir}/.local/share/borg/security/[a-f0-9]+
                             > Cache: /{run_dir}/.cache/borg/[a-f0-9]+
 
@@ -3458,7 +3458,7 @@ assimilate:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > default config: test
-                        > encryption: none
+                        > encryption: none-sha256
                         > repo list default format: long
 
                 ~/REPO/:
@@ -3501,7 +3501,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --encryption=none
+                            >         --encryption=none-sha256
 
                     ~/.local/share/assimilate/test.log.nt:
                         contains lines in order:
@@ -4080,7 +4080,7 @@ assimilate:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > default config: test
-                        > encryption: none
+                        > encryption: none-sha256
                         > working dir: ~
                         > check after create: 'all
                         > prune after create: 'yes
@@ -4166,7 +4166,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --encryption=none
+                            >         --encryption=none-sha256
 
 
                     ~/.local/share/assimilate/test.log.nt:
@@ -4686,7 +4686,7 @@ assimilate:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > default config: test
-                        > encryption: none
+                        > encryption: none-sha256
                     mtime: 2024-11-23T00:00:00
 
                 ~/REPO/:
@@ -4728,7 +4728,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --encryption=none
+                            >         --encryption=none-sha256
                         contains text:
                             > running:
                             >     borg \
@@ -4797,7 +4797,7 @@ assimilate:
                             - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}
                             - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config
                             - drwx------ .+ 0 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate
-                            - -rw------- .+ 37 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/shared.conf.nt
+                            - -rw------- .+ 44 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/shared.conf.nt
                             - -rw------- .+ 137 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/\.config/assimilate/test.conf.nt
                             - -rw------- .+ 3999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/a
                             - -rw------- .+ 399999 \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\d\d\d\d[+-]\d\d:\d\d {run_dir}/b
@@ -4866,7 +4866,7 @@ assimilate:
                             >      0B {run_dir}/
                             >      0B {run_dir}/.config/
                             >      0B {run_dir}/.config/assimilate/
-                            >     37B {run_dir}/.config/assimilate/shared.conf.nt
+                            >     44B {run_dir}/.config/assimilate/shared.conf.nt
                             >    137B {run_dir}/.config/assimilate/test.conf.nt
                             > 3.91KiB {run_dir}/a
                             > 39.1KiB {run_dir}/c
@@ -4885,7 +4885,7 @@ assimilate:
                             > 39.1KiB {run_dir}/c
                             > 3.91KiB {run_dir}/a
                             >    137B {run_dir}/.config/assimilate/test.conf.nt
-                            >     37B {run_dir}/.config/assimilate/shared.conf.nt
+                            >     44B {run_dir}/.config/assimilate/shared.conf.nt
                             >      0B {run_dir}/.config/assimilate/
                             >      0B {run_dir}/.config/
                             >      0B {run_dir}/
@@ -4955,7 +4955,7 @@ assimilate:
                             -        0 {run_dir}/
                             -        0 {run_dir}/.config/
                             -        0 {run_dir}/.config/assimilate/
-                            -       37 {run_dir}/.config/assimilate/shared.conf.nt
+                            -       44 {run_dir}/.config/assimilate/shared.conf.nt
                             -      137 {run_dir}/.config/assimilate/test.conf.nt
                             -     3999 {run_dir}/a
                             -   399999 {run_dir}/b
@@ -5019,7 +5019,7 @@ assimilate:
                 ~/.config/assimilate/shared.conf.nt:
                     contents:
                         > default config: test1
-                        > encryption: none
+                        > encryption: none-sha256
                         > repo list default format: long
                     mtime: 2024-11-23T00:00:00
 
@@ -5075,7 +5075,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test \
-                            >         --encryption=none
+                            >         --encryption=none-sha256
 
 
             creel — create (test1) {{{2:
@@ -5321,7 +5321,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test1 \
-                            >         --encryption=none
+                            >         --encryption=none-blake3
 
                     ~/.local/share/assimilate/test2.log:
                         contains text:
@@ -5329,7 +5329,7 @@ assimilate:
                             >     borg \
                             >         repo-create \
                             >         --repo=/{run_dir}/REPO/test2 \
-                            >         --encryption=none
+                            >         --encryption=none-blake3
 
             pharmacy — list {{{2:
                 run: assimilate -ctest list
@@ -5489,7 +5489,7 @@ assimilate:
                         > default config: test
                         > composite configs:
                         >     test: test1 test2
-                        > encryption: none
+                        > encryption: none-sha256
                         > keep: 1d
                         >
                         > # user defined placeholders

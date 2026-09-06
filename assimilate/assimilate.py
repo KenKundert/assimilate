@@ -421,6 +421,7 @@ class Assimilate:
                     self.notifier.format(
                         cmd=cmd,
                         msg=msg,
+                        config_name = self.config_name,
                         host_name = hostname,
                         user_name = username,
                         prog_name = PROGRAM_NAME,
@@ -621,8 +622,8 @@ class Assimilate:
                         wrap=True,
                     )
             else:
-                encryption = self.encryption if self.encryption else "none"
-                if encryption != "none":
+                encryption = self.encryption if self.encryption else DEFAULT_ENCRYPTION
+                if not encryption.startswith('none-'):
                     raise Error("passphrase not specified.")
                 borg_opts.append(f"--encryption={encryption}")
 
@@ -700,9 +701,8 @@ class Assimilate:
             return
 
         if self.encryption is None:
-            self.encryption = "none"
-        if self.encryption == "none" or self.encryption.startswith('authenticated'):
-            comment("Encryption is disabled.")
+            self.encryption = DEFAULT_ENCRYPTION
+        if self.encryption.startswith('none-'):
             return
         raise Error("Cannot determine the encryption passphrase.")
 
@@ -1008,9 +1008,9 @@ class Assimilate:
                     log("garbled lock file:", e)
 
                 if report:
-                    self.fail(f"currently running (see {lockfile} for details).")
-                    lockfile.unlink()
-                    terminate(2)
+                    msg = f"currently running (see {lockfile} for details)."
+                    self.fail(msg)
+                    raise Error(msg)
 
             # create lockfile
             now = arrow.now()
