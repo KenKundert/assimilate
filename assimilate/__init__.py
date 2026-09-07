@@ -1,4 +1,4 @@
-__version__ = "0.3"
-__released__ = "2026-08-04"
+__version__ = "0.4"
+__released__ = "2026-09-07"
 
 from .assimilate import Assimilate, Error as AssimilateError
