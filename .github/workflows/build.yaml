@@ -21,7 +21,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Borg
         run: |
-          wget -q https://github.com/borgbackup/borg/releases/download/2.0.0b23/borg-linux-glibc239-x86_64-gh
+          wget -q https://github.com/borgbackup/borg/releases/download/2.0.0b24/borg-linux-glibc239-x86_64-gh
           chmod +x borg-linux-glibc239-x86_64-gh
           sudo mv borg-linux-glibc239-x86_64-gh /usr/local/bin/borg
           borg --version
