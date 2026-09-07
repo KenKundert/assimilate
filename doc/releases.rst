@@ -19,6 +19,7 @@ Latest development release
 | Version: 0.3
 | Released: 2026-08-04
 
+
 0.4 (2026-09-06)
 ----------------
 
