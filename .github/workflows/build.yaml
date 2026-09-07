@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.9", "3.x"]
+        python-version: ["3.11", "3.x"]
       max-parallel: 6
 
     steps:
@@ -16,17 +16,15 @@ jobs:
         with:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Borg
         run: |
-          sudo apt-get install libacl1-dev libacl1
-          sudo apt-get install libssl-dev
-          sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
-          sudo apt-get install build-essential
-          sudo apt-get install pkg-config python3-pkgconfig
-          sudo apt-get install libfuse3-dev fuse3
+          wget -q https://github.com/borgbackup/borg/releases/download/2.0.0b23/borg-linux-glibc239-x86_64-gh
+          chmod +x borg-linux-glibc239-x86_64-gh
+          sudo mv borg-linux-glibc239-x86_64-gh /usr/local/bin/borg
+          borg --version
       - name: Install packages
         run: |
           python -m pip install --upgrade pip
